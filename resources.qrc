@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/fullmce" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
