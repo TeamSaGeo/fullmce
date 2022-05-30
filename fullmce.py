@@ -185,6 +185,10 @@ class full_mce:
         self.dlg.BT_PREVIOUS.clicked.connect(
             lambda: self.dlg.STACKED_WIDGET.setCurrentIndex(i-1))
 
+    def select_output_file(self):
+        filename, _filter = QFileDialog.getSaveFileName(self.dlg, "Sélectionner le répertoire de sortie","", '*.shp')
+        self.dlg.lineEdit.setText(filename)
+
     def run(self):
         """Run method that performs all the real work"""
 
