@@ -12,6 +12,8 @@ class initialiseAll:
         self.myFont = QFont()
         self.myFont.setBold(False)
 
+        self.pageInd = self.iface.dlg.STACKED_WIDGET.currentIndex()
+
         concepteurpath = os.path.join(
             self.iface.plugin_dir, 'event_tools/concepteur.csv')
         self.concepteurs = []
@@ -23,16 +25,23 @@ class initialiseAll:
 
         # self.concepteurs = pd.read_csv(concepteurpath, sep=';')
 
-    def display_next_page(self, i):
-        self.iface.dlg.STACKED_WIDGET.setCurrentIndex(i)
+    def display_next_page(self):
+        self.pageInd += 1
+        self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
         self.iface.dlg.BT_PREVIOUS.setEnabled(True)
-        self.iface.dlg.BT_PREVIOUS.clicked.connect(
-            lambda: self.iface.dlg.STACKED_WIDGET.setCurrentIndex(i-1))
+        return self.pageInd
 
-    def select_output_file(self):
-        filename, _filter = QFileDialog.getSaveFileName(
-              self.iface.dlg, "Sélectionner le répertoire de sortie", "", '*.shp')
-        self.iface.dlg.LE_OUTPUT_DIR.setText(filename)
+    def display_previous_page(self):
+        self.pageInd -= 1
+        self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
+        if self.pageInd == 0:
+            self.iface.dlg.BT_PREVIOUS.setEnabled(False)
+        return self.pageInd
+
+    def select_output_folder(self):
+        foldername = QFileDialog.getExistingDirectory(
+              self.iface.dlg, "Sélectionner le répertoire de sortie")
+        self.iface.dlg.LE_OUTPUT_DIR.setText(foldername)
         self.iface.dlg.LE_OUTPUT_DIR.setFont(self.myFont)
 
     def display_plugin_info(self):
@@ -78,9 +87,12 @@ class initialiseAll:
         if self.iface.first_start is True:
             self.iface.first_start = False
             # On click on Suivant
-            currentInd = self.iface.dlg.STACKED_WIDGET.currentIndex()
             self.iface.dlg.BT_NEXT.clicked.connect(
-                lambda: self.display_next_page(currentInd+1))
+                lambda: self.display_next_page())
+            #On click on Precedent
+            self.iface.dlg.BT_PREVIOUS.clicked.connect(
+                lambda: self.display_previous_page())
+            #On click on répertoire de sortie
             self.iface.dlg.BT_OUTPUT.clicked.connect(
-                self.select_output_file)
+                self.select_output_folder)
         self.display_plugin_info()

@@ -13,7 +13,7 @@ email=sfamenontsoa@gmail.com
 about=This plugin is a full multicriteria evaluation (MCE) tool for vector data. It allows: - to reclassify constraints to boolean - to normalize factors - to get weight of each factors using a pairwise comparison matrix - to combine constraints and weighted factors using Weighted Linear Combination (WLC)
 
 tracker=http://bugs
-repository=http://repo
+repository=https://github.com/famenontsoa/fullmce_Sarah/
 # End of mandatory metadata
 
 # Recommended items:
@@ -44,4 +44,3 @@ Category of the plugin: Raster, Vector, Database or Web
 
 # If the plugin can run on QGIS Server.
 server=False
-
