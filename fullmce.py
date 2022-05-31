@@ -21,17 +21,16 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication,          Qt  # AddbySarah
-from qgis.PyQt.QtGui import QIcon,                                              QFont  # AddbySarah
-from qgis.PyQt.QtWidgets import QAction,                                        QVBoxLayout, QLabel  # AddbySarah
-import pandas as pd  # AddbySarah
-
+from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction
 
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
 from .fullmce_dialog import full_mceDialog
 import os.path
+from .event_tools import initialiseAll
 
 
 class full_mce:
@@ -61,13 +60,23 @@ class full_mce:
             self.translator.load(locale_path)
             QCoreApplication.installTranslator(self.translator)
 
+        # Create the dialog (after translation) and keep reference
+        self.dlg = full_mceDialog()
+
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Full MCE for Public Health')
 
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
-        self.first_start = None
+        # self.first_start = None
+        # TODO: We are going to let the user set this up in a future iteration
+        self.toolbar = self.iface.addToolBar(u'full_mce')
+        self.toolbar.setObjectName(u'full_mce')
+
+        initialisation = initialiseAll(self)
+        initialisation.initialise_variable_init()
+        #initialisation.testCnx(iface)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -179,71 +188,23 @@ class full_mce:
                 action)
             self.iface.removeToolBarIcon(action)
 
-    def display(self, i):
-        self.dlg.STACKED_WIDGET.setCurrentIndex(i)
-        self.dlg.BT_PREVIOUS.setEnabled(True)
-        self.dlg.BT_PREVIOUS.clicked.connect(
-            lambda: self.dlg.STACKED_WIDGET.setCurrentIndex(i-1))
-
-    def select_output_file(self):
-        filename, _filter = QFileDialog.getSaveFileName(self.dlg, "Sélectionner le répertoire de sortie","", '*.shp')
-        self.dlg.lineEdit.setText(filename)
-
     def run(self):
         """Run method that performs all the real work"""
 
         # Create the dialog with elements (after translation) and keep reference
         # Only create GUI ONCE in callback, so that it will only load when the plugin is started
-        if self.first_start == True:
-            self.first_start = False
-            self.dlg = full_mceDialog()
-            # On click on Suivant
-            currentInd = self.dlg.STACKED_WIDGET.currentIndex()
-            self.dlg.BT_NEXT.clicked.connect(
-                lambda: self.display(currentInd+1))
+        #if self.first_start is True:
+        #    self.first_start = False
 
-        myFont = QFont()
-        myFont.setBold(False)
-
-        # Populate GB_DEVELOPER
-        concepteurpath = os.path.join(self.plugin_dir, 'concepteur.csv')
-        concepteurs = pd.read_csv(concepteurpath, sep=';')
-
-        developper = " ".join(concepteurs.loc[0, ['prenom', 'nom']])
-        labeldevelopper = QLabel(developper)
-        labeldevelopper.setFont(myFont)
-        # create groupbox layout
-        devbox = QVBoxLayout()
-        devbox.addWidget(labeldevelopper)
-        self.dlg.GB_DEVELOPER.setLayout(devbox)
-
-        # Populate GB_CONCEPTEUR
-        conceptbox = QVBoxLayout()
-        for i in concepteurs.index:
-            concepteurtxt = " ".join(concepteurs.loc[i, ['prenom', 'nom']])
-            concepteurtxt += " (" + concepteurs['email'][i]+")"
-            labelconcepteur = QLabel(concepteurtxt)
-            labelconcepteur.setFont(myFont)
-            conceptbox.addWidget(labelconcepteur)
-        self.dlg.GB_CONCEPTEUR.setLayout(conceptbox)
-
-        # Populate TE_INFO
-        self.dlg.TE_INFO.setText("Ce plugin a été spécialement dévéloppé par l'Institut Pasteur de Madagascar dans le cadre d'une étude sur la surveillance constante du paludisme et la détermination des zones prioritaires aux Campagnes d'Aspertion Intra-Domiciliaire (CAID) à Madagascar. Son utilisation est privilégié dans le domaine de la santé publique.")
-        self.dlg.TE_INFO.setFont(myFont)
-
-        # Populate LBL_ROHY
-        self.dlg.LBL_ROHY.setText(
-            "<a href=\"mailto:sfamenontsoa@pasteur.mg\">Suggestions ou Remarques</a>")
-        self.dlg.LBL_ROHY.setTextFormat(Qt.RichText)
-        self.dlg.LBL_ROHY.setTextInteractionFlags(Qt.TextBrowserInteraction)
-        self.dlg.LBL_ROHY.setOpenExternalLinks(True)
+        initialisation = initialiseAll(self)
+        initialisation.initialise_run()
 
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
-        if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            pass
+        #if result:
+        # Do something useful here - delete the line containing pass and
+        # substitute with your code.
+        #    pass

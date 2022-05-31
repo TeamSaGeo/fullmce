@@ -403,53 +403,6 @@
           <string>Répértoire et format de sortie</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_21">
-          <item row="1" column="2">
-           <widget class="QLineEdit" name="LE_OUTPUT_DIR">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2">
-           <widget class="QComboBox" name="CB_OUTPUT_FORMAT">
-            <property name="minimumSize">
-             <size>
-              <width>69</width>
-              <height>22</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>69</width>
-              <height>22</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="QLabel" name="label_6">
-            <property name="font">
-             <font>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Répértoire de sortie</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_7">
-            <property name="font">
-             <font>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Format de sortie</string>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="2">
            <spacer name="verticalSpacer_4">
             <property name="orientation">
@@ -459,19 +412,6 @@
              <size>
               <width>20</width>
               <height>16</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="4" column="1">
-           <spacer name="verticalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>108</height>
              </size>
             </property>
            </spacer>
@@ -499,6 +439,25 @@
             </property>
             <property name="text">
              <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLineEdit" name="LE_OUTPUT_DIR">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="QLabel" name="label_6">
+            <property name="font">
+             <font>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Répértoire de sortie</string>
             </property>
            </widget>
           </item>
