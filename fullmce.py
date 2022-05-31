@@ -178,7 +178,10 @@ class full_mce:
             parent=self.iface.mainWindow())
 
         # will be set False in run()
-        self.first_start = True
+        #self.first_start = True
+        initialisation = initialiseAll(self)
+        initialisation.initialise_initGui()
+        #initialisation.make_hmpn()
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""

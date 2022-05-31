@@ -72,7 +72,7 @@ class initialiseAll:
         return self
 
     def initialise_initGui(self):
-        self.first_start = True
+        self.iface.first_start = True
 
     def initialise_run(self):
         if self.iface.first_start is True:
