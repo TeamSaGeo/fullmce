@@ -33,8 +33,8 @@ class initialiseAll:
                 buttons=QMessageBox.Ok,
                 defaultButton=QMessageBox.Ok,
                 )
-            if button == QMessageBox.Ok:
-                print("OK!")
+        elif self.pageInd == 2 and self.contraintes.contraintes_empty():
+            return self.pageInd
         else:
             self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd + 1)
             self.iface.dlg.BT_PREVIOUS.setEnabled(True)
@@ -96,7 +96,7 @@ class initialiseAll:
         if self.iface.first_start is True:
             self.iface.first_start = False
             # On click on Suivant
-            self.iface.dlg.BT_NEXT.clicked.connect(
+            self.iface.dlg.BT_NEXT.pressed.connect(
                 lambda: self.display_next_page())
             #On click on Precedent
             self.iface.dlg.BT_PREVIOUS.clicked.connect(
@@ -105,4 +105,4 @@ class initialiseAll:
             self.iface.dlg.BT_OUTPUT.clicked.connect(
                 self.select_output_folder)
             self.display_plugin_info()
-            contrainte = contraintes(self.iface, self.myFont)
+            self.contraintes = contraintes(self.iface, self.myFont)
