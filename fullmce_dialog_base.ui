@@ -515,6 +515,9 @@
             <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
             </property>
+            <property name="lineWidth">
+             <number>1</number>
+            </property>
             <property name="horizontalScrollBarPolicy">
              <enum>Qt::ScrollBarAlwaysOff</enum>
             </property>

@@ -1,7 +1,8 @@
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QFont
-from qgis.PyQt.QtWidgets import QVBoxLayout, QLabel, QFileDialog
+from qgis.PyQt.QtWidgets import *
 import os
+from .contraintes import contraintes
 
 
 class initialiseAll:
@@ -23,19 +24,28 @@ class initialiseAll:
                 data = row.rstrip('\n').split(";")
                 self.concepteurs.append(data)
 
-        # self.concepteurs = pd.read_csv(concepteurpath, sep=';')
-
     def display_next_page(self):
-        self.pageInd += 1
-        self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
-        self.iface.dlg.BT_PREVIOUS.setEnabled(True)
+        if self.pageInd == 1 and not self.iface.dlg.LE_OUTPUT_DIR.text():
+            button = QMessageBox.critical(
+                self.iface.dlg,
+                "Erreur ...",
+                "Choisissez un répertoire de sortie!",
+                buttons=QMessageBox.Ok,
+                defaultButton=QMessageBox.Ok,
+                )
+            if button == QMessageBox.Ok:
+                print("OK!")
+        else:
+            self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd + 1)
+            self.iface.dlg.BT_PREVIOUS.setEnabled(True)
+            self.pageInd += 1
         return self.pageInd
 
     def display_previous_page(self):
         self.pageInd -= 1
-        self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
         if self.pageInd == 0:
             self.iface.dlg.BT_PREVIOUS.setEnabled(False)
+        self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
         return self.pageInd
 
     def select_output_folder(self):
@@ -47,7 +57,6 @@ class initialiseAll:
     def display_plugin_info(self):
         # Populate GB_DEVELOPER
         devbox = QVBoxLayout()  # create groupbox layout
-        #developper = " ".join(self.concepteurs.loc[0, ['prenom', 'nom']])
         developper = " ".join(self.concepteurs[0][1::-1])
         labeldevelopper = QLabel(developper)
         labeldevelopper.setFont(self.myFont)
@@ -55,7 +64,7 @@ class initialiseAll:
         self.iface.dlg.GB_DEVELOPER.setLayout(devbox)
 
         # Populate GB_CONCEPTEUR
-        conceptbox = QVBoxLayout()
+        conceptbox = QVBoxLayout()  # create groupbox layout
         for concepteur in self.concepteurs:
             concepteurtxt = " ".join(concepteur[1::-1])
             concepteurtxt += " (" + concepteur[-1] + ")"
@@ -95,4 +104,5 @@ class initialiseAll:
             #On click on répertoire de sortie
             self.iface.dlg.BT_OUTPUT.clicked.connect(
                 self.select_output_folder)
-        self.display_plugin_info()
+            self.display_plugin_info()
+            contrainte = contraintes(self.iface, self.myFont)
