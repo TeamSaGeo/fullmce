@@ -33,12 +33,17 @@ class initialiseAll:
                 buttons=QMessageBox.Ok,
                 defaultButton=QMessageBox.Ok,
                 )
-        elif self.pageInd == 2 and self.contraintes.contraintes_empty():
-            return self.pageInd
-        else:
-            self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd + 1)
+        elif self.pageInd == 2 and self.contraintes.contraintesToReclass()[1]:
+            self.pageInd = 2
+        elif self.pageInd == 2 and self.contraintes.contraintesToReclass()[0] == []:
+            self.pageInd += 3
+            self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
             self.iface.dlg.BT_PREVIOUS.setEnabled(True)
+        else:
             self.pageInd += 1
+            self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
+            self.iface.dlg.BT_PREVIOUS.setEnabled(True)
+
         return self.pageInd
 
     def display_previous_page(self):

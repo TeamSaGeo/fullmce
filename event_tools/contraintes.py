@@ -54,6 +54,8 @@ class contraintes:
                 lambda name=row, row=r: self.set_contrainte_name(name, row))
             toolButton.released.connect(
                 lambda r=r: self.set_contrainte_path(r))
+            checkbox.stateChanged.connect(
+                lambda status=row, row=r: self.set_contrainte_status(status, row))
 
             # Set contrainte name, path, button, checkbox
             self.iface.dlg.TBL_CONTRAINTE.setCellWidget(
@@ -65,13 +67,17 @@ class contraintes:
 
             # Append list of contraintes
             if row >= len(self.listContraintes):
-                contrainte = [contrainte_name.text(), contrainte_path.text()]
+                contrainte = [contrainte_name.text(
+                ), contrainte_path.text(), 0]
                 self.listContraintes.append(contrainte)
             contrainte_name.setText(self.listContraintes[row][0])
             contrainte_path.setText(self.listContraintes[row][1])
 
         self.iface.dlg.TBL_CONTRAINTE.setStyleSheet(
             "QTableWidget::item {border: 0px; padding-top: 5px; padding-bottom: 5px; padding-left: 15px; padding-right: 15px;}")
+
+    def set_contrainte_name(self, name, row):
+        self.listContraintes[row][0] = name
 
     def set_contrainte_path(self, row):
         filename, _filter = QFileDialog.getOpenFileName(
@@ -80,10 +86,11 @@ class contraintes:
         inlineEdit.setText(filename)
         self.listContraintes[row][1] = filename
 
-    def set_contrainte_name(self, name, row):
-        self.listContraintes[row][0] = name
+    def set_contrainte_status(self, status, row):
+        self.listContraintes[row][2] = status
 
-    def contraintes_empty(self):
+    def contraintesToReclass(self):
+        listContraintesToReclass = []
         for i, contrainte in enumerate(self.listContraintes):
             if not contrainte[0] or not contrainte[1]:
                 msg_name = "Entrez un nom pour la contrainte numéro"
@@ -91,9 +98,11 @@ class contraintes:
                 button = QMessageBox.critical(
                     self.iface.dlg,
                     "Erreur ...",
-                    f"{msg_name} {i+1}" if not contrainte[0] else f"{msg_path} {i+1}",
+                    f"{msg_name} {contrainte} {i+1}" if not contrainte[0] else f"{msg_path} {i+1}",
                     buttons=QMessageBox.Ok,
                     defaultButton=QMessageBox.Ok,
                 )
-                return True
-        return False
+                return [], True
+            if contrainte[2] == 0:
+                listContraintesToReclass.append(contrainte)
+        return listContraintesToReclass, False
