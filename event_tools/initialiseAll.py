@@ -35,7 +35,7 @@ class initialiseAll:
                 )
         elif self.pageInd == 2 and self.contraintes.contraintes_empty():
             self.pageInd = 2
-        elif self.pageInd == 2 and self.contraintes.listContraintesToReclass == []:
+        elif self.pageInd == 2 and self.contraintes.listContraintesNotReady == []:
             self.pageInd += 3
             self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
             self.iface.dlg.BT_PREVIOUS.setEnabled(True)
@@ -51,7 +51,7 @@ class initialiseAll:
         if self.pageInd == 0:
             self.iface.dlg.BT_PREVIOUS.setEnabled(False)
         if self.pageInd == 4:
-            if self.contraintes.listContraintesToReclass == []:
+            if self.contraintes.listContraintesNotReady == []:
                 self.pageInd = 2
             else:
                 self.pageInd = 3

@@ -20,7 +20,7 @@ class contraintes:
 
         # Initialize list of contraintes
         self.listContraintes = []
-        self.listContraintesToReclass = []
+        self.listContraintesNotReady = []
 
         # Listen to spinbox contraintes
         self.iface.dlg.SB_NB_CONTRAINTE.valueChanged.connect(
@@ -92,10 +92,13 @@ class contraintes:
         self.listContraintes[row][2] = status
 
     def contraintes_empty(self):
-        self.listContraintesToReclass = self.listContraintes.copy()
+        self.listContraintesNotReady = self.listContraintes.copy()
+        self.iface.dlg.LV_CONTRAINTE_NOT_READY.clear()
         for i, contrainte in enumerate(self.listContraintes):
             if contrainte[2] == 2:
-                self.listContraintesToReclass.remove(contrainte)
+                self.listContraintesNotReady.remove(contrainte)
+            else:
+                self.iface.dlg.LV_CONTRAINTE_NOT_READY.addItem(contrainte[0])
             if not contrainte[0] or not contrainte[1]:
                 msg_name = "Entrez un nom pour la contrainte numéro"
                 msg_path = "Sélectionner une image pour la contrainte numéro"
