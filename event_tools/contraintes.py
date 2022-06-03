@@ -20,6 +20,7 @@ class contraintes:
 
         # Initialize list of contraintes
         self.listContraintes = []
+        self.listContraintesToReclass = []
 
         # Listen to spinbox contraintes
         self.iface.dlg.SB_NB_CONTRAINTE.valueChanged.connect(
@@ -67,11 +68,12 @@ class contraintes:
 
             # Append list of contraintes
             if row >= len(self.listContraintes):
-                contrainte = [contrainte_name.text(
-                ), contrainte_path.text(), 0]
+                contrainte = [
+                    contrainte_name.text(), contrainte_path.text(), 0]
                 self.listContraintes.append(contrainte)
             contrainte_name.setText(self.listContraintes[row][0])
             contrainte_path.setText(self.listContraintes[row][1])
+            checkbox.setCheckState(self.listContraintes[row][2])
 
         self.iface.dlg.TBL_CONTRAINTE.setStyleSheet(
             "QTableWidget::item {border: 0px; padding-top: 5px; padding-bottom: 5px; padding-left: 15px; padding-right: 15px;}")
@@ -89,20 +91,20 @@ class contraintes:
     def set_contrainte_status(self, status, row):
         self.listContraintes[row][2] = status
 
-    def contraintesToReclass(self):
-        listContraintesToReclass = []
+    def contraintes_empty(self):
+        self.listContraintesToReclass = self.listContraintes.copy()
         for i, contrainte in enumerate(self.listContraintes):
+            if contrainte[2] == 2:
+                self.listContraintesToReclass.remove(contrainte)
             if not contrainte[0] or not contrainte[1]:
                 msg_name = "Entrez un nom pour la contrainte numéro"
                 msg_path = "Sélectionner une image pour la contrainte numéro"
                 button = QMessageBox.critical(
                     self.iface.dlg,
                     "Erreur ...",
-                    f"{msg_name} {contrainte} {i+1}" if not contrainte[0] else f"{msg_path} {i+1}",
+                    f"{msg_name} {i+1}" if not contrainte[0] else f"{msg_path} {i+1}",
                     buttons=QMessageBox.Ok,
                     defaultButton=QMessageBox.Ok,
                 )
-                return [], True
-            if contrainte[2] == 0:
-                listContraintesToReclass.append(contrainte)
-        return listContraintesToReclass, False
+                return True
+        return False

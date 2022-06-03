@@ -33,9 +33,9 @@ class initialiseAll:
                 buttons=QMessageBox.Ok,
                 defaultButton=QMessageBox.Ok,
                 )
-        elif self.pageInd == 2 and self.contraintes.contraintesToReclass()[1]:
+        elif self.pageInd == 2 and self.contraintes.contraintes_empty():
             self.pageInd = 2
-        elif self.pageInd == 2 and self.contraintes.contraintesToReclass()[0] == []:
+        elif self.pageInd == 2 and self.contraintes.listContraintesToReclass == []:
             self.pageInd += 3
             self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
             self.iface.dlg.BT_PREVIOUS.setEnabled(True)
@@ -50,6 +50,11 @@ class initialiseAll:
         self.pageInd -= 1
         if self.pageInd == 0:
             self.iface.dlg.BT_PREVIOUS.setEnabled(False)
+        if self.pageInd == 4:
+            if self.contraintes.listContraintesToReclass == []:
+                self.pageInd = 2
+            else:
+                self.pageInd = 3
         self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
         return self.pageInd
 
