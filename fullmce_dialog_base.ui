@@ -413,7 +413,7 @@
           <string>Répértoire de sortie</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_21">
-          <item row="2" column="2">
+          <item row="2" column="3">
            <spacer name="verticalSpacer_4">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -426,7 +426,7 @@
             </property>
            </spacer>
           </item>
-          <item row="0" column="3">
+          <item row="0" column="4">
            <spacer name="verticalSpacer_3">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -439,7 +439,7 @@
             </property>
            </spacer>
           </item>
-          <item row="1" column="4">
+          <item row="1" column="5">
            <widget class="QToolButton" name="BT_OUTPUT">
             <property name="minimumSize">
              <size>
@@ -452,10 +452,19 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="2">
+          <item row="1" column="3">
            <widget class="QLineEdit" name="LE_OUTPUT_DIR">
             <property name="enabled">
              <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>650</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: black;</string>
             </property>
            </widget>
           </item>
@@ -471,6 +480,19 @@
              <string>Répertoire de sortie</string>
             </property>
            </widget>
+          </item>
+          <item row="1" column="2">
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>

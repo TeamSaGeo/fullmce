@@ -19,6 +19,12 @@ class Contrainte:
     def setready(self, ready):
         self.ready = ready
 
+    def setvlayer(self,vlayer):
+        self.vlayer = vlayer
+
+    def setreclass_output(self,output_path):
+        self.reclass_output = output_path
+
     def source_path_isvalid(self, filename):
         vlayer = QgsVectorLayer(filename,self.name, "ogr")
         if not vlayer.isValid():
@@ -31,11 +37,9 @@ class Contrainte:
     def setfield(self, name, type):
         self.field_name = name
         self.field_type = type
-
-    def set_reclass_output(self,vlayer,output_path):
-        self.vlayer = vlayer
-        self.output_path = output_path
+        self.field_idx = self.vlayer.fields().indexOf(name)
+        self.field_values = list(filter(None,self.vlayer.uniqueValues(self.field_idx,-1)))
 
     def __getattr__(self, item):
         # return super(Contrainte, self).__setattr__(item, 'orphan')
-        return 'Contrainte does not have `{}` attribute.'.format(str(name))
+        return 'Contrainte does not have `{}` attribute.'.format(str(item))
