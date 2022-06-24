@@ -255,6 +255,7 @@ class initialiseAll:
             contrainte_status = "PRÊTE" if contrainte.ready else "NON PRÊTE"
             log += f"{contrainte.name}\t\t{contrainte.source_path}\t\t{contrainte_status}\n"
 
+        log += "\n\n"
         self.log_path = os.path.join(output_dir,"param_log.txt")
         with open(self.log_path,"w") as f:
             f.write(log)
@@ -405,7 +406,7 @@ class initialiseAll:
             self.iface.dlg.BT_ADD_ROW_CONTRAINTE.setEnabled(True)
 
     def reclassification(self):
-        log = "\n\nParamètres de reclassification: \n"
+        log = "Paramètres de reclassification: \n"
         for i,contrainte in enumerate(self.listContraintesNotReady):
             # Get field name et field type
             tab = self.iface.dlg.STACKED_WIDGET_RECLASS.widget(i)
@@ -424,7 +425,7 @@ class initialiseAll:
             field_type = tab.cellWidget(0,1).text()
             vlayer = contrainte.vlayer
             field_idx = vlayer.fields().indexOf(field_name)
-            log += f"{i}) Contrainte \"{contrainte.name}\":\nChamp {contrainte.field_name}\tType {contrainte.field_type}\t"
+            log += f"{i+1}) Contrainte \"{contrainte.name}\": Champ {contrainte.field_name} (Type {contrainte.field_type})\n"
 
             row = -1
             col = -1
@@ -438,18 +439,9 @@ class initialiseAll:
 
             if row == -1 and col == -1:
                 contrainte.setvlayer(vlayer)
-                for r in range(tab.rowCount()):
-                    log += f"\t\t{tab.cellWidget(r,2).text()}"
-                    if field_type == "String":
-                        log += f"\t\t{tab.cellWidget(r,3).currentText()}"
-                    else:
-                        start_inclus = "[" if tab.cellWidget(r,4).isChecked() else "]"
-                        end_inclus = "]" if tab.cellWidget(r,6).isChecked() else "["
-                        log += f"\t\t{start_inclus}{tab.cellWidget(r,3).text()} , {tab.cellWidget(r,5).text(){end_inclus}}"
-                    log += "\n\t\t\t"
-                log +="\n\n"
+                log = self.write_reclassification_log(log, tab, field_type)
             else:
-                error_msg = "en entier (ou réelle)" if col == 2 else "Initiale/Début" if col == 3 else "Finale"
+                error_msg = "en entier (ou réelle)" if col == 2 else "Initiale/Début" if col == 3 else "Finale (supérieure à la valeur Début)"
                 button = QMessageBox.critical(
                     self.iface.dlg,
                     "Erreur ...",
@@ -473,9 +465,35 @@ class initialiseAll:
             return False
 
         # Write into log file
-        with open(self.log_path, "a") as f:
-            f.write(log)
+        self.save_reclassification_log_into_file(log)
         return True
+
+    def write_reclassification_log(self, log, tab, field_type):
+        for r in range(tab.rowCount()):
+            log += f"\t{tab.cellWidget(r,2).text()}"
+            if field_type == "String":
+                log += f"\t\t{tab.cellWidget(r,3).currentText()}\n"
+            else:
+                start_inclus = "[" if tab.cellWidget(r,4).isChecked() else "]"
+                end_inclus = "]" if tab.cellWidget(r,6).isChecked() else "["
+
+                log += f"\t\t{start_inclus} {tab.cellWidget(r,3).text()} , {tab.cellWidget(r,5).text()} {end_inclus}\n"
+        log +="\n"
+        return log
+
+    def save_reclassification_log_into_file(self,log):
+        with open(self.log_path, "r") as input:
+            with open(self.log_path + ".temp", "a") as output:
+                # iterate all lines from file
+                for line in input:
+                    if not line.strip("\n").startswith('Paramètres'):
+                        # if line starts with substring 'Paramètres' then don't write it in temp file
+                        output.write(line)
+                    else:
+                        break
+                output.write(log)
+        # replace file with original name
+        os.replace(self.log_path + ".temp", self.log_path)
 
     def save_reclassified_layer_to_image(self):
         options = QgsVectorFileWriter.SaveVectorOptions()
@@ -518,7 +536,7 @@ class initialiseAll:
             # Get new value
             if value == start_value:
                 try:
-                    new_value = "{:.2f}".format(float(tab.cellWidget(row,2).text()))
+                    new_value = float(tab.cellWidget(row,2).text())
                 except ValueError:
                     return vlayer,row,2
 
@@ -549,11 +567,14 @@ class initialiseAll:
             except ValueError:
                 return vlayer,row,5
 
+            if start_value >= end_value:
+                return vlayer,row,5
+
             start_value_inclued = tab.cellWidget(0,4).isChecked()
             end_value_inclued = tab.cellWidget(0,6).isChecked()
 
             # Start condition
-            while self.get_false_values_condition(value,start_value,start_value_inclued,end_value,end_value_inclued) and row < (tab.rowCount() - 1):
+            while self.attribute_is_outof_range(value,start_value,start_value_inclued,end_value,end_value_inclued) and row < (tab.rowCount() - 1):
                 row += 1
                 try:
                     start_value = float(tab.cellWidget(row,3).text())
@@ -569,9 +590,9 @@ class initialiseAll:
                 end_value_inclued = tab.cellWidget(row,6).isChecked()
 
             # Get new value
-            if self.get_true_values_condition(value,end_value,end_value_inclued):
+            if self.attribute_is_in_range(value,end_value,end_value_inclued):
                 try:
-                    new_value = "{:.2f}".format(float(tab.cellWidget(row,2).text()))
+                    new_value = float(tab.cellWidget(row,2).text())
                 except ValueError:
                     return vlayer,row,2
 
@@ -605,11 +626,14 @@ class initialiseAll:
             except ValueError:
                 return vlayer,row,5
 
+            if start_value >= end_value:
+                return vlayer,row,5
+
             start_value_inclued = tab.cellWidget(0,4).isChecked()
             end_value_inclued = tab.cellWidget(0,6).isChecked()
 
             # Start condition
-            while self.get_false_values_condition(value,start_value,start_value_inclued,end_value,end_value_inclued) and row < (tab.rowCount() - 1):
+            while self.attribute_is_outof_range(value,start_value,start_value_inclued,end_value,end_value_inclued) and row < (tab.rowCount() - 1):
                 row += 1
                 try:
                     start_value = datetime.strptime(tab.cellWidget(row,3).text(),'%y-%m-%d')
@@ -625,30 +649,30 @@ class initialiseAll:
                 end_value_inclued = tab.cellWidget(row,6).isChecked()
 
             # Get new value
-            if self.get_true_values_condition(value,end_value,end_value_inclued):
+            if self.attribute_is_in_range(value,end_value,end_value_inclued):
                 try:
-                    new_value = "{:.2f}".format(float(tab.cellWidget(row,2).text()))
+                    new_value = float(tab.cellWidget(row,2).text())
                 except ValueError:
                     return vlayer,row,2
 
             vlayer.changeAttributeValue(feat.id(),new_field_idx, new_value)
         return vlayer,-1,-1
 
-    def get_false_values_condition(self,value,start_value,start_value_inclued,end_value,end_value_inclued):
-        condition_false = False
+    def attribute_is_outof_range(self,value,start_value,start_value_inclued,end_value,end_value_inclued):
+        out_of_range = False
 
         if start_value_inclued and not end_value_inclued:
-            condition_false = value < start_value or value >= end_value
+            out_of_range = value < start_value or value >= end_value
         elif start_value_inclued and end_value_inclued:
-            condition_false = value < start_value or value > end_value
+            out_of_range = value < start_value or value > end_value
         elif not start_value_inclued and end_value_inclued:
-            condition_false = value <= start_value or value > end_value
+            out_of_range = value <= start_value or value > end_value
         elif not start_value_inclued and not end_value_inclued:
-            condition_false = value <= start_value or value >= end_value
+            out_of_range = value <= start_value or value >= end_value
 
-        return condition_false
+        return out_of_range
 
-    def get_true_values_condition(self,value,end_value,end_value_inclued):
+    def attribute_is_in_range(self,value,end_value,end_value_inclued):
         if end_value_inclued:
             return (value <= end_value)
         else:
@@ -658,16 +682,16 @@ class initialiseAll:
         vlayer = contrainte.vlayer
         # Create new field
         vlayer_provider = vlayer.dataProvider()
-        new_field_name = contrainte.field_name + "Bl"
+        new_field_name = contrainte.field_name[:-2] + "Bl"
         new_field_idx = vlayer.fields().indexOf(new_field_name)
         if new_field_idx == -1:
-            vlayer_provider.addAttributes([QgsField(new_field_name,QVariant.Double)])
+            vlayer_provider.addAttributes([QgsField(new_field_name,QVariant.Double,"double",10,2)])
             vlayer.updateFields()
             new_field_idx = vlayer.fields().indexOf(new_field_name)
         return new_field_idx
 
     def delete_new_field(self,contrainte):
-        new_field_idx = contrainte.vlayer.fields().indexOf(contrainte.field_name + "Bl")
+        new_field_idx = contrainte.vlayer.fields().indexOf(contrainte.field_name[:-2] + "Bl")
         contrainte.vlayer.dataProvider().deleteAttributes([new_field_idx])
         contrainte.vlayer.updateFields()
 
