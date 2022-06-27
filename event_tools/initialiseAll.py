@@ -1,4 +1,4 @@
-from qgis.PyQt.QtCore import Qt, QVariant
+from qgis.PyQt.QtCore import Qt, QVariant, QCoreApplication
 from qgis.PyQt.QtGui import QFont
 from qgis.PyQt.QtWidgets import *
 from .contrainte import Contrainte
@@ -50,8 +50,9 @@ class initialiseAll:
             self.iface.dlg.GB_CONCEPTEUR.setLayout(conceptbox)
 
         # Populate TE_INFO
+        _translate = QCoreApplication.translate
         self.iface.dlg.TE_INFO.setText(
-            "Ce plugin a été spécialement dévéloppé par l'Institut Pasteur de Madagascar dans le cadre d'une étude sur la surveillance constante du paludisme et la détermination des zones prioritaires aux Campagnes d'Aspertion Intra-Domiciliaire (CAID) à Madagascar. Son utilisation est privilégié dans le domaine de la santé publique.")
+            _translate("full_mce","Ce plugin a été spécialement dévéloppé par l'Institut Pasteur de Madagascar dans le cadre d'une étude sur la surveillance constante du paludisme et la détermination des zones prioritaires aux Campagnes d'Aspertion Intra-Domiciliaire (CAID) à Madagascar. Son utilisation est privilégié dans le domaine de la santé publique."))
         self.iface.dlg.TE_INFO.setFont(self.myFont)
 
         # Populate LBL_ROHY
@@ -146,6 +147,7 @@ class initialiseAll:
             if self.listContraintesNotReady == []:
                 self.pageInd = 2
             else:
+                self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.clear()
                 self.pageInd = 3
         self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
         return self.pageInd
@@ -256,7 +258,7 @@ class initialiseAll:
             log += f"{contrainte.name}\t\t{contrainte.source_path}\t\t{contrainte_status}\n"
 
         log += "\n\n"
-        self.log_path = os.path.join(output_dir,"param_log.txt")
+        self.log_path = os.path.join(output_dir,"full_mce_log.txt")
         with open(self.log_path,"w") as f:
             f.write(log)
 
@@ -472,12 +474,12 @@ class initialiseAll:
         for r in range(tab.rowCount()):
             log += f"\t{tab.cellWidget(r,2).text()}"
             if field_type == "String":
-                log += f"\t\t{tab.cellWidget(r,3).currentText()}\n"
+                log += f"\t{tab.cellWidget(r,3).currentText()}\n"
             else:
                 start_inclus = "[" if tab.cellWidget(r,4).isChecked() else "]"
                 end_inclus = "]" if tab.cellWidget(r,6).isChecked() else "["
 
-                log += f"\t\t{start_inclus} {tab.cellWidget(r,3).text()} , {tab.cellWidget(r,5).text()} {end_inclus}\n"
+                log += f"\t{start_inclus} {tab.cellWidget(r,3).text()} , {tab.cellWidget(r,5).text()} {end_inclus}\n"
         log +="\n"
         return log
 
