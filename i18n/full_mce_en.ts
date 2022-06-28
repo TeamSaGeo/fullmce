@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US">
+<TS version="2.1" language="en_US" sourcelanguage="fr_FR">
 <context>
     <name>IzarDialogBase</name>
     <message>
@@ -85,7 +85,7 @@
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="386"/>
-        <source>A propos</source>
+        <source>À propos</source>
         <translation>About</translation>
     </message>
     <message>
@@ -130,7 +130,7 @@
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="662"/>
-        <source>Liste des contraintes à  reclassifier</source>
+        <source>Liste des contraintes à  reclassifier</source>
         <translation>List of objects to classify</translation>
     </message>
     <message>
@@ -221,10 +221,159 @@
         <source>&amp;Analyse Multicritère pour la santé publique</source>
         <translation>&amp;Full MCE for Public Health</translation>
     </message>
+</context>
+<context>
+    <name>initialisation</name>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="54"/>
-        <source>Ce plugin a été spécialement dévéloppé par l&apos;Institut Pasteur de Madagascar dans le cadre d&apos;une étude sur la surveillance constante du paludisme et la détermination des zones prioritaires aux Campagnes d&apos;Aspertion Intra-Domiciliaire (CAID) à  Madagascar. Son utilisation est privilégié dans le domaine de la santé publique.</source>
-        <translation>This plugin was specially developed by the Institute Pasteur of Madagascar as part of a study on the constant monitoring of malaria and the determination of priority areas for Intra-Domiciliary Spraying Campaigns (CAID) in Madagascar. Its use is privileged in the field of public health.</translation>
+        <location filename="../event_tools/initialiseAll.py" line="55"/>
+        <source>Ce plugin a été spécialement dévéloppé par l&apos;Institut Pasteur de Madagascar dans le cadre d&apos;une étude sur la surveillance constante du paludisme et la détermination des zones prioritaires aux Campagnes d&apos;Aspertion Intra-Domiciliaire (CAID) à Madagascar. Son utilisation est privilégié dans le domaine de la santé publique.</source>
+        <translation>This plugin was specially developed by the Institute Pasteur of Madagascar as part of a study on the constant monitoring of malaria and the determination of priority areas for Intra-Domiciliary Spraying Campaigns (CAID) in Madagascar. Its use is favored in the field of public health.</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="60"/>
+        <source>Suggestions ou Remarques</source>
+        <translation>Suggestions or Comments</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="68"/>
+        <source>Noms</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="69"/>
+        <source>Chemins</source>
+        <translation>Path</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="70"/>
+        <source>Prêts</source>
+        <translation>Ready</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="105"/>
+        <source>Champ</source>
+        <translation>Field</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="106"/>
+        <source>Type</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="107"/>
+        <source>Valeur</source>
+        <translation>Value</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="357"/>
+        <source>Valeur Initiale</source>
+        <translation>Initial value</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="124"/>
+        <source>Sélectionner le répertoire de sortie</source>
+        <translation>Select the output folder</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="455"/>
+        <source>Erreur ...</source>
+        <translation>Error ...</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="131"/>
+        <source>Choisissez un répertoire de sortie!</source>
+        <translation>Choose an output folder</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="217"/>
+        <source>Choisir un vecteur</source>
+        <translation>Choose a vector image</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="224"/>
+        <source>Choisissez un fichier valide!</source>
+        <translation>Choose a valid file!</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="254"/>
+        <source>Saisir un nom pour la contrainte numéro</source>
+        <translation>Input a name for the object number</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="255"/>
+        <source>Sélectionner une image pour la contrainte numéro</source>
+        <translation>Choose a vector for the contraint number</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="265"/>
+        <source>PRÊTE</source>
+        <translation>READY</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="265"/>
+        <source>NON PRÊTE</source>
+        <translation>NOT READY</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="369"/>
+        <source>Début</source>
+        <translation>Start</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="381"/>
+        <source>Inclus</source>
+        <translation>Inclued</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="377"/>
+        <source>Fin</source>
+        <translation>End</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="419"/>
+        <source>Paramètres de reclassification:
+</source>
+        <translation>Classification parameters:
+</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="454"/>
+        <source>en entier (ou réelle)</source>
+        <translation>in integer (or real)</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="454"/>
+        <source>Initiale/Début</source>
+        <translation>Initial/Start</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="454"/>
+        <source>Finale (supérieure à la valeur Début)</source>
+        <translation>End (greater than start value)</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="466"/>
+        <source>Question ...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="466"/>
+        <source>Voulez-vous tout de suite effectuer le traitement des contraintes ?</source>
+        <translation>Do you want to proceed to classification right now?</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="499"/>
+        <source>Paramètres</source>
+        <translation>Classification</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="519"/>
+        <source>Reclassification des contraintes terminés avec succès !
+
+#######################################################</source>
+        <translation>Contraints classification succesfully completed !
+
+#######################################################</translation>
     </message>
 </context>
 </TS>

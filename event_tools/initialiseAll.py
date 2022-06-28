@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from qgis.PyQt.QtCore import Qt, QVariant, QCoreApplication
 from qgis.PyQt.QtGui import QFont
 from qgis.PyQt.QtWidgets import *
@@ -50,21 +52,23 @@ class initialiseAll:
             self.iface.dlg.GB_CONCEPTEUR.setLayout(conceptbox)
 
         # Populate TE_INFO
-        _translate = QCoreApplication.translate
-        self.iface.dlg.TE_INFO.setText(
-            _translate("full_mce","Ce plugin a été spécialement dévéloppé par l'Institut Pasteur de Madagascar dans le cadre d'une étude sur la surveillance constante du paludisme et la détermination des zones prioritaires aux Campagnes d'Aspertion Intra-Domiciliaire (CAID) à Madagascar. Son utilisation est privilégié dans le domaine de la santé publique."))
+        text = QCoreApplication.translate("initialisation","Ce plugin a été spécialement dévéloppé par l'Institut Pasteur de Madagascar dans le cadre d'une étude sur la surveillance constante du paludisme et la détermination des zones prioritaires aux Campagnes d'Aspertion Intra-Domiciliaire (CAID) à Madagascar. Son utilisation est privilégié dans le domaine de la santé publique.")
+        self.iface.dlg.TE_INFO.setText(text)
         self.iface.dlg.TE_INFO.setFont(self.myFont)
 
         # Populate LBL_ROHY
         self.iface.dlg.LBL_ROHY.setText(
-              "<a href=\"mailto:sfamenontsoa@pasteur.mg\">Suggestions ou Remarques</a>")
+              "<a href=\"mailto:sfamenontsoa@pasteur.mg\">" + QCoreApplication.translate("initialisation","Suggestions ou Remarques") + "</a>")
         self.iface.dlg.LBL_ROHY.setTextFormat(Qt.RichText)
         self.iface.dlg.LBL_ROHY.setTextInteractionFlags(
             Qt.TextBrowserInteraction)
         self.iface.dlg.LBL_ROHY.setOpenExternalLinks(True)
 
     def display_page3(self):
-        columns = ["Noms", "Chemins", "", "Prêts"]
+        name = QCoreApplication.translate("initialisation","Noms")
+        path = QCoreApplication.translate("initialisation","Chemins")
+        ready = QCoreApplication.translate("initialisation","Prêts")
+        columns = [name, path, "", ready]
         self.iface.dlg.TBL_CONTRAINTE.setColumnCount(len(columns))
         self.iface.dlg.TBL_CONTRAINTE.setHorizontalHeaderLabels(columns)
         # Table will fit the screen horizontally
@@ -98,7 +102,11 @@ class initialiseAll:
         tab = QTableWidget()
 
         # Column count
-        columns = ["Champ","Type", "Valeur", "Valeur initiale"]
+        field = QCoreApplication.translate("initialisation","Champ")
+        type = QCoreApplication.translate("initialisation","Type")
+        value = QCoreApplication.translate("initialisation","Valeur")
+        init_value = QCoreApplication.translate("initialisation","Valeur Initiale")
+        columns = [field,type, value, init_value]
         tab.setColumnCount(len(columns))
         tab.setHorizontalHeaderLabels(columns)
         tab.verticalHeader().setVisible(False)
@@ -114,7 +122,7 @@ class initialiseAll:
 
     def select_output_dir(self):
         foldername = QFileDialog.getExistingDirectory(
-            self.iface.dlg, "Sélectionner le répertoire de sortie")
+            self.iface.dlg, QCoreApplication.translate("initialisation","Sélectionner le répertoire de sortie"))
         self.iface.dlg.LE_OUTPUT_DIR.setText(foldername)
         self.iface.dlg.LE_OUTPUT_DIR.setFont(self.myFont)
 
@@ -122,8 +130,8 @@ class initialiseAll:
         if self.pageInd == 1 and not self.iface.dlg.LE_OUTPUT_DIR.text():
             button = QMessageBox.critical(
                 self.iface.dlg,
-                "Erreur ...",
-                "Choisissez un répertoire de sortie!",
+                QCoreApplication.translate("initialisation","Erreur ..."),
+                QCoreApplication.translate("initialisation","Choisissez un répertoire de sortie!"),
                 buttons=QMessageBox.Ok,
                 defaultButton=QMessageBox.Ok,
                 )
@@ -207,7 +215,7 @@ class initialiseAll:
 
     def select_contrainte_source_path(self, row):
         filename, _filter = QFileDialog.getOpenFileName(
-            self.iface.dlg.TBL_CONTRAINTE, "Choisir une image", "", "*.shp")
+            self.iface.dlg.TBL_CONTRAINTE, QCoreApplication.translate("initialisation","Choisir un vecteur"), "", "*.shp")
         contrainte = self.listContraintes[row]
         if contrainte.source_path_isvalid(filename):
             inlineEdit = self.iface.dlg.TBL_CONTRAINTE.cellWidget(row, 1)
@@ -215,8 +223,8 @@ class initialiseAll:
         else:
             button = QMessageBox.critical(
                 self.iface.dlg,
-                "Erreur ...",
-                "Choisissez un fichier valide!",
+                QCoreApplication.translate("initialisation","Erreur ..."),
+                QCoreApplication.translate("initialisation","Choisissez un fichier valide!"),
                 buttons=QMessageBox.Ok,
                 defaultButton=QMessageBox.Ok,
                 )
@@ -233,7 +241,7 @@ class initialiseAll:
         # Start writing log
         now = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
         output_dir = self.iface.dlg.LE_OUTPUT_DIR.text()
-        log = f"Traitement initié le {now}\n\nRépértoire de sortie: {output_dir}\nFormat de sortie: SHP\n\nCONTRAINTES\nNombre de contraintes: {len(self.listContraintes)}\n"
+        log = QCoreApplication.translate("initialisation",f"Traitement initié le {now}\n\nRépértoire de sortie: {output_dir}\nFormat de sortie: SHP\n\nCONTRAINTES\nNombre de contraintes: {len(self.listContraintes)}\n")
 
         for i,contrainte in enumerate(self.listContraintes):
             tab = self.iface.dlg.STACKED_WIDGET_RECLASS.widget(i)
@@ -243,18 +251,18 @@ class initialiseAll:
                 # Initialize reclassification table
                 self.display_page4(i,contrainte)
             if not contrainte.name or not contrainte.source_path:
-                msg_name = "Saisir un nom pour la contrainte numéro"
-                msg_path = "Sélectionner une image pour la contrainte numéro"
+                msg_name = QCoreApplication.translate("initialisation","Saisir un nom pour la contrainte numéro")
+                msg_path = QCoreApplication.translate("initialisation","Sélectionner une image pour la contrainte numéro")
                 error_msg = msg_name if not contrainte.name else msg_path
                 button = QMessageBox.critical(
                     self.iface.dlg,
-                    "Erreur ...",
+                    QCoreApplication.translate("initialisation","Erreur ..."),
                     f"{error_msg} {i+1}",
                     buttons=QMessageBox.Ok,
                     defaultButton=QMessageBox.Ok,
                 )
                 return True
-            contrainte_status = "PRÊTE" if contrainte.ready else "NON PRÊTE"
+            contrainte_status = QCoreApplication.translate("initialisation","PRÊTE") if contrainte.ready else QCoreApplication.translate("initialisation","NON PRÊTE")
             log += f"{contrainte.name}\t\t{contrainte.source_path}\t\t{contrainte_status}\n"
 
         log += "\n\n"
@@ -346,7 +354,7 @@ class initialiseAll:
         if field_type == "String":
             tab.setColumnCount(4)
             header3 = QTableWidgetItem()
-            header3.setText("Valeur Initiale")
+            header3.setText(QCoreApplication.translate("initialisation","Valeur Initiale"))
             tab.setHorizontalHeaderItem(3,header3)
 
             # Set Input field of column 4
@@ -358,19 +366,19 @@ class initialiseAll:
             tab.setColumnCount(7)
 
             header3 = QTableWidgetItem()
-            header3.setText("Début")
+            header3.setText(QCoreApplication.translate("initialisation","Début"))
             tab.setHorizontalHeaderItem(3,header3)
 
             header4 = QTableWidgetItem()
-            header4.setText("Inclus")
+            header4.setText(QCoreApplication.translate("initialisation","Inclus"))
             tab.setHorizontalHeaderItem(4,header4)
 
             header5 = QTableWidgetItem()
-            header5.setText("Fin")
+            header5.setText(QCoreApplication.translate("initialisation","Fin"))
             tab.setHorizontalHeaderItem(5,header5)
 
             header6 = QTableWidgetItem()
-            header6.setText("Inclus")
+            header6.setText(QCoreApplication.translate("initialisation","Inclus"))
             tab.setHorizontalHeaderItem(6,header6)
 
             for row in range(tab.rowCount()):
@@ -408,7 +416,7 @@ class initialiseAll:
             self.iface.dlg.BT_ADD_ROW_CONTRAINTE.setEnabled(True)
 
     def reclassification(self):
-        log = "Paramètres de reclassification: \n"
+        log = QCoreApplication.translate("initialisation","Paramètres de reclassification: \n")
         for i,contrainte in enumerate(self.listContraintesNotReady):
             # Get field name et field type
             tab = self.iface.dlg.STACKED_WIDGET_RECLASS.widget(i)
@@ -417,8 +425,8 @@ class initialiseAll:
             except (ValueError, AttributeError) as error:
                 button = QMessageBox.critical(
                     self.iface.dlg,
-                    "Erreur ...",
-                    f"Sélectionner la contrainte \"{contrainte.name}\" pour choisir le champ à reclassifier",
+                    QCoreApplication.translate("initialisation","Erreur ..."),
+                    QCoreApplication.translate("initialisation",f"Sélectionner la contrainte \"{contrainte.name}\" pour choisir le champ à reclassifier"),
                     buttons=QMessageBox.Ok,
                     defaultButton=QMessageBox.Ok,
                 )
@@ -427,7 +435,7 @@ class initialiseAll:
             field_type = tab.cellWidget(0,1).text()
             vlayer = contrainte.vlayer
             field_idx = vlayer.fields().indexOf(field_name)
-            log += f"{i+1}) Contrainte \"{contrainte.name}\": Champ {contrainte.field_name} (Type {contrainte.field_type})\n"
+            log += QCoreApplication.translate("initialisation",f"{i+1}) Contrainte \"{contrainte.name}\": Champ {contrainte.field_name} (Type {contrainte.field_type})\n")
 
             row = -1
             col = -1
@@ -443,11 +451,11 @@ class initialiseAll:
                 contrainte.setvlayer(vlayer)
                 log = self.write_reclassification_log(log, tab, field_type)
             else:
-                error_msg = "en entier (ou réelle)" if col == 2 else "Initiale/Début" if col == 3 else "Finale (supérieure à la valeur Début)"
+                error_msg = QCoreApplication.translate("initialisation","en entier (ou réelle)") if col == 2 else QCoreApplication.translate("initialisation","Initiale/Début") if col == 3 else QCoreApplication.translate("initialisation","Finale (supérieure à la valeur Début)")
                 button = QMessageBox.critical(
                     self.iface.dlg,
-                    "Erreur ...",
-                    f"Saisir <b>une valeur {error_msg}</b> valide à la ligne {row + 1} pour la contrainte <b>\"{contrainte.name}\"</b>.",
+                    QCoreApplication.translate("initialisation","Erreur ..."),
+                    QCoreApplication.translate("initialisation",f"Saisir <b>une valeur {error_msg}</b> valide à la ligne {row + 1} pour la contrainte <b>\"{contrainte.name}\"</b>."),
                     buttons=QMessageBox.Ok,
                     defaultButton=QMessageBox.Ok,
                 )
@@ -457,8 +465,8 @@ class initialiseAll:
         # Show dialog Box
         reply = QMessageBox.question(
             self.iface.dlg,
-            "Question ...",
-            "Voulez-vous tout de suite effectuer le traitement des contraintes ?",
+            QCoreApplication.translate("initialisation","Question ..."),
+            QCoreApplication.translate("initialisation","Voulez-vous tout de suite effectuer le traitement des contraintes ?"),
             buttons= QMessageBox.Cancel | QMessageBox.No | QMessageBox.Yes,
         )
         if reply == QMessageBox.Yes:
@@ -488,7 +496,7 @@ class initialiseAll:
             with open(self.log_path + ".temp", "a") as output:
                 # iterate all lines from file
                 for line in input:
-                    if not line.strip("\n").startswith('Paramètres'):
+                    if not line.strip("\n").startswith(QCoreApplication.translate("initialisation",'Paramètres')):
                         # if line starts with substring 'Paramètres' then don't write it in temp file
                         output.write(line)
                     else:
@@ -500,15 +508,15 @@ class initialiseAll:
     def save_reclassified_layer_to_image(self):
         options = QgsVectorFileWriter.SaveVectorOptions()
         options.driverName = "ESRI Shapefile"
-        log = f"#######################################################\n\nNombre de contraintes en entrée: {len(self.listContraintes)} ({len(self.listContraintesNotReady)} à reclassifier)\n\nTraitement en cours. . .\n\n"
+        log = QCoreApplication.translate("initialisation",f"#######################################################\n\nNombre de contraintes en entrée: {len(self.listContraintes)} ({len(self.listContraintesNotReady)} à reclassifier)\n\nTraitement en cours. . .\n\n")
         for contrainte in self.listContraintesNotReady:
             name = contrainte.name
             output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),contrainte.name + "_bool.shp")
             contrainte.setreclass_output(output_path)
             QgsVectorFileWriter.writeAsVectorFormatV2(contrainte.vlayer, contrainte.reclass_output, QgsCoordinateTransformContext(), options)
             self.delete_new_field(contrainte)
-            log += f"Contrainte \"{contrainte.name}\" :\nLecture des paramètres\t\t[OK]\nReclassification du champ \"{contrainte.field_name}\" - Type \"{contrainte.field_type}\"\t\t[OK]\nSauvegarde du résultat dans le fichier {contrainte.reclass_output} \t\t[OK]\n\n"
-        log += "Reclassification des contraintes termninés avec succès !\n\n#######################################################"
+            log += QCoreApplication.translate("initialisation",f"Contrainte \"{contrainte.name}\" :\nLecture des paramètres\t\t[OK]\nReclassification du champ \"{contrainte.field_name}\" - Type \"{contrainte.field_type}\"\t\t[OK]\nSauvegarde du résultat dans le fichier {contrainte.reclass_output} \t\t[OK]\n\n")
+        log += QCoreApplication.translate("initialisation","Reclassification des contraintes terminés avec succès !\n\n#######################################################")
         self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.setText(log)
         self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.setFont(self.myFont)
 
