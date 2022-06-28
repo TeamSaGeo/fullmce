@@ -241,7 +241,7 @@ class initialiseAll:
         # Start writing log
         now = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
         output_dir = self.iface.dlg.LE_OUTPUT_DIR.text()
-        log = QCoreApplication.translate("initialisation",f"Traitement initié le {now}\n\nRépértoire de sortie: {output_dir}\nFormat de sortie: SHP\n\nCONTRAINTES\nNombre de contraintes: {len(self.listContraintes)}\n")
+        log = QCoreApplication.translate("initialisation","Traitement initié le {0}\n\nRépértoire de sortie: {1}\nFormat de sortie: SHP\n\nCONTRAINTES\nNombre de contraintes: {2}\n").format(now,output_dir,len(self.listContraintes))
 
         for i,contrainte in enumerate(self.listContraintes):
             tab = self.iface.dlg.STACKED_WIDGET_RECLASS.widget(i)
@@ -426,7 +426,7 @@ class initialiseAll:
                 button = QMessageBox.critical(
                     self.iface.dlg,
                     QCoreApplication.translate("initialisation","Erreur ..."),
-                    QCoreApplication.translate("initialisation",f"Sélectionner la contrainte \"{contrainte.name}\" pour choisir le champ à reclassifier"),
+                    QCoreApplication.translate("initialisation","Sélectionner la contrainte \"{0}\" pour choisir le champ à reclassifier").format(contrainte.name),
                     buttons=QMessageBox.Ok,
                     defaultButton=QMessageBox.Ok,
                 )
@@ -435,7 +435,7 @@ class initialiseAll:
             field_type = tab.cellWidget(0,1).text()
             vlayer = contrainte.vlayer
             field_idx = vlayer.fields().indexOf(field_name)
-            log += QCoreApplication.translate("initialisation",f"{i+1}) Contrainte \"{contrainte.name}\": Champ {contrainte.field_name} (Type {contrainte.field_type})\n")
+            log += QCoreApplication.translate("initialisation","{0}) Contrainte \"{1}\": Champ {2} (Type {3})\n").format(i+1,contrainte.name,contrainte.field_name,contrainte.field_type)
 
             row = -1
             col = -1
@@ -455,7 +455,7 @@ class initialiseAll:
                 button = QMessageBox.critical(
                     self.iface.dlg,
                     QCoreApplication.translate("initialisation","Erreur ..."),
-                    QCoreApplication.translate("initialisation",f"Saisir <b>une valeur {error_msg}</b> valide à la ligne {row + 1} pour la contrainte <b>\"{contrainte.name}\"</b>."),
+                    QCoreApplication.translate("initialisation","Saisir <b>une valeur {0}</b> valide à la ligne {1} pour la contrainte <b>\"{2}\"</b>.").format(error_msg,row + 1,contrainte.name),
                     buttons=QMessageBox.Ok,
                     defaultButton=QMessageBox.Ok,
                 )
@@ -508,14 +508,14 @@ class initialiseAll:
     def save_reclassified_layer_to_image(self):
         options = QgsVectorFileWriter.SaveVectorOptions()
         options.driverName = "ESRI Shapefile"
-        log = QCoreApplication.translate("initialisation",f"#######################################################\n\nNombre de contraintes en entrée: {len(self.listContraintes)} ({len(self.listContraintesNotReady)} à reclassifier)\n\nTraitement en cours. . .\n\n")
+        log = QCoreApplication.translate("initialisation","#######################################################\n\nNombre de contraintes en entrée: {0} ({1} à reclassifier)\n\nTraitement en cours. . .\n\n").format(len(self.listContraintes),len(self.listContraintesNotReady))
         for contrainte in self.listContraintesNotReady:
             name = contrainte.name
             output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),contrainte.name + "_bool.shp")
             contrainte.setreclass_output(output_path)
             QgsVectorFileWriter.writeAsVectorFormatV2(contrainte.vlayer, contrainte.reclass_output, QgsCoordinateTransformContext(), options)
             self.delete_new_field(contrainte)
-            log += QCoreApplication.translate("initialisation",f"Contrainte \"{contrainte.name}\" :\nLecture des paramètres\t\t[OK]\nReclassification du champ \"{contrainte.field_name}\" - Type \"{contrainte.field_type}\"\t\t[OK]\nSauvegarde du résultat dans le fichier {contrainte.reclass_output} \t\t[OK]\n\n")
+            log += QCoreApplication.translate("initialisation","Contrainte \"{0}\" :\nLecture des paramètres\t\t[OK]\nReclassification du champ \"{1}\" - Type \"{2}\"\t\t[OK]\nSauvegarde du résultat dans le fichier {3} \t\t[OK]\n\n").format(contrainte.name,contrainte.field_name,contrainte.field_type,contrainte.reclass_output)
         log += QCoreApplication.translate("initialisation","Reclassification des contraintes terminés avec succès !\n\n#######################################################")
         self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.setText(log)
         self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.setFont(self.myFont)

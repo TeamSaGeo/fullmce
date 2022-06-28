@@ -130,7 +130,7 @@
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="662"/>
-        <source>Liste des contraintes à  reclassifier</source>
+        <source>Liste des contraintes à reclassifier</source>
         <translation>List of objects to classify</translation>
     </message>
     <message>
@@ -306,11 +306,6 @@
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="265"/>
-        <source>PRÊTE</source>
-        <translation>READY</translation>
-    </message>
-    <message>
-        <location filename="../event_tools/initialiseAll.py" line="265"/>
         <source>NON PRÊTE</source>
         <translation>NOT READY</translation>
     </message>
@@ -335,11 +330,6 @@
 </source>
         <translation>Classification parameters:
 </translation>
-    </message>
-    <message>
-        <location filename="../event_tools/initialiseAll.py" line="454"/>
-        <source>en entier (ou réelle)</source>
-        <translation>in integer (or real)</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="454"/>
@@ -374,6 +364,79 @@
         <translation>Contraints classification succesfully completed !
 
 #######################################################</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="244"/>
+        <source>Traitement initié le {0}
+
+Répértoire de sortie: {1}
+Format de sortie: SHP
+
+CONTRAINTES
+Nombre de contraintes: {2}
+</source>
+        <translation>Process strated at {0}
+
+Output folder: {1}
+Output format: SHP
+
+CONTRAINTS
+Count of contraints: {2}
+</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="426"/>
+        <source>Sélectionner la contrainte &quot;{0}&quot; pour choisir le champ à reclassifier</source>
+        <translation>Select the contraint &quot;{0}&quot; to choose the field to classify</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="438"/>
+        <source>{0}) Contrainte &quot;{1}&quot;: Champ {2} (Type {3})
+</source>
+        <translation>{0}) Contraint &quot;{1}&quot;: Field {2} (Type {3})
+</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="511"/>
+        <source>#######################################################
+
+Nombre de contraintes en entrée: {0} ({1} à reclassifier)
+
+Traitement en cours. . .
+
+</source>
+        <translation>#######################################################
+
+Count of input contraints: {0} ({1} to classify)
+
+Processing in progress. . .
+
+</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="518"/>
+        <source>Contrainte &quot;{0}&quot; :
+Lecture des paramètres		[OK]
+Reclassification du champ &quot;{1}&quot; - Type &quot;{2}&quot;		[OK]
+Sauvegarde du résultat dans le fichier {3} 		[OK]
+
+</source>
+        <translation>Contraint &quot;{0}&quot; :
+Reading parameters		[OK]
+Classifying the field &quot;{1}&quot; - Type &quot;{2}&quot;		[OK]
+Save the result into the output file {3} 		[OK]
+
+</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="454"/>
+        <source>en entier (ou réelle)</source>
+        <translation>integer (or real)</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="455"/>
+        <source>Saisir &lt;b&gt;une valeur {0}&lt;/b&gt; valide à la ligne {1} pour la contrainte &lt;b&gt;&quot;{2}&quot;&lt;/b&gt;.</source>
+        <translation>Input &lt;b&gt;a valid {0}&lt;/b&gt; value in line {1} for contraint &lt;b&gt;&quot;{2}&quot;&lt;/b&gt;.</translation>
     </message>
 </context>
 </TS>
