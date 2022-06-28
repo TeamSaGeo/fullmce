@@ -5,3 +5,4 @@ help/
 test/
 scripts/
 *.sh
+*_bak.py
