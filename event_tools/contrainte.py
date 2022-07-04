@@ -1,14 +1,9 @@
-from itertools import count
-from qgis.core import QgsVectorLayer
-
 class Contrainte:
-    _ids = count(0)
-
-    def __init__(self, name, source_path, ready):
+    def __init__(self, name, inputLayer, ready, type):
         self.name = name
-        self.source_path = source_path
         self.ready = ready
-        self.id = next(self._ids)
+        self.type = type
+        self.inputLayer = inputLayer
 
     def __setattr__(self, name, value):
         self.__dict__[name] = value
@@ -19,26 +14,17 @@ class Contrainte:
     def setready(self, ready):
         self.ready = ready
 
-    def setvlayer(self,vlayer):
-        self.vlayer = vlayer
+    def setinputLayer(self,inputLayer):
+        self.inputLayer.remove_element(self)
+        self.inputLayer = inputLayer
+        inputLayer.add_element(self)
 
-    def setreclass_output(self,output_path):
-        self.reclass_output = output_path
-
-    def source_path_isvalid(self, filename):
-        vlayer = QgsVectorLayer(filename,self.name, "ogr")
-        if not vlayer.isValid():
-            return False
-        else:
-            self.source_path = filename
-            self.vlayer = vlayer
-            return True
-
-    def setfield(self, name, type):
-        self.field_name = name
-        self.field_type = type
-        self.field_idx = self.vlayer.fields().indexOf(name)
-        self.field_values = list(filter(None,self.vlayer.uniqueValues(self.field_idx,-1)))
+    def setfield_type (self,field_name):
+        self.field_name = field_name
+        self.field_idx = self.inputLayer.vlayer.fields().indexOf(field_name)
+        self.field_type = self.inputLayer.vlayer.fields().at(self.field_idx).typeName()
+        self.field_values = list(filter(None,self.inputLayer.vlayer.uniqueValues(self.field_idx,-1)))
+        return self.field_type
 
     def __getattr__(self, item):
         # return super(Contrainte, self).__setattr__(item, 'orphan')

@@ -4,7 +4,8 @@ from qgis.PyQt.QtCore import Qt, QVariant, QCoreApplication
 from qgis.PyQt.QtGui import QFont
 from qgis.PyQt.QtWidgets import *
 from .contrainte import Contrainte
-from qgis.core import QgsVectorLayer, QgsVectorFileWriter, QgsFeatureRequest, QgsField, QgsCoordinateTransformContext
+from .inputLayer import InputLayer
+from qgis.core import QgsVectorFileWriter, QgsField
 import os, shutil
 from datetime import datetime
 
@@ -64,35 +65,18 @@ class initialiseAll:
             Qt.TextBrowserInteraction)
         self.iface.dlg.LBL_ROHY.setOpenExternalLinks(True)
 
-    def display_page3(self):
-        name = QCoreApplication.translate("initialisation","Noms")
-        path = QCoreApplication.translate("initialisation","Chemins")
-        ready = QCoreApplication.translate("initialisation","Prêts")
-        columns = [name, path, "", ready]
-        self.iface.dlg.TBL_CONTRAINTE.setColumnCount(len(columns))
-        self.iface.dlg.TBL_CONTRAINTE.setHorizontalHeaderLabels(columns)
+    def display_page3_5(self, columns, tbl, sb):
+        self.list_inputLayers = []
+
+        tbl.setColumnCount(len(columns))
+        tbl.setHorizontalHeaderLabels(columns)
         # Table will fit the screen horizontally
-        self.iface.dlg.TBL_CONTRAINTE.setColumnWidth(0,150)
-        self.iface.dlg.TBL_CONTRAINTE.horizontalHeader().setSectionResizeMode(1,
-                                                                              QHeaderView.Stretch)
-        self.iface.dlg.TBL_CONTRAINTE.horizontalHeader().setSectionResizeMode(2,
-                                                                              QHeaderView.ResizeToContents)
-        self.iface.dlg.TBL_CONTRAINTE.horizontalHeader().setSectionResizeMode(3,
-                                                                              QHeaderView.ResizeToContents)
+        tbl.setColumnWidth(0,150)
+        tbl.horizontalHeader().setSectionResizeMode(1,QHeaderView.Stretch)
+        tbl.horizontalHeader().setSectionResizeMode(2,QHeaderView.ResizeToContents)
+        tbl.horizontalHeader().setSectionResizeMode(3,QHeaderView.ResizeToContents)
         # Listen to spinbox contraintes
-        self.iface.dlg.SB_NB_CONTRAINTE.valueChanged.connect(
-            lambda: self.update_listContraintes())
-
-        # Listen to list of contraintes not ready
-        self.iface.dlg.LV_CONTRAINTE_NOT_READY.itemSelectionChanged.connect(
-            lambda : self.select_contrainte_not_ready())
-
-        # Listen to button add/delete row, reclassification contraintes
-        self.iface.dlg.BT_DELETE_ROW_CONTRAINTE.clicked.connect(
-            lambda : self.delete_reclass_row_param())
-
-        self.iface.dlg.BT_ADD_ROW_CONTRAINTE.clicked.connect(
-            lambda : self.add_reclass_row_param())
+        sb.valueChanged.connect(lambda: self.update_listData(tbl,sb))
 
     def display_page4(self, i, contrainte):
         ###---------Initialize List contrainte not ready Widget----------
@@ -104,7 +88,7 @@ class initialiseAll:
         # Column count
         field = QCoreApplication.translate("initialisation","Champ")
         type = QCoreApplication.translate("initialisation","Type")
-        value = QCoreApplication.translate("initialisation","Valeur")
+        value = QCoreApplication.translate("initialisation","Nouvelle valeur")
         init_value = QCoreApplication.translate("initialisation","Valeur Initiale")
         columns = [field,type, value, init_value]
         tab.setColumnCount(len(columns))
@@ -135,7 +119,7 @@ class initialiseAll:
                 buttons=QMessageBox.Ok,
                 defaultButton=QMessageBox.Ok,
                 )
-        elif (self.pageInd == 2 and self.contraintes_filled()) or (self.pageInd == 3 and not self.reclassification()):
+        elif (self.pageInd == 2 and not self.contraintes_filled()) or (self.pageInd == 3 and not self.reclassification()):
             self.pageInd = self.iface.dlg.STACKED_WIDGET.currentIndex()
         elif (self.pageInd == 2 and self.listContraintesNotReady == []) or (self.pageInd == 3 and self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.document().isEmpty()):
             self.pageInd = 5
@@ -160,24 +144,24 @@ class initialiseAll:
         self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
         return self.pageInd
 
-    def update_listContraintes(self):
+    def update_listData(self,tbl,sb):
         # Row count
-        spinbox_value = self.iface.dlg.SB_NB_CONTRAINTE.value()
-        self.iface.dlg.TBL_CONTRAINTE.setRowCount(spinbox_value)
-        self.iface.dlg.TBL_CONTRAINTE.verticalHeader().setVisible(True)
+        spinbox_value = sb.value()
+        tbl.setRowCount(spinbox_value)
+        tbl.verticalHeader().setVisible(True)
 
         # Update list of contraintes
         self.listContraintes = self.listContraintes[:spinbox_value]
 
         for row in range(spinbox_value):
             # Initialise input widget
-            contrainte_name = QLineEdit()
-            contrainte_name.setFont(self.myFont)
+            name = QLineEdit()
+            name.setFont(self.myFont)
 
-            contrainte_path = QLineEdit()
-            contrainte_path.setFont(self.myFont)
-            contrainte_path.setEnabled(False)
-            contrainte_path.setStyleSheet(
+            path = QLineEdit()
+            path.setFont(self.myFont)
+            path.setEnabled(False)
+            path.setStyleSheet(
                 "QLineEdit {background-color: rgb(255, 255, 255);")
 
             toolButton = QToolButton()
@@ -187,47 +171,66 @@ class initialiseAll:
 
             # Handle items
             r = row
-            contrainte_name.textEdited.connect(
+            name.textEdited.connect(
                 lambda name=row, row=r: self.listContraintes[row].setname(name))
             toolButton.released.connect(
-                lambda r=r: self.select_contrainte_source_path(r))
+                lambda r=r: self.select_source_path(tbl,r))
             checkbox.stateChanged.connect(
                 lambda ready=row, row=r: self.listContraintes[row].setready(ready))
 
             # Set contrainte name, path, button, checkbox
-            self.iface.dlg.TBL_CONTRAINTE.setCellWidget(
-                row, 0, contrainte_name)
-            self.iface.dlg.TBL_CONTRAINTE.setCellWidget(
-                row, 1, contrainte_path)
-            self.iface.dlg.TBL_CONTRAINTE.setCellWidget(row, 2, toolButton)
-            self.iface.dlg.TBL_CONTRAINTE.setCellWidget(row, 3, checkbox)
+            tbl.setCellWidget(row, 0, name)
+            tbl.setCellWidget(row, 1, path)
+            tbl.setCellWidget(row, 2, toolButton)
+            tbl.setCellWidget(row, 3, checkbox)
 
-            # Append list of contraintes
+             # Append list of contraintes
             if row >= len(self.listContraintes):
-                contrainte = Contrainte(contrainte_name.text(), contrainte_path.text(), 0)
+                type = "contraint" if self.pageInd == 2 else "factor"
+                inputLayer = InputLayer(path.text())
+                contrainte = Contrainte(name.text(),inputLayer, 0, type)
+                inputLayer.add_element(contrainte)
                 self.listContraintes.append(contrainte)
-            contrainte_name.setText(self.listContraintes[row].name)
-            contrainte_path.setText(self.listContraintes[row].source_path)
+            name.setText(self.listContraintes[row].name)
+            path.setText(self.listContraintes[row].inputLayer.path)
             checkbox.setCheckState(self.listContraintes[row].ready)
 
-        self.iface.dlg.TBL_CONTRAINTE.setStyleSheet(
+        tbl.setStyleSheet(
             "QTableWidget::item {border: 0px; padding-top: 5px; padding-bottom: 5px; padding-left: 10px; padding-right: 10px;}")
 
-    def select_contrainte_source_path(self, row):
-        filename, _filter = QFileDialog.getOpenFileName(
-            self.iface.dlg.TBL_CONTRAINTE, QCoreApplication.translate("initialisation","Choisir un vecteur"), "", "*.shp")
+    def select_source_path(self, tbl, row):
+        path, _filter = QFileDialog.getOpenFileName(
+            tbl, QCoreApplication.translate("initialisation","Choisir un vecteur"), "", "*.shp")
         contrainte = self.listContraintes[row]
-        if contrainte.source_path_isvalid(filename):
-            inlineEdit = self.iface.dlg.TBL_CONTRAINTE.cellWidget(row, 1)
-            inlineEdit.setText(filename)
-        else:
-            button = QMessageBox.critical(
-                self.iface.dlg,
-                QCoreApplication.translate("initialisation","Erreur ..."),
-                QCoreApplication.translate("initialisation","Choisissez un fichier valide!"),
-                buttons=QMessageBox.Ok,
-                defaultButton=QMessageBox.Ok,
-                )
+
+        for inputLayer in self.list_inputLayers:
+            # Search If inputLayer is in list of inputLayer
+            if inputLayer.path == path:
+                contrainte.setinputLayer(inputLayer)
+                inlineEdit = tbl.cellWidget(row, 1)
+                inlineEdit.setText(path)
+
+        # Else create new inputLayer
+        if contrainte.inputLayer.path != path:
+            inputLayer = InputLayer(path)
+            if inputLayer.isValid():
+                contrainte.setinputLayer(inputLayer)
+                self.list_inputLayers.append(inputLayer)
+                inlineEdit = tbl.cellWidget(row, 1)
+                inlineEdit.setText(path)
+            else:
+                button = QMessageBox.critical(
+                    self.iface.dlg,
+                    QCoreApplication.translate("initialisation","Erreur ..."),
+                    QCoreApplication.translate("initialisation","Choisissez un fichier valide!"),
+                    buttons=QMessageBox.Ok,
+                    defaultButton=QMessageBox.Ok,
+                    )
+
+        # Remove empty inputLayer from list
+        for inputLayer in self.list_inputLayers:
+            if len(inputLayer.elements) == 0:
+                self.list_inputLayers.remove(inputLayer)
 
     def contraintes_filled(self):
         # Re-initialize the list of contrainte not ready and reclassification table
@@ -250,7 +253,7 @@ class initialiseAll:
             else:
                 # Initialize reclassification table
                 self.display_page4(i,contrainte)
-            if not contrainte.name or not contrainte.source_path:
+            if not contrainte.name or contrainte.inputLayer.path == "":
                 msg_name = QCoreApplication.translate("initialisation","Saisir un nom pour la contrainte numéro")
                 msg_path = QCoreApplication.translate("initialisation","Sélectionner une image pour la contrainte numéro")
                 error_msg = msg_name if not contrainte.name else msg_path
@@ -261,9 +264,9 @@ class initialiseAll:
                     buttons=QMessageBox.Ok,
                     defaultButton=QMessageBox.Ok,
                 )
-                return True
+                return False
             contrainte_status = QCoreApplication.translate("initialisation","PRÊTE") if contrainte.ready else QCoreApplication.translate("initialisation","NON PRÊTE")
-            log += f"{contrainte.name}\t\t{contrainte.source_path}\t\t{contrainte_status}\n"
+            log += f"{contrainte.name}\t\t{contrainte.inputLayer.path}\t\t{contrainte_status}\n"
 
         log += "\n\n"
         self.log_path = os.path.join(output_dir,"full_mce_log.txt")
@@ -273,6 +276,38 @@ class initialiseAll:
         self.iface.dlg.STACKED_WIDGET_RECLASS.setCurrentIndex(-1)
         self.iface.dlg.BT_ADD_ROW_CONTRAINTE.setEnabled(False)
 
+        return True
+
+    def factors_filled(self):
+        # Re-initialize the list of contrainte not ready and reclassification table
+        self.listFactorNotNormal = self.listFactor.copy()
+        self.iface.dlg.TBL_DATA_STANDARDIZATION.clear()
+
+        for i,factor in enumerate(self.listFactor):
+            if factor.ready == 2:
+                self.listFactorNotNormal.remove(factor)
+            # else:
+                # Initialize reclassification table
+                # self.display_page4(i,contrainte)
+            if not factor.name or not factor.inputLayer:
+                msg_name = QCoreApplication.translate("initialisation","Saisir un nom pour le facteur numéro")
+                msg_path = QCoreApplication.translate("initialisation","Sélectionner une image pour le facteur numéro")
+                error_msg = msg_name if not factor.name else msg_path
+                button = QMessageBox.critical(
+                    self.iface.dlg,
+                    QCoreApplication.translate("initialisation","Erreur ..."),
+                    f"{error_msg} {i+1}",
+                    buttons=QMessageBox.Ok,
+                    defaultButton=QMessageBox.Ok,
+                )
+                return True
+        #     contrainte_status = QCoreApplication.translate("initialisation","PRÊTE") if contrainte.ready else QCoreApplication.translate("initialisation","NON PRÊTE")
+        #     log += f"{contrainte.name}\t\t{contrainte.source_path}\t\t{contrainte_status}\n"
+        #
+        # log += "\n\n"
+        # self.log_path = os.path.join(output_dir,"full_mce_log.txt")
+        # with open(self.log_path,"w") as f:
+        #     f.write(log)
         return False
 
     def select_contrainte_not_ready(self):
@@ -295,7 +330,7 @@ class initialiseAll:
         self.iface.dlg.BT_ADD_ROW_CONTRAINTE.setEnabled(True)
 
         # Handle items
-        tab.cellWidget(0,0).currentIndexChanged.connect(lambda: self.update_field_type(contrainte.vlayer, tab))
+        tab.cellWidget(0,0).currentIndexChanged.connect(lambda: self.update_field_type(contrainte, tab))
 
     def add_reclass_row_param(self):
         tab = self.iface.dlg.STACKED_WIDGET_RECLASS.currentWidget()
@@ -318,9 +353,9 @@ class initialiseAll:
             contrainte_field_name = QComboBox()
             contrainte_field_name.setFont(self.myFont)
             tab.setCellWidget(0, 0, contrainte_field_name)
-            for field in contrainte.vlayer.fields():
+            for field in contrainte.inputLayer.vlayer.fields():
                 contrainte_field_name.addItem(field.name())
-            self.update_field_type(contrainte.vlayer,tab)
+            self.update_field_type(contrainte,tab)
 
         col = self.iface.dlg.STACKED_WIDGET_RECLASS.currentWidget().columnCount()
         if col == 7:
@@ -340,16 +375,10 @@ class initialiseAll:
         if row == 2:
             self.iface.dlg.BT_DELETE_ROW_CONTRAINTE.setEnabled(False)
 
-    def update_field_type(self,vlayer,tab):
+    def update_field_type(self,contrainte,tab):
         field_name = tab.cellWidget(0,0).currentText()
-        field_idx = vlayer.fields().indexOf(field_name)
-        field_type = vlayer.fields().at(field_idx).typeName()
+        field_type = contrainte.setfield_type(field_name)
         tab.cellWidget(0,1).setText(field_type)
-
-        # Update contrainte instance
-        i = self.iface.dlg.LV_CONTRAINTE_NOT_READY.currentRow()
-        contrainte = self.listContraintesNotReady[i]
-        contrainte.setfield(field_name,field_type)
 
         if field_type == "String":
             tab.setColumnCount(4)
@@ -418,8 +447,9 @@ class initialiseAll:
     def reclassification(self):
         log = QCoreApplication.translate("initialisation","Paramètres de reclassification: \n")
         for i,contrainte in enumerate(self.listContraintesNotReady):
-            # Get field name et field type
             tab = self.iface.dlg.STACKED_WIDGET_RECLASS.widget(i)
+
+            # Check if field name exist
             try:
                 field_name = tab.cellWidget(0,0).currentText()
             except (ValueError, AttributeError) as error:
@@ -432,36 +462,36 @@ class initialiseAll:
                 )
                 return False
 
-            field_type = tab.cellWidget(0,1).text()
-            vlayer = contrainte.vlayer
-            field_idx = vlayer.fields().indexOf(field_name)
             log += QCoreApplication.translate("initialisation","{0}) Contrainte \"{1}\": Champ {2} (Type {3})\n").format(i+1,contrainte.name,contrainte.field_name,contrainte.field_type)
 
             row = -1
             col = -1
+            vlayer = None
+            field_type = contrainte.field_type
 
             if field_type == "String":
-                vlayer,row,col = self.change_string_attributes_values(contrainte,tab)
-            elif field_type == "Real" or field_type == "Integer":
-                vlayer,row,col = self.change_number_attributes_values(contrainte,tab)
-            elif field_type == "Date":
-                vlayer,row,col = self.change_date_attributes_values(contrainte,tab)
+                list_values,row,col = self.change_string_attributes_values(contrainte,tab)
+            else:
+                list_values,row,col = self.get_number_reclass_param(contrainte,tab)
 
             if row == -1 and col == -1:
-                contrainte.setvlayer(vlayer)
-                log = self.write_reclassification_log(log, tab, field_type)
+                if field_type == "String":
+                    vlayer, self.change_string_attributes_values(contrainte,tab, list_values)
+                else:
+                    vlayer = self.change_number_attributes_values(contrainte,tab,list_values)
+                contrainte.inputLayer.setvlayer(vlayer)
+                log = self.reclassification_log(log,tab,field_type)
             else:
-                error_msg = QCoreApplication.translate("initialisation","en entier (ou réelle)") if col == 2 else QCoreApplication.translate("initialisation","Initiale/Début") if col == 3 else QCoreApplication.translate("initialisation","Finale (supérieure à la valeur Début)")
+                error_msg = self.reclass_error_msg(col,field_type)
                 button = QMessageBox.critical(
                     self.iface.dlg,
                     QCoreApplication.translate("initialisation","Erreur ..."),
-                    QCoreApplication.translate("initialisation","Saisir <b>une valeur {0}</b> valide à la ligne {1} pour la contrainte <b>\"{2}\"</b>.").format(error_msg,row + 1,contrainte.name),
+                    QCoreApplication.translate("initialisation","Contrainte <b>\"{0}\"</b> - Ligne {1} : Saisir <b>une valeur {2}</b> valide.").format(contrainte.name,row + 1,error_msg),
                     buttons=QMessageBox.Ok,
                     defaultButton=QMessageBox.Ok,
                 )
                 self.delete_new_field(contrainte)
                 return False
-
         # Show dialog Box
         reply = QMessageBox.question(
             self.iface.dlg,
@@ -478,7 +508,18 @@ class initialiseAll:
         self.save_reclassification_log_into_file(log)
         return True
 
-    def write_reclassification_log(self, log, tab, field_type):
+    def reclass_error_msg (self, col,field_type):
+        if col == 2:
+            return QCoreApplication.translate("initialisation","en entier (ou réelle)")
+        elif col == 3:
+            if field_type == "String":
+                return QCoreApplication.translate("initialisation","Initiale (différente)")
+            else:
+                return QCoreApplication.translate("initialisation","Début")
+        else:
+            return QCoreApplication.translate("initialisation","Finale (supérieure à la valeur Début)")
+
+    def reclassification_log(self,log, tab, field_type):
         for r in range(tab.rowCount()):
             log += f"\t{tab.cellWidget(r,2).text()}"
             if field_type == "String":
@@ -505,24 +546,107 @@ class initialiseAll:
         # replace file with original name
         os.replace(self.log_path + ".temp", self.log_path)
 
+    def contraintes_not_ready_insame_iput(self, inputLayer):
+        contraintes_not_ready = []
+        for contrainte in inputLayer.elements:
+            if contrainte in self.listContraintesNotReady:
+                contraintes_not_ready.append(contrainte)
+        return contraintes_not_ready
+
     def save_reclassified_layer_to_image(self):
-        options = QgsVectorFileWriter.SaveVectorOptions()
-        options.driverName = "ESRI Shapefile"
         log = QCoreApplication.translate("initialisation","#######################################################\n\nNombre de contraintes en entrée: {0} ({1} à reclassifier)\n\nTraitement en cours. . .\n\n").format(len(self.listContraintes),len(self.listContraintesNotReady))
-        for contrainte in self.listContraintesNotReady:
-            name = contrainte.name
-            output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),contrainte.name + "_bool.shp")
-            contrainte.setreclass_output(output_path)
-            QgsVectorFileWriter.writeAsVectorFormatV2(contrainte.vlayer, contrainte.reclass_output, QgsCoordinateTransformContext(), options)
-            self.delete_new_field(contrainte)
-            log += QCoreApplication.translate("initialisation","Contrainte \"{0}\" :\nLecture des paramètres\t\t[OK]\nReclassification du champ \"{1}\" - Type \"{2}\"\t\t[OK]\nSauvegarde du résultat dans le fichier {3} \t\t[OK]\n\n").format(contrainte.name,contrainte.field_name,contrainte.field_type,contrainte.reclass_output)
+        for inputLayer in self.list_inputLayers:
+            contraintes_not_ready = self.contraintes_not_ready_insame_iput(inputLayer)
+            if contraintes_not_ready != []:
+                output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),inputLayer.name + "_bool.shp")
+                inputLayer.setreclass_output(output_path)
+                QgsVectorFileWriter.writeAsVectorFormat(inputLayer.vlayer, inputLayer.reclass_output, 'utf-8',driverName='ESRI Shapefile')
+                for contrainte in contraintes_not_ready:
+                    self.delete_new_field(contrainte)
+                    log += QCoreApplication.translate("initialisation","Contrainte \"{0}\" :\nLecture des paramètres\t\t[OK]\nReclassification du champ \"{1}\" - Type \"{2}\"\t\t[OK]\nSauvegarde du résultat dans le fichier {3} \t\t[OK]\n\n").format(contrainte.name,contrainte.field_name,contrainte.field_type,inputLayer.reclass_output)
         log += QCoreApplication.translate("initialisation","Reclassification des contraintes terminés avec succès !\n\n#######################################################")
         self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.setText(log)
         self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.setFont(self.myFont)
 
-    def change_string_attributes_values(self,contrainte,tab):
+    def get_number_reclass_param(self,contrainte,tab):
+        list_values = []
+        field_type = contrainte.field_type
+        for row in range(tab.rowCount()):
+            # get new value
+            try:
+                new_value = float(tab.cellWidget(row,2).text())
+            except ValueError:
+                return list_values,row,2
+
+            # get start_value
+            try:
+                start_value = tab.cellWidget(row,3).text()
+                if start_value == "min":
+                    start_value = min(contrainte.field_values)
+                # Convert end_value to Date or to Real
+                if field_type == "Date":
+                    start_value = datetime.strptime(start_value,'%y-%m-%d')
+                else:
+                    start_value = float(start_value)
+            except ValueError:
+                return list_values,row,3
+
+            # Get end_value
+            try:
+                end_value = tab.cellWidget(row,5).text()
+                if end_value == "max":
+                    end_value = max(contrainte.field_values)
+                # Convert end_value to Date or to Real
+                if field_type == "Date":
+                    end_value = datetime.strptime(start_value,'%y-%m-%d')
+                else:
+                    end_value = float(end_value)
+            except ValueError:
+                return list_values,row,5
+
+            # Check if start value < end_value
+            if start_value >= end_value:
+                return list_values,row,5
+
+            # Compare row interval to previous row
+            for values in list_values:
+                if self.attribute_is_in_range(start_value,values):
+                    return list_values,row,3
+                if self.attribute_is_in_range(end_value,values):
+                    return list_values,row,5
+
+            # Save parameter to list
+            start_value_inclued = tab.cellWidget(row,4).isChecked()
+            end_value_inclued = tab.cellWidget(row,6).isChecked()
+            row_values = [start_value, start_value_inclued, end_value, end_value_inclued, new_value]
+            list_values.append(row_values)
+        return list_values, -1, -1
+
+    def get_string_reclass_param(self,contrainte,tab):
+        list_values = []
+        for row in range(tab.rowCount()):
+            # get new value
+            try:
+                new_value = float(tab.cellWidget(row,2).text())
+            except ValueError:
+                return vlayer,row,2
+
+            # get start_value
+            start_value = tab.cellWidget(row,3).currentText()
+
+            # check if initial value is duplicated
+            for values in list_values:
+                if start_value == values[0]:
+                    return list_values,row,3
+
+            row_values = [start_value,new_value]
+            list_values.append(row_values)
+
+        return list_values, -1, -1
+
+    def change_string_attributes_values(self,contrainte,tab,values):
+        vlayer = contrainte.inputLayer.vlayer
         new_field_idx = self.add_new_field(contrainte)
-        vlayer = contrainte.vlayer
         features = vlayer.getFeatures()
         vlayer.startEditing()
         for feat in features:
@@ -532,31 +656,24 @@ class initialiseAll:
             # initialize iteration variable
             row = 0
             new_value = 0
-            start_value = tab.cellWidget(0,3).currentText()
-            if not start_value:
-                return vlayer,row,3
+            start_value = values[0][0]
 
             # Start condition
             while value != start_value and row < (tab.rowCount()-1):
                 row += 1
-                start_value = tab.cellWidget(row,3).currentText()
-                if not start_value:
-                    return vlayer,row,3
+                start_value = values[row][0]
 
             # Get new value
             if value == start_value:
-                try:
-                    new_value = float(tab.cellWidget(row,2).text())
-                except ValueError:
-                    return vlayer,row,2
+                new_value = values[row][1]
 
             # Change Value
             vlayer.changeAttributeValue(feat.id(),new_field_idx, new_value)
-        return vlayer,-1,-1
+        return vlayer
 
-    def change_number_attributes_values(self,contrainte,tab):
+    def change_number_attributes_values(self,contrainte,tab, values):
+        vlayer = contrainte.inputLayer.vlayer
         new_field_idx = self.add_new_field(contrainte)
-        vlayer = contrainte.vlayer
         features = vlayer.getFeatures()
         vlayer.startEditing()
         for feat in features:
@@ -566,130 +683,41 @@ class initialiseAll:
             # initialize iteration variable
             row = 0
             new_value = 0
-
-            try:
-                start_value = float(tab.cellWidget(0,3).text())
-            except ValueError:
-                return vlayer,row,3
-
-            try:
-                end_value = float(tab.cellWidget(0,5).text())
-            except ValueError:
-                return vlayer,row,5
-
-            if start_value >= end_value:
-                return vlayer,row,5
-
-            start_value_inclued = tab.cellWidget(0,4).isChecked()
-            end_value_inclued = tab.cellWidget(0,6).isChecked()
+            row_values = values[0]
 
             # Start condition
-            while self.attribute_is_outof_range(value,start_value,start_value_inclued,end_value,end_value_inclued) and row < (tab.rowCount() - 1):
+            while not self.attribute_is_in_range(value,row_values) and row < (tab.rowCount() - 1):
                 row += 1
-                try:
-                    start_value = float(tab.cellWidget(row,3).text())
-                except ValueError:
-                    return vlayer,row,3
-
-                try:
-                    end_value = float(tab.cellWidget(row,5).text())
-                except ValueError:
-                    return vlayer,row,5
-
-                start_value_inclued = tab.cellWidget(row,4).isChecked()
-                end_value_inclued = tab.cellWidget(row,6).isChecked()
+                row_values = values[row]
 
             # Get new value
-            if self.attribute_is_in_range(value,end_value,end_value_inclued):
-                try:
-                    new_value = float(tab.cellWidget(row,2).text())
-                except ValueError:
-                    return vlayer,row,2
+            if self.attribute_is_in_range(value,row_values):
+                new_value = values[row][4]
 
             vlayer.changeAttributeValue(feat.id(),new_field_idx, new_value)
-            # for row in range(tab.rowCount()):
-            #     while value >= start_value and value < end_value:
-            #         new_value = tab.cellWidget(row,2).text()
-            #         vlayer.changeAttributeValue(feat.id(), field_idx, new_value)
-        return vlayer,-1,-1
 
-    def change_date_attributes_values(self,contrainte,tab):
-        new_field_idx = self.add_new_field(contrainte)
-        vlayer = contrainte.vlayer
-        features = vlayer.getFeatures()
-        vlayer.startEditing()
-        for feat in features:
-            # get layer value
-            value = feat[contrainte.field_idx]
+        return vlayer
 
-            # initialize iteration variable
-            row = 0
-            new_value = 0
-
-            try:
-                start_value = datetime.strptime(tab.cellWidget(0,3).text(),'%y-%m-%d')
-            except ValueError:
-                return vlayer,row,3
-
-            try:
-                end_value = datetime.strptime(tab.cellWidget(0,5).text(),'%y-%m-%d')
-            except ValueError:
-                return vlayer,row,5
-
-            if start_value >= end_value:
-                return vlayer,row,5
-
-            start_value_inclued = tab.cellWidget(0,4).isChecked()
-            end_value_inclued = tab.cellWidget(0,6).isChecked()
-
-            # Start condition
-            while self.attribute_is_outof_range(value,start_value,start_value_inclued,end_value,end_value_inclued) and row < (tab.rowCount() - 1):
-                row += 1
-                try:
-                    start_value = datetime.strptime(tab.cellWidget(row,3).text(),'%y-%m-%d')
-                except ValueError:
-                    return vlayer,row,3
-
-                try:
-                    end_value = datetime.strptime(tab.cellWidget(row,5).text(),'%y-%m-%d')
-                except ValueError:
-                    return vlayer,row,5
-
-                start_value_inclued = tab.cellWidget(row,4).isChecked()
-                end_value_inclued = tab.cellWidget(row,6).isChecked()
-
-            # Get new value
-            if self.attribute_is_in_range(value,end_value,end_value_inclued):
-                try:
-                    new_value = float(tab.cellWidget(row,2).text())
-                except ValueError:
-                    return vlayer,row,2
-
-            vlayer.changeAttributeValue(feat.id(),new_field_idx, new_value)
-        return vlayer,-1,-1
-
-    def attribute_is_outof_range(self,value,start_value,start_value_inclued,end_value,end_value_inclued):
-        out_of_range = False
+    def attribute_is_in_range(self,value,values):
+        in_range = False
+        start_value = values[0]
+        start_value_inclued = values[1]
+        end_value = values[2]
+        end_value_inclued = values[3]
 
         if start_value_inclued and not end_value_inclued:
-            out_of_range = value < start_value or value >= end_value
+            in_range = value >= start_value and value < end_value
         elif start_value_inclued and end_value_inclued:
-            out_of_range = value < start_value or value > end_value
+            in_range = value >= start_value and value <= end_value
         elif not start_value_inclued and end_value_inclued:
-            out_of_range = value <= start_value or value > end_value
+            in_range = value > start_value and value <= end_value
         elif not start_value_inclued and not end_value_inclued:
-            out_of_range = value <= start_value or value >= end_value
+            in_range = value > start_value and value < end_value
 
-        return out_of_range
-
-    def attribute_is_in_range(self,value,end_value,end_value_inclued):
-        if end_value_inclued:
-            return (value <= end_value)
-        else:
-            return (value < end_value)
+        return in_range
 
     def add_new_field(self,contrainte):
-        vlayer = contrainte.vlayer
+        vlayer = contrainte.inputLayer.vlayer
         # Create new field
         vlayer_provider = vlayer.dataProvider()
         new_field_name = contrainte.field_name[:-2] + "Bl"
@@ -701,9 +729,10 @@ class initialiseAll:
         return new_field_idx
 
     def delete_new_field(self,contrainte):
-        new_field_idx = contrainte.vlayer.fields().indexOf(contrainte.field_name[:-2] + "Bl")
-        contrainte.vlayer.dataProvider().deleteAttributes([new_field_idx])
-        contrainte.vlayer.updateFields()
+        vlayer = contrainte.inputLayer.vlayer
+        new_field_idx = vlayer.fields().indexOf(contrainte.field_name[:-2] + "Bl")
+        vlayer.dataProvider().deleteAttributes([new_field_idx])
+        vlayer.updateFields()
 
     def initialise_variable_init(self):
         return self
@@ -715,6 +744,7 @@ class initialiseAll:
         if self.iface.first_start is True:
             self.iface.first_start = False
             self.display_page1()
+
             # On click on Suivant
             self.iface.dlg.BT_NEXT.pressed.connect(lambda: self.display_next_page())
 
@@ -724,4 +754,21 @@ class initialiseAll:
             #On click on Precedent
             self.iface.dlg.BT_PREVIOUS.clicked.connect(lambda: self.display_previous_page())
 
-            self.display_page3()
+
+            name = QCoreApplication.translate("initialisation","Noms")
+            path = QCoreApplication.translate("initialisation","Chemins")
+            ready = QCoreApplication.translate("initialisation","Prêts")
+            columns = [name, path, "", ready]
+            self.display_page3_5(columns,self.iface.dlg.TBL_CONTRAINTE,self.iface.dlg.SB_NB_CONTRAINTE)
+            # Listen to list of contraintes not ready
+            self.iface.dlg.LV_CONTRAINTE_NOT_READY.itemSelectionChanged.connect(
+                lambda : self.select_contrainte_not_ready())
+            # Listen to button add/delete row, reclassification contraintes
+            self.iface.dlg.BT_DELETE_ROW_CONTRAINTE.clicked.connect(
+                lambda : self.delete_reclass_row_param())
+            self.iface.dlg.BT_ADD_ROW_CONTRAINTE.clicked.connect(
+                lambda : self.add_reclass_row_param())
+
+            normalized = QCoreApplication.translate("initialisation","Normalisés")
+            columns[3] = normalized
+            self.display_page3_5(columns,self.iface.dlg.TBL_DATA_ENTREE,self.iface.dlg.SB_NB_DATA)

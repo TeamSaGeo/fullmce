@@ -261,8 +261,8 @@
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="107"/>
-        <source>Valeur</source>
-        <translation>Value</translation>
+        <source>Nouvelle valeur</source>
+        <translation>New value</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="357"/>
