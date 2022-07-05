@@ -203,6 +203,9 @@ class initialiseAll:
             self.pageInd = 5
             self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
             self.iface.dlg.BT_PREVIOUS.setEnabled(True)
+        elif self.pageInd == 5 and len(self.listFactorNotNormalized)== 0:
+            self.pageInd = 8
+            self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
         else:
             self.pageInd += 1
             self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
@@ -565,13 +568,13 @@ class initialiseAll:
             field_type = contrainte.field_type
 
             if field_type == "String":
-                list_values,row,col = self.change_string_attributes_values(contrainte,tab)
+                list_values,row,col = self.get_string_reclass_param(contrainte,tab)
             else:
                 list_values,row,col = self.get_number_reclass_param(contrainte,tab)
 
             if row == -1 and col == -1:
                 if field_type == "String":
-                    vlayer, self.change_string_attributes_values(contrainte,tab, list_values)
+                    vlayer = self.change_string_attributes_values(contrainte,tab, list_values)
                 else:
                     vlayer = self.change_number_attributes_values(contrainte,tab,list_values)
                 contrainte.inputLayer.setvlayer(vlayer)
@@ -581,11 +584,12 @@ class initialiseAll:
                 button = QMessageBox.critical(
                     self.iface.dlg,
                     QCoreApplication.translate("initialisation","Erreur ..."),
-                    QCoreApplication.translate("initialisation","Contrainte <b>\"{0}\"</b> - Ligne {1} : Saisir <b>une valeur {2}</b> valide.").format(contrainte.name,row + 1,error_msg),
+                    QCoreApplication.translate("initialisation","Contrainte <b>\"{0}\" - Ligne {1} </b>: Saisir <b>une valeur {2}</b> valide.").format(contrainte.name,row + 1,error_msg),
                     buttons=QMessageBox.Ok,
                     defaultButton=QMessageBox.Ok,
                 )
-                self.delete_new_field(contrainte)
+                new_field_name = contrainte.field_name[:-2] + "Bl"
+                contrainte.inputLayer.delete_new_field(new_field_name)
                 return False
         # Show dialog Box
         reply = QMessageBox.question(
@@ -657,7 +661,8 @@ class initialiseAll:
                 inputLayer.setreclass_output(output_path)
                 QgsVectorFileWriter.writeAsVectorFormat(inputLayer.vlayer, inputLayer.reclass_output, 'utf-8',driverName='ESRI Shapefile')
                 for contrainte in contraintes_not_ready:
-                    self.delete_new_field(contrainte)
+                    new_field_name = contrainte.field_name[:-2] + "Bl"
+                    contrainte.inputLayer.delete_new_field(new_field_name)
                     log += QCoreApplication.translate("initialisation","Contrainte \"{0}\" :\nLecture des paramètres\t\t[OK]\nReclassification du champ \"{1}\" - Type \"{2}\"\t\t[OK]\nSauvegarde du résultat dans le fichier {3} \t\t[OK]\n\n").format(contrainte.name,contrainte.field_name,contrainte.field_type,inputLayer.reclass_output)
         log += QCoreApplication.translate("initialisation","Reclassification des contraintes terminés avec succès !\n\n#######################################################")
         self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.setText(log)
@@ -708,10 +713,18 @@ class initialiseAll:
 
             # Compare row interval to previous row
             for values in list_values:
-                if start_value_inclued and self.attribute_is_in_range(start_value,values):
-                    return list_values,row,3
+                # Check if interval is in another interval
+                if self.attribute_is_in_range(start_value,values):
+                    if start_value != values[2] or start_value_inclued:
+                        return list_values,row,3
                 if self.attribute_is_in_range(end_value,values):
+                    if end_value != values[0] or end_value_inclued:
+                        return list_values,row,5
+
+                # Check if interval contains another interval
+                if start_value < values [0] and end_value >= values [2]:
                     return list_values,row,5
+
 
             # Save parameter to list
             row_values = [start_value, start_value_inclued, end_value, end_value_inclued, new_value]
@@ -742,7 +755,8 @@ class initialiseAll:
 
     def change_string_attributes_values(self,contrainte,tab,values):
         vlayer = contrainte.inputLayer.vlayer
-        new_field_idx = self.add_new_field(contrainte)
+        new_field_name = contrainte.field_name[:-2] + "Bl"
+        new_field_idx = contrainte.inputLayer.add_new_field(new_field_name)
         features = vlayer.getFeatures()
         vlayer.startEditing()
         for feat in features:
@@ -769,7 +783,8 @@ class initialiseAll:
 
     def change_number_attributes_values(self,contrainte,tab, values):
         vlayer = contrainte.inputLayer.vlayer
-        new_field_idx = self.add_new_field(contrainte)
+        new_field_name = contrainte.field_name[:-2] + "Bl"
+        new_field_idx = contrainte.inputLayer.add_new_field(new_field_name)
         features = vlayer.getFeatures()
         vlayer.startEditing()
         for feat in features:
@@ -811,24 +826,6 @@ class initialiseAll:
             in_range = value > start_value and value < end_value
 
         return in_range
-
-    def add_new_field(self,contrainte):
-        vlayer = contrainte.inputLayer.vlayer
-        # Create new field
-        vlayer_provider = vlayer.dataProvider()
-        new_field_name = contrainte.field_name[:-2] + "Bl"
-        new_field_idx = vlayer.fields().indexOf(new_field_name)
-        if new_field_idx == -1:
-            vlayer_provider.addAttributes([QgsField(new_field_name,QVariant.Double,"double",10,2)])
-            vlayer.updateFields()
-            new_field_idx = vlayer.fields().indexOf(new_field_name)
-        return new_field_idx
-
-    def delete_new_field(self,contrainte):
-        vlayer = contrainte.inputLayer.vlayer
-        new_field_idx = vlayer.fields().indexOf(contrainte.field_name[:-2] + "Bl")
-        vlayer.dataProvider().deleteAttributes([new_field_idx])
-        vlayer.updateFields()
 
     def initialise_variable_init(self):
         return self

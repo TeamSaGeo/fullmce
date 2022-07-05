@@ -66,7 +66,7 @@
     <message>
         <location filename="../fullmce_dialog_base.ui" line="836"/>
         <source>Reclassification des contraintes</source>
-        <translation>Object Based image analysis (OBIA) classification</translation>
+        <translation>Contraints classification</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="319"/>
@@ -121,12 +121,12 @@
     <message>
         <location filename="../fullmce_dialog_base.ui" line="644"/>
         <source>Paramètres de reclassification des contraintes</source>
-        <translation>Classification parameters</translation>
+        <translation>Contraints classification parameters</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="662"/>
         <source>Liste des contraintes à reclassifier</source>
-        <translation>List of objects to classify</translation>
+        <translation>List of contraints to classify</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="721"/>
@@ -287,7 +287,7 @@
     <message>
         <location filename="../event_tools/initialiseAll.py" line="496"/>
         <source>Voulez-vous tout de suite effectuer le traitement des contraintes ?</source>
-        <translation>Do you want to proceed to classification right now?</translation>
+        <translation>Do you want to proceed to contraints classification right now?</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="465"/>
