@@ -3,7 +3,7 @@
 from qgis.PyQt.QtCore import Qt, QVariant, QCoreApplication
 from qgis.PyQt.QtGui import QFont
 from qgis.PyQt.QtWidgets import *
-from .contrainte import Contrainte
+from .inputData import InputData
 from .inputLayer import InputLayer
 from qgis.core import QgsVectorFileWriter, QgsField
 import os, shutil
@@ -19,11 +19,14 @@ class initialiseAll:
 
         self.pageInd = self.iface.dlg.STACKED_WIDGET.currentIndex()
 
-        # Initialize list of contraintes
+        # Initialize list of InputData
         self.listContraintes = []
         self.listContraintesNotReady = []
+        self.listFactors = []
+        self.listFactorNotNormalized = []
+        self.list_inputLayers = []
 
-    def display_page1(self):
+    def display_output_config(self):
         concepteurpath = os.path.join(
             self.iface.plugin_dir, 'event_tools/concepteur.csv')
 
@@ -65,9 +68,7 @@ class initialiseAll:
             Qt.TextBrowserInteraction)
         self.iface.dlg.LBL_ROHY.setOpenExternalLinks(True)
 
-    def display_page3_5(self, columns, tbl, sb):
-        self.list_inputLayers = []
-
+    def display_input_config(self, columns, tbl, sb):
         tbl.setColumnCount(len(columns))
         tbl.setHorizontalHeaderLabels(columns)
         # Table will fit the screen horizontally
@@ -75,10 +76,55 @@ class initialiseAll:
         tbl.horizontalHeader().setSectionResizeMode(1,QHeaderView.Stretch)
         tbl.horizontalHeader().setSectionResizeMode(2,QHeaderView.ResizeToContents)
         tbl.horizontalHeader().setSectionResizeMode(3,QHeaderView.ResizeToContents)
-        # Listen to spinbox contraintes
+        # Listen to spinbox
         sb.valueChanged.connect(lambda: self.update_listData(tbl,sb))
 
-    def display_page4(self, i, contrainte):
+    def init_classification_input(self):
+        name = QCoreApplication.translate("initialisation","Noms")
+        path = QCoreApplication.translate("initialisation","Chemins")
+        ready = QCoreApplication.translate("initialisation","Prêts")
+        columns = [name, path, "", ready]
+        self.display_input_config(columns,self.iface.dlg.TBL_CONTRAINTE,self.iface.dlg.SB_NB_CONTRAINTE)
+
+        # Listen to list of contraintes not ready
+        self.iface.dlg.LV_CONTRAINTE_NOT_READY.itemSelectionChanged.connect(
+            lambda : self.select_contrainte_not_ready())
+        # Listen to button add/delete row, reclassification contraintes
+        self.iface.dlg.BT_DELETE_ROW_CONTRAINTE.clicked.connect(
+            lambda : self.delete_reclass_row_param())
+        self.iface.dlg.BT_ADD_ROW_CONTRAINTE.clicked.connect(
+            lambda : self.add_reclass_row_param())
+
+    def init_standardization_input(self):
+        # Get columns name
+        tab = self.iface.dlg.TBL_CONTRAINTE
+        columns =  [tab.horizontalHeaderItem(col).text() for col in range(tab.columnCount())]
+        normalized = QCoreApplication.translate("initialisation","Normalisés")
+        columns[3] = normalized
+
+        # Initialize standardization input table
+        self.display_input_config(columns,self.iface.dlg.TBL_DATA_ENTREE,self.iface.dlg.SB_NB_DATA)
+
+        # Initialize 3 input rows
+        self.update_listData(self.iface.dlg.TBL_DATA_ENTREE,self.iface.dlg.SB_NB_DATA)
+
+    def display_standardization_table(self, nb_rows):
+        tab = self.iface.dlg.TBL_DATA_STANDARDIZATION
+        name = QCoreApplication.translate("initialisation","Noms")
+        fonctions = QCoreApplication.translate("initialisation","Fonctions")
+        sens = QCoreApplication.translate("initialisation","Sens")
+        columns = [name, fonctions, sens, "A", "B", "C", "D"]
+        tab.setColumnCount(len(columns))
+        tab.setHorizontalHeaderLabels(columns)
+        tab.verticalHeader().setVisible(True)
+        tab.setRowCount(nb_rows)
+        tab.horizontalHeader().setSectionResizeMode(0,QHeaderView.Stretch)
+        tab.horizontalHeader().setSectionResizeMode(1,QHeaderView.Stretch)
+        tab.horizontalHeader().setSectionResizeMode(2,QHeaderView.Stretch)
+        tab.setStyleSheet(
+            "QTableWidget::item {border: 0px; padding-top: 5px; padding-bottom: 5px; padding-left: 8px; padding-right: 8px;}")
+
+    def display_classification_table(self, i, contrainte):
         ###---------Initialize List contrainte not ready Widget----------
         self.iface.dlg.LV_CONTRAINTE_NOT_READY.addItem(contrainte.name)
 
@@ -104,6 +150,38 @@ class initialiseAll:
         # Table will fit the screen horizontally
         tab.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
+    def add_standardization_row(self,row,factor):
+        tab = self.iface.dlg.TBL_DATA_STANDARDIZATION
+
+        factor_name = QLineEdit()
+        factor_name.setFont(self.myFont)
+        factor_name.setText(factor.name)
+        tab.setCellWidget(row, 0, factor_name)
+
+        factor_function = QComboBox()
+        factor_function.setFont(self.myFont)
+        s_shaped = QCoreApplication.translate("initialisation","S-Shaped (Sigmoïdal)")
+        j_shaped = QCoreApplication.translate("initialisation","J-Shaped")
+        linear = QCoreApplication.translate("initialisation","Linéaire")
+        functions = [s_shaped,j_shaped,linear]
+        factor_function.addItems(functions)
+        tab.setCellWidget(row, 1, factor_function)
+
+        factor_sens = QComboBox()
+        factor_sens.setFont(self.myFont)
+        decroissant = QCoreApplication.translate("initialisation","Décroissant")
+        croissant = QCoreApplication.translate("initialisation","Croissant")
+        symetrique = QCoreApplication.translate("initialisation","Symétrique")
+        sens = [decroissant,croissant,symetrique]
+        factor_sens.addItems(sens)
+        tab.setCellWidget(row, 2, factor_sens)
+
+        for col in range(3,7):
+            factor_param = QLineEdit()
+            factor_param.setFont(self.myFont)
+            tab.setColumnWidth(col,80)
+            tab.setCellWidget(row, col, factor_param)
+
     def select_output_dir(self):
         foldername = QFileDialog.getExistingDirectory(
             self.iface.dlg, QCoreApplication.translate("initialisation","Sélectionner le répertoire de sortie"))
@@ -119,7 +197,7 @@ class initialiseAll:
                 buttons=QMessageBox.Ok,
                 defaultButton=QMessageBox.Ok,
                 )
-        elif (self.pageInd == 2 and not self.contraintes_filled()) or (self.pageInd == 3 and not self.reclassification()):
+        elif (self.pageInd == 2 and not self.contraintes_filled()) or (self.pageInd == 3 and not self.reclassification()) or (self.pageInd == 5 and not self.factors_filled()):
             self.pageInd = self.iface.dlg.STACKED_WIDGET.currentIndex()
         elif (self.pageInd == 2 and self.listContraintesNotReady == []) or (self.pageInd == 3 and self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.document().isEmpty()):
             self.pageInd = 5
@@ -150,8 +228,14 @@ class initialiseAll:
         tbl.setRowCount(spinbox_value)
         tbl.verticalHeader().setVisible(True)
 
-        # Update list of contraintes
-        self.listContraintes = self.listContraintes[:spinbox_value]
+        # Update list of input data
+        if self.pageInd == 2:
+            self.listContraintes = self.listContraintes[:spinbox_value]
+            list_object = self.listContraintes
+        else:
+            self.listFactors = self.listFactors[:spinbox_value]
+            self.iface.dlg.SB_NB_DATA_2.setValue(spinbox_value)
+            list_object = self.listFactors
 
         for row in range(spinbox_value):
             # Initialise input widget
@@ -172,28 +256,29 @@ class initialiseAll:
             # Handle items
             r = row
             name.textEdited.connect(
-                lambda name=row, row=r: self.listContraintes[row].setname(name))
+                lambda name=row, row=r: list_object[row].setname(name))
+            checkbox.stateChanged.connect(
+                lambda ready=row, row=r: list_object[row].setready(ready))
             toolButton.released.connect(
                 lambda r=r: self.select_source_path(tbl,r))
-            checkbox.stateChanged.connect(
-                lambda ready=row, row=r: self.listContraintes[row].setready(ready))
 
-            # Set contrainte name, path, button, checkbox
+            # Set inputData name, path, button, checkbox
             tbl.setCellWidget(row, 0, name)
             tbl.setCellWidget(row, 1, path)
             tbl.setCellWidget(row, 2, toolButton)
             tbl.setCellWidget(row, 3, checkbox)
 
-             # Append list of contraintes
-            if row >= len(self.listContraintes):
+             # If row added => Append list of inputData
+            if row >= len(list_object):
                 type = "contraint" if self.pageInd == 2 else "factor"
                 inputLayer = InputLayer(path.text())
-                contrainte = Contrainte(name.text(),inputLayer, 0, type)
-                inputLayer.add_element(contrainte)
-                self.listContraintes.append(contrainte)
-            name.setText(self.listContraintes[row].name)
-            path.setText(self.listContraintes[row].inputLayer.path)
-            checkbox.setCheckState(self.listContraintes[row].ready)
+                inputObject = InputData(name.text(),inputLayer, 0, type)
+                inputLayer.add_element(inputObject)
+                list_object.append(inputObject)
+
+            name.setText(list_object[row].name)
+            path.setText(list_object[row].inputLayer.path)
+            checkbox.setCheckState(list_object[row].ready)
 
         tbl.setStyleSheet(
             "QTableWidget::item {border: 0px; padding-top: 5px; padding-bottom: 5px; padding-left: 10px; padding-right: 10px;}")
@@ -201,20 +286,24 @@ class initialiseAll:
     def select_source_path(self, tbl, row):
         path, _filter = QFileDialog.getOpenFileName(
             tbl, QCoreApplication.translate("initialisation","Choisir un vecteur"), "", "*.shp")
-        contrainte = self.listContraintes[row]
+
+        if self.pageInd == 2:
+            inputData = self.listContraintes[row]
+        else:
+            inputData = self.listFactors[row]
 
         for inputLayer in self.list_inputLayers:
             # Search If inputLayer is in list of inputLayer
             if inputLayer.path == path:
-                contrainte.setinputLayer(inputLayer)
+                inputData.setinputLayer(inputLayer)
                 inlineEdit = tbl.cellWidget(row, 1)
                 inlineEdit.setText(path)
 
         # Else create new inputLayer
-        if contrainte.inputLayer.path != path:
+        if inputData.inputLayer.path != path:
             inputLayer = InputLayer(path)
             if inputLayer.isValid():
-                contrainte.setinputLayer(inputLayer)
+                inputData.setinputLayer(inputLayer)
                 self.list_inputLayers.append(inputLayer)
                 inlineEdit = tbl.cellWidget(row, 1)
                 inlineEdit.setText(path)
@@ -233,8 +322,10 @@ class initialiseAll:
                 self.list_inputLayers.remove(inputLayer)
 
     def contraintes_filled(self):
-        # Re-initialize the list of contrainte not ready and reclassification table
+        # Re-initialize the list of contrainte not ready
         self.listContraintesNotReady = self.listContraintes.copy()
+
+        # Clear reclassification table
         self.iface.dlg.LV_CONTRAINTE_NOT_READY.clear()
         nb_tab = self.iface.dlg.STACKED_WIDGET_RECLASS.count()
         for ind in range(nb_tab-1,-1,-1):
@@ -252,7 +343,7 @@ class initialiseAll:
                 self.listContraintesNotReady.remove(contrainte)
             else:
                 # Initialize reclassification table
-                self.display_page4(i,contrainte)
+                self.display_classification_table(i,contrainte)
             if not contrainte.name or contrainte.inputLayer.path == "":
                 msg_name = QCoreApplication.translate("initialisation","Saisir un nom pour la contrainte numéro")
                 msg_path = QCoreApplication.translate("initialisation","Sélectionner une image pour la contrainte numéro")
@@ -279,36 +370,40 @@ class initialiseAll:
         return True
 
     def factors_filled(self):
-        # Re-initialize the list of contrainte not ready and reclassification table
-        self.listFactorNotNormal = self.listFactor.copy()
-        self.iface.dlg.TBL_DATA_STANDARDIZATION.clear()
+        # Re-initialize the list of factors
+        self.listFactorNotNormalized = self.listFactors.copy()
 
-        for i,factor in enumerate(self.listFactor):
-            if factor.ready == 2:
-                self.listFactorNotNormal.remove(factor)
-            # else:
-                # Initialize reclassification table
-                # self.display_page4(i,contrainte)
-            if not factor.name or not factor.inputLayer:
+        # Update standardization table
+        self.display_standardization_table(len(self.listFactors))
+
+        for row,factor in enumerate(self.listFactors):
+            if not factor.name or factor.inputLayer.path == "":
                 msg_name = QCoreApplication.translate("initialisation","Saisir un nom pour le facteur numéro")
                 msg_path = QCoreApplication.translate("initialisation","Sélectionner une image pour le facteur numéro")
                 error_msg = msg_name if not factor.name else msg_path
                 button = QMessageBox.critical(
                     self.iface.dlg,
                     QCoreApplication.translate("initialisation","Erreur ..."),
-                    f"{error_msg} {i+1}",
+                    f"{error_msg} {row+1}",
                     buttons=QMessageBox.Ok,
                     defaultButton=QMessageBox.Ok,
                 )
-                return True
-        #     contrainte_status = QCoreApplication.translate("initialisation","PRÊTE") if contrainte.ready else QCoreApplication.translate("initialisation","NON PRÊTE")
-        #     log += f"{contrainte.name}\t\t{contrainte.source_path}\t\t{contrainte_status}\n"
-        #
+                return False
+
+            if factor.ready == 2:
+                self.listFactorNotNormalized.remove(factor)
+
+            # Initialize standardization table
+            self.add_standardization_row(row,factor)
+            # contrainte_status = QCoreApplication.translate("initialisation","PRÊTE") if contrainte.ready else QCoreApplication.translate("initialisation","NON PRÊTE")
+            # log += f"{contrainte.name}\t\t{contrainte.inputLayer.path}\t\t{contrainte_status}\n"
+
         # log += "\n\n"
         # self.log_path = os.path.join(output_dir,"full_mce_log.txt")
         # with open(self.log_path,"w") as f:
         #     f.write(log)
-        return False
+
+        return True
 
     def select_contrainte_not_ready(self):
         # Get selected contrainte
@@ -413,8 +508,8 @@ class initialiseAll:
             for row in range(tab.rowCount()):
                 self.update_cell_to_editline(tab,row)
 
-            tab.horizontalHeader().setSectionResizeMode(4,QHeaderView.ResizeToContents)
-            tab.horizontalHeader().setSectionResizeMode(6,QHeaderView.ResizeToContents)
+            tab.horizontalHeader().setSectionResizeMode(0,QHeaderView.ResizeToContents)
+            tab.horizontalHeader().setSectionResizeMode(2,QHeaderView.ResizeToContents)
 
     def update_cell_to_editline(self,tab,row):
         start_value = QLineEdit()
@@ -515,9 +610,9 @@ class initialiseAll:
             if field_type == "String":
                 return QCoreApplication.translate("initialisation","Initiale (différente)")
             else:
-                return QCoreApplication.translate("initialisation","Début")
+                return QCoreApplication.translate("initialisation","début")
         else:
-            return QCoreApplication.translate("initialisation","Finale (supérieure à la valeur Début)")
+            return QCoreApplication.translate("initialisation","finale (supérieure à la valeur Début)")
 
     def reclassification_log(self,log, tab, field_type):
         for r in range(tab.rowCount()):
@@ -604,20 +699,21 @@ class initialiseAll:
             except ValueError:
                 return list_values,row,5
 
+            start_value_inclued = tab.cellWidget(row,4).isChecked()
+            end_value_inclued = tab.cellWidget(row,6).isChecked()
+
             # Check if start value < end_value
             if start_value >= end_value:
                 return list_values,row,5
 
             # Compare row interval to previous row
             for values in list_values:
-                if self.attribute_is_in_range(start_value,values):
+                if start_value_inclued and self.attribute_is_in_range(start_value,values):
                     return list_values,row,3
                 if self.attribute_is_in_range(end_value,values):
                     return list_values,row,5
 
             # Save parameter to list
-            start_value_inclued = tab.cellWidget(row,4).isChecked()
-            end_value_inclued = tab.cellWidget(row,6).isChecked()
             row_values = [start_value, start_value_inclued, end_value, end_value_inclued, new_value]
             list_values.append(row_values)
         return list_values, -1, -1
@@ -743,32 +839,14 @@ class initialiseAll:
     def initialise_run(self):
         if self.iface.first_start is True:
             self.iface.first_start = False
-            self.display_page1()
+            self.display_output_config()
 
             # On click on Suivant
             self.iface.dlg.BT_NEXT.pressed.connect(lambda: self.display_next_page())
-
             #On click on répertoire de sortie
             self.iface.dlg.BT_OUTPUT.clicked.connect(lambda: self.select_output_dir())
-
             #On click on Precedent
             self.iface.dlg.BT_PREVIOUS.clicked.connect(lambda: self.display_previous_page())
 
-
-            name = QCoreApplication.translate("initialisation","Noms")
-            path = QCoreApplication.translate("initialisation","Chemins")
-            ready = QCoreApplication.translate("initialisation","Prêts")
-            columns = [name, path, "", ready]
-            self.display_page3_5(columns,self.iface.dlg.TBL_CONTRAINTE,self.iface.dlg.SB_NB_CONTRAINTE)
-            # Listen to list of contraintes not ready
-            self.iface.dlg.LV_CONTRAINTE_NOT_READY.itemSelectionChanged.connect(
-                lambda : self.select_contrainte_not_ready())
-            # Listen to button add/delete row, reclassification contraintes
-            self.iface.dlg.BT_DELETE_ROW_CONTRAINTE.clicked.connect(
-                lambda : self.delete_reclass_row_param())
-            self.iface.dlg.BT_ADD_ROW_CONTRAINTE.clicked.connect(
-                lambda : self.add_reclass_row_param())
-
-            normalized = QCoreApplication.translate("initialisation","Normalisés")
-            columns[3] = normalized
-            self.display_page3_5(columns,self.iface.dlg.TBL_DATA_ENTREE,self.iface.dlg.SB_NB_DATA)
+            self.init_classification_input()
+            self.init_standardization_input()

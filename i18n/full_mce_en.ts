@@ -94,11 +94,6 @@
         <translation>Input data</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="413"/>
-        <source>Répértoire de sortie</source>
-        <translation type="obsolete">Output folder</translation>
-    </message>
-    <message>
         <location filename="../fullmce_dialog_base.ui" line="451"/>
         <source>...</source>
         <translation></translation>
@@ -214,159 +209,95 @@
     <message>
         <location filename="../fullmce.py" line="174"/>
         <source>Analyse Multicritère pour la santé publique</source>
-        <translation>Full MCE for Public Health</translation>
+        <translation type="unfinished">Full MCE for Public Health</translation>
     </message>
     <message>
         <location filename="../fullmce.py" line="189"/>
         <source>&amp;Analyse Multicritère pour la santé publique</source>
-        <translation>&amp;Full MCE for Public Health</translation>
+        <translation type="unfinished">&amp;Full MCE for Public Health</translation>
     </message>
 </context>
 <context>
     <name>initialisation</name>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="55"/>
-        <source>Ce plugin a été spécialement dévéloppé par l&apos;Institut Pasteur de Madagascar dans le cadre d&apos;une étude sur la surveillance constante du paludisme et la détermination des zones prioritaires aux Campagnes d&apos;Aspertion Intra-Domiciliaire (CAID) à Madagascar. Son utilisation est privilégié dans le domaine de la santé publique.</source>
-        <translation>This plugin was specially developed by the Institute Pasteur of Madagascar as part of a study on the constant monitoring of malaria and the determination of priority areas for Intra-Domiciliary Spraying Campaigns (CAID) in Madagascar. Its use is favored in the field of public health.</translation>
-    </message>
-    <message>
-        <location filename="../event_tools/initialiseAll.py" line="60"/>
+        <location filename="../event_tools/initialiseAll.py" line="61"/>
         <source>Suggestions ou Remarques</source>
         <translation>Suggestions or Comments</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="68"/>
+        <location filename="../event_tools/initialiseAll.py" line="758"/>
         <source>Noms</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="69"/>
+        <location filename="../event_tools/initialiseAll.py" line="759"/>
         <source>Chemins</source>
         <translation>Path</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="70"/>
-        <source>Prêts</source>
-        <translation>Ready</translation>
-    </message>
-    <message>
-        <location filename="../event_tools/initialiseAll.py" line="105"/>
+        <location filename="../event_tools/initialiseAll.py" line="89"/>
         <source>Champ</source>
         <translation>Field</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="106"/>
+        <location filename="../event_tools/initialiseAll.py" line="90"/>
         <source>Type</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="107"/>
+        <location filename="../event_tools/initialiseAll.py" line="91"/>
         <source>Nouvelle valeur</source>
         <translation>New value</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="357"/>
+        <location filename="../event_tools/initialiseAll.py" line="386"/>
         <source>Valeur Initiale</source>
         <translation>Initial value</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="124"/>
-        <source>Sélectionner le répertoire de sortie</source>
-        <translation>Select the output folder</translation>
-    </message>
-    <message>
-        <location filename="../event_tools/initialiseAll.py" line="455"/>
+        <location filename="../event_tools/initialiseAll.py" line="486"/>
         <source>Erreur ...</source>
         <translation>Error ...</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="131"/>
-        <source>Choisissez un répertoire de sortie!</source>
-        <translation>Choose an output folder</translation>
-    </message>
-    <message>
-        <location filename="../event_tools/initialiseAll.py" line="217"/>
+        <location filename="../event_tools/initialiseAll.py" line="202"/>
         <source>Choisir un vecteur</source>
         <translation>Choose a vector image</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="224"/>
+        <location filename="../event_tools/initialiseAll.py" line="222"/>
         <source>Choisissez un fichier valide!</source>
         <translation>Choose a valid file!</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="254"/>
-        <source>Saisir un nom pour la contrainte numéro</source>
-        <translation>Input a name for the object number</translation>
-    </message>
-    <message>
-        <location filename="../event_tools/initialiseAll.py" line="255"/>
-        <source>Sélectionner une image pour la contrainte numéro</source>
-        <translation>Choose a vector for the contraint number</translation>
-    </message>
-    <message>
-        <location filename="../event_tools/initialiseAll.py" line="265"/>
-        <source>NON PRÊTE</source>
-        <translation>NOT READY</translation>
-    </message>
-    <message>
-        <location filename="../event_tools/initialiseAll.py" line="369"/>
-        <source>Début</source>
-        <translation>Start</translation>
-    </message>
-    <message>
-        <location filename="../event_tools/initialiseAll.py" line="381"/>
+        <location filename="../event_tools/initialiseAll.py" line="410"/>
         <source>Inclus</source>
         <translation>Inclued</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="377"/>
+        <location filename="../event_tools/initialiseAll.py" line="406"/>
         <source>Fin</source>
         <translation>End</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="419"/>
-        <source>Paramètres de reclassification:
-</source>
-        <translation>Classification parameters:
-</translation>
-    </message>
-    <message>
-        <location filename="../event_tools/initialiseAll.py" line="454"/>
-        <source>Initiale/Début</source>
-        <translation>Initial/Start</translation>
-    </message>
-    <message>
-        <location filename="../event_tools/initialiseAll.py" line="454"/>
-        <source>Finale (supérieure à la valeur Début)</source>
-        <translation>End (greater than start value)</translation>
-    </message>
-    <message>
-        <location filename="../event_tools/initialiseAll.py" line="466"/>
+        <location filename="../event_tools/initialiseAll.py" line="496"/>
         <source>Question ...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="466"/>
+        <location filename="../event_tools/initialiseAll.py" line="496"/>
         <source>Voulez-vous tout de suite effectuer le traitement des contraintes ?</source>
         <translation>Do you want to proceed to classification right now?</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="499"/>
-        <source>Paramètres</source>
-        <translation>Classification</translation>
+        <location filename="../event_tools/initialiseAll.py" line="465"/>
+        <source>{0}) Contrainte &quot;{1}&quot;: Champ {2} (Type {3})
+</source>
+        <translation>{0}) Contraint &quot;{1}&quot;: Field {2} (Type {3})
+</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="519"/>
-        <source>Reclassification des contraintes terminés avec succès !
-
-#######################################################</source>
-        <translation>Contraints classification succesfully completed !
-
-#######################################################</translation>
-    </message>
-    <message>
-        <location filename="../event_tools/initialiseAll.py" line="244"/>
+        <location filename="../event_tools/initialiseAll.py" line="247"/>
         <source>Traitement initié le {0}
 
 Répértoire de sortie: {1}
@@ -385,19 +316,94 @@ Count of contraints: {2}
 </translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="426"/>
+        <location filename="../event_tools/initialiseAll.py" line="268"/>
+        <source>NON PRÊTE</source>
+        <translation>READY</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="293"/>
+        <source>Saisir un nom pour le facteur numéro</source>
+        <translation>Input a name for the object number</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="294"/>
+        <source>Sélectionner une image pour le facteur numéro</source>
+        <translation>Choose a vector for the contraint number</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="486"/>
+        <source>Contrainte &lt;b&gt;&quot;{0}&quot;&lt;/b&gt; - Ligne {1} : Saisir &lt;b&gt;une valeur {2}&lt;/b&gt; valide.</source>
+        <translation>Contraint &lt;b&gt;&quot;{0}&quot;&lt;/b&gt; - Line {1} : Input &lt;b&gt;a valid {2}&lt;/b&gt; value.</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="516"/>
+        <source>Initiale (différente)</source>
+        <translation>Initial (different)</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="772"/>
+        <source>Normalisés</source>
+        <translation>Standardized</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="56"/>
+        <source>Ce plugin a été spécialement dévéloppé par l&apos;Institut Pasteur de Madagascar dans le cadre d&apos;une étude sur la surveillance constante du paludisme et la détermination des zones prioritaires aux Campagnes d&apos;Aspertion Intra-Domiciliaire (CAID) à Madagascar. Son utilisation est privilégié dans le domaine de la santé publique.</source>
+        <translation>This plugin was specially developed by the Institute Pasteur of Madagascar as part of a study on the constant monitoring of malaria and the determination of priority areas for Intra-Domiciliary Spraying Campaigns (CAID) in Madagascar. Its use is favored in the field of public health.</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="108"/>
+        <source>Sélectionner le répertoire de sortie</source>
+        <translation>Select the output folder</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="115"/>
+        <source>Choisissez un répertoire de sortie!</source>
+        <translation>Choose an output folder</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="257"/>
+        <source>Saisir un nom pour la contrainte numéro</source>
+        <translation>Input a name for the object number</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="258"/>
+        <source>Sélectionner une image pour la contrainte numéro</source>
+        <translation>Choose a vector for the contraint number</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="518"/>
+        <source>début</source>
+        <translation>start</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="448"/>
+        <source>Paramètres de reclassification:
+</source>
+        <translation>Classification parameters:
+</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="456"/>
         <source>Sélectionner la contrainte &quot;{0}&quot; pour choisir le champ à reclassifier</source>
         <translation>Select the contraint &quot;{0}&quot; to choose the field to classify</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="438"/>
-        <source>{0}) Contrainte &quot;{1}&quot;: Champ {2} (Type {3})
-</source>
-        <translation>{0}) Contraint &quot;{1}&quot;: Field {2} (Type {3})
-</translation>
+        <location filename="../event_tools/initialiseAll.py" line="513"/>
+        <source>en entier (ou réelle)</source>
+        <translation>integer (or real)</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="511"/>
+        <location filename="../event_tools/initialiseAll.py" line="520"/>
+        <source>finale (supérieure à la valeur Début)</source>
+        <translation>end (greater than start value)</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="540"/>
+        <source>Paramètres</source>
+        <translation>Classification</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="557"/>
         <source>#######################################################
 
 Nombre de contraintes en entrée: {0} ({1} à reclassifier)
@@ -414,7 +420,7 @@ Processing in progress. . .
 </translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="518"/>
+        <location filename="../event_tools/initialiseAll.py" line="566"/>
         <source>Contrainte &quot;{0}&quot; :
 Lecture des paramètres		[OK]
 Reclassification du champ &quot;{1}&quot; - Type &quot;{2}&quot;		[OK]
@@ -429,14 +435,18 @@ Save the result into the output file {3} 		[OK]
 </translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="454"/>
-        <source>en entier (ou réelle)</source>
-        <translation>integer (or real)</translation>
+        <location filename="../event_tools/initialiseAll.py" line="567"/>
+        <source>Reclassification des contraintes terminés avec succès !
+
+#######################################################</source>
+        <translation>Contraints classification succesfully completed !
+
+#######################################################</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="455"/>
-        <source>Saisir &lt;b&gt;une valeur {0}&lt;/b&gt; valide à la ligne {1} pour la contrainte &lt;b&gt;&quot;{2}&quot;&lt;/b&gt;.</source>
-        <translation>Input &lt;b&gt;a valid {0}&lt;/b&gt; value in line {1} for contraint &lt;b&gt;&quot;{2}&quot;&lt;/b&gt;.</translation>
+        <location filename="../event_tools/initialiseAll.py" line="760"/>
+        <source>Prêts</source>
+        <translation>Ready</translation>
     </message>
 </context>
 </TS>

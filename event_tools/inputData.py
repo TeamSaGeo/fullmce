@@ -1,4 +1,4 @@
-class Contrainte:
+class InputData:
     def __init__(self, name, inputLayer, ready, type):
         self.name = name
         self.ready = ready
@@ -27,5 +27,4 @@ class Contrainte:
         return self.field_type
 
     def __getattr__(self, item):
-        # return super(Contrainte, self).__setattr__(item, 'orphan')
-        return 'Contrainte does not have `{}` attribute.'.format(str(item))
+        return 'inputData does not have `{}` attribute.'.format(str(item))

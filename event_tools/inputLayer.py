@@ -35,5 +35,4 @@ class InputLayer:
         self.reclass_output = output_path
 
     def __getattr__(self, item):
-        # return super(Contrainte, self).__setattr__(item, 'orphan')
         return 'Source path does not have `{}` attribute.'.format(str(item))
