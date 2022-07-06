@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from qgis.PyQt.QtCore import Qt, QVariant, QCoreApplication
+from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtGui import QFont
 from qgis.PyQt.QtWidgets import *
 from .inputData import InputData
 from .inputLayer import InputLayer
+from .classification import Classification
 from qgis.core import QgsVectorFileWriter, QgsField
 import os, shutil
 from datetime import datetime
@@ -546,51 +547,21 @@ class initialiseAll:
         log = QCoreApplication.translate("initialisation","Paramètres de reclassification: \n")
         for i,contrainte in enumerate(self.listContraintesNotReady):
             tab = self.iface.dlg.STACKED_WIDGET_RECLASS.widget(i)
-
-            # Check if field name exist
-            try:
-                field_name = tab.cellWidget(0,0).currentText()
-            except (ValueError, AttributeError) as error:
+            classification = Classification(contrainte, tab, i, log)
+            row, col = classification.correct_param()
+            if col != -1 :
+                error_msg = classification.raise_error_msg(row,col)
                 button = QMessageBox.critical(
                     self.iface.dlg,
                     QCoreApplication.translate("initialisation","Erreur ..."),
-                    QCoreApplication.translate("initialisation","Sélectionner la contrainte \"{0}\" pour choisir le champ à reclassifier").format(contrainte.name),
-                    buttons=QMessageBox.Ok,
-                    defaultButton=QMessageBox.Ok,
-                )
-                return False
-
-            log += QCoreApplication.translate("initialisation","{0}) Contrainte \"{1}\": Champ {2} (Type {3})\n").format(i+1,contrainte.name,contrainte.field_name,contrainte.field_type)
-
-            row = -1
-            col = -1
-            vlayer = None
-            field_type = contrainte.field_type
-
-            if field_type == "String":
-                list_values,row,col = self.get_string_reclass_param(contrainte,tab)
-            else:
-                list_values,row,col = self.get_number_reclass_param(contrainte,tab)
-
-            if row == -1 and col == -1:
-                if field_type == "String":
-                    vlayer = self.change_string_attributes_values(contrainte,tab, list_values)
-                else:
-                    vlayer = self.change_number_attributes_values(contrainte,tab,list_values)
-                contrainte.inputLayer.setvlayer(vlayer)
-                log = self.reclassification_log(log,tab,field_type)
-            else:
-                error_msg = self.reclass_error_msg(col,field_type)
-                button = QMessageBox.critical(
-                    self.iface.dlg,
-                    QCoreApplication.translate("initialisation","Erreur ..."),
-                    QCoreApplication.translate("initialisation","Contrainte <b>\"{0}\" - Ligne {1} </b>: Saisir <b>une valeur {2}</b> valide.").format(contrainte.name,row + 1,error_msg),
+                    error_msg,
                     buttons=QMessageBox.Ok,
                     defaultButton=QMessageBox.Ok,
                 )
                 new_field_name = contrainte.field_name[:-2] + "Bl"
                 contrainte.inputLayer.delete_new_field(new_field_name)
                 return False
+
         # Show dialog Box
         reply = QMessageBox.question(
             self.iface.dlg,
@@ -606,30 +577,6 @@ class initialiseAll:
         # Write into log file
         self.save_reclassification_log_into_file(log)
         return True
-
-    def reclass_error_msg (self, col,field_type):
-        if col == 2:
-            return QCoreApplication.translate("initialisation","en entier (ou réelle)")
-        elif col == 3:
-            if field_type == "String":
-                return QCoreApplication.translate("initialisation","Initiale (différente)")
-            else:
-                return QCoreApplication.translate("initialisation","début")
-        else:
-            return QCoreApplication.translate("initialisation","finale (supérieure à la valeur Début)")
-
-    def reclassification_log(self,log, tab, field_type):
-        for r in range(tab.rowCount()):
-            log += f"\t{tab.cellWidget(r,2).text()}"
-            if field_type == "String":
-                log += f"\t{tab.cellWidget(r,3).currentText()}\n"
-            else:
-                start_inclus = "[" if tab.cellWidget(r,4).isChecked() else "]"
-                end_inclus = "]" if tab.cellWidget(r,6).isChecked() else "["
-
-                log += f"\t{start_inclus} {tab.cellWidget(r,3).text()} , {tab.cellWidget(r,5).text()} {end_inclus}\n"
-        log +="\n"
-        return log
 
     def save_reclassification_log_into_file(self,log):
         with open(self.log_path, "r") as input:
@@ -667,165 +614,6 @@ class initialiseAll:
         log += QCoreApplication.translate("initialisation","Reclassification des contraintes terminés avec succès !\n\n#######################################################")
         self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.setText(log)
         self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.setFont(self.myFont)
-
-    def get_number_reclass_param(self,contrainte,tab):
-        list_values = []
-        field_type = contrainte.field_type
-        for row in range(tab.rowCount()):
-            # get new value
-            try:
-                new_value = float(tab.cellWidget(row,2).text())
-            except ValueError:
-                return list_values,row,2
-
-            # get start_value
-            try:
-                start_value = tab.cellWidget(row,3).text()
-                if start_value == "min":
-                    start_value = min(contrainte.field_values)
-                # Convert end_value to Date or to Real
-                if field_type == "Date":
-                    start_value = datetime.strptime(start_value,'%y-%m-%d')
-                else:
-                    start_value = float(start_value)
-            except ValueError:
-                return list_values,row,3
-
-            # Get end_value
-            try:
-                end_value = tab.cellWidget(row,5).text()
-                if end_value == "max":
-                    end_value = max(contrainte.field_values)
-                # Convert end_value to Date or to Real
-                if field_type == "Date":
-                    end_value = datetime.strptime(start_value,'%y-%m-%d')
-                else:
-                    end_value = float(end_value)
-            except ValueError:
-                return list_values,row,5
-
-            start_value_inclued = tab.cellWidget(row,4).isChecked()
-            end_value_inclued = tab.cellWidget(row,6).isChecked()
-
-            # Check if start value < end_value
-            if start_value >= end_value:
-                return list_values,row,5
-
-            # Compare row interval to previous row
-            for values in list_values:
-                # Check if interval is in another interval
-                if self.attribute_is_in_range(start_value,values):
-                    if start_value != values[2] or start_value_inclued:
-                        return list_values,row,3
-                if self.attribute_is_in_range(end_value,values):
-                    if end_value != values[0] or end_value_inclued:
-                        return list_values,row,5
-
-                # Check if interval contains another interval
-                if start_value < values [0] and end_value >= values [2]:
-                    return list_values,row,5
-
-
-            # Save parameter to list
-            row_values = [start_value, start_value_inclued, end_value, end_value_inclued, new_value]
-            list_values.append(row_values)
-        return list_values, -1, -1
-
-    def get_string_reclass_param(self,contrainte,tab):
-        list_values = []
-        for row in range(tab.rowCount()):
-            # get new value
-            try:
-                new_value = float(tab.cellWidget(row,2).text())
-            except ValueError:
-                return vlayer,row,2
-
-            # get start_value
-            start_value = tab.cellWidget(row,3).currentText()
-
-            # check if initial value is duplicated
-            for values in list_values:
-                if start_value == values[0]:
-                    return list_values,row,3
-
-            row_values = [start_value,new_value]
-            list_values.append(row_values)
-
-        return list_values, -1, -1
-
-    def change_string_attributes_values(self,contrainte,tab,values):
-        vlayer = contrainte.inputLayer.vlayer
-        new_field_name = contrainte.field_name[:-2] + "Bl"
-        new_field_idx = contrainte.inputLayer.add_new_field(new_field_name)
-        features = vlayer.getFeatures()
-        vlayer.startEditing()
-        for feat in features:
-            # get layer value
-            value = feat[contrainte.field_idx]
-
-            # initialize iteration variable
-            row = 0
-            new_value = 0
-            start_value = values[0][0]
-
-            # Start condition
-            while value != start_value and row < (tab.rowCount()-1):
-                row += 1
-                start_value = values[row][0]
-
-            # Get new value
-            if value == start_value:
-                new_value = values[row][1]
-
-            # Change Value
-            vlayer.changeAttributeValue(feat.id(),new_field_idx, new_value)
-        return vlayer
-
-    def change_number_attributes_values(self,contrainte,tab, values):
-        vlayer = contrainte.inputLayer.vlayer
-        new_field_name = contrainte.field_name[:-2] + "Bl"
-        new_field_idx = contrainte.inputLayer.add_new_field(new_field_name)
-        features = vlayer.getFeatures()
-        vlayer.startEditing()
-        for feat in features:
-            # get layer value
-            value = feat[contrainte.field_idx]
-
-            # initialize iteration variable
-            row = 0
-            new_value = 0
-            row_values = values[0]
-
-            # Start condition
-            while not self.attribute_is_in_range(value,row_values) and row < (tab.rowCount() - 1):
-                row += 1
-                row_values = values[row]
-
-            # Get new value
-            if self.attribute_is_in_range(value,row_values):
-                new_value = values[row][4]
-
-            vlayer.changeAttributeValue(feat.id(),new_field_idx, new_value)
-
-        return vlayer
-
-    def attribute_is_in_range(self,value,values):
-        in_range = False
-        start_value = values[0]
-        start_value_inclued = values[1]
-        end_value = values[2]
-        end_value_inclued = values[3]
-
-        if start_value_inclued and not end_value_inclued:
-            in_range = value >= start_value and value < end_value
-        elif start_value_inclued and end_value_inclued:
-            in_range = value >= start_value and value <= end_value
-        elif not start_value_inclued and end_value_inclued:
-            in_range = value > start_value and value <= end_value
-        elif not start_value_inclued and not end_value_inclued:
-            in_range = value > start_value and value < end_value
-
-        return in_range
 
     def initialise_variable_init(self):
         return self
