@@ -23,10 +23,10 @@ Your QGIS plugin directory is located at:<br>
 </ol>
 Notes:
 <ul>
-    <li>You can use <b>pb_tool</b> to compile, deploy, and manage your plugin. Tweak the <i>pb_tool.cfg</i> file included with your plugin as you add files. Install <b>pb_tool</b> using 
+    <li>You can use <b>pb_tool</b> to compile, deploy, and manage your plugin. Tweak the <i>pb_tool.cfg</i> file included with your plugin as you add files. Install <b>pb_tool</b> using
         <i>pip</i> or <i>easy_install</i>. See <b>http://loc8.cc/pb_tool</b> for more information.
     <li>You can also use the <b>Makefile</b> to compile and deploy when you
-        make changes. This requires GNU make (gmake). The Makefile is ready to use, however you 
+        make changes. This requires GNU make (gmake). The Makefile is ready to use, however you
         will have to edit it to add addional Python source files, dialogs, and translations.
 </ul>
 </div>
@@ -36,7 +36,41 @@ For information on writing PyQGIS code, see <b>http://loc8.cc/pyqgis_resources</
 </p>
 </div>
 <p>
-&copy;2011-2019 GeoApt LLC - geoapt.com 
+&copy;2011-2019 GeoApt LLC - geoapt.com
 </p>
+
+REGLES DE GESTION:
+  - Le log est sauvegardé dans le fichier "full_mce_log.txt" dans le répertoire de sortie choisit par l'utilisateur
+
+* Classification:
+  1) nombre minimal des contraintes = 0, nombre maximale = illimité
+  2) chaque contrainte correspond à un et un seul champ issu d'un seul fichier source
+  3) un fichier source peut contenir un ou plusieurs contraintes
+  4) un champ d'un fichier source correspond à un et un seul contrainte
+  5) un contrainte doit contenir au moins un nom, un fichier source, un status (prêt ou pas prêt)
+  6) Si la case "Prêts" est cochée, le plugin propose de reclassifier le contrainte
+
+  7) Par défaut, la nouvelle valeur d'un contrainte reclassifé est égale à 0 et de type réel
+  8) Pour les contraintes de type quantitative,
+            - la valeur "Début" doit être strictement inférieure à la valeur "Fin"
+            - si la valeur "Début" est égale à "min", le plugin remplacera cette valeur par la valeur miniminum du champ
+            - si la valeur "Fin" est égale à "max", le plugin remplacera cette valeur par la valeur maximale du champ
+            - chaque interval "Début", "Fin" ne devrait pas contenir un autre interval, ni être inclus dans un autre interval
+  9) Pour les contraintes de type qualitative,
+            - le plugin propose de choisir parmi les attributs du champ;
+            - chaque attribut ne doit être choisit qu'une seule fois
+
+
+* Standardization:
+  1) nombre minimal des facteurs = 3, nombre maximale = 15
+  2) chaque facteur correspond à un et un seul champ issu d'un seul fichier source
+  3) un fichier source peut contenir un ou plusieurs facteurs
+  4) un champ d'un fichier source correspond à un et un seul facteur
+  5) un contrainte doit contenir au moins un nom, un fichier source, un status (prêt ou pas prêt)
+  6) Si une ou plusieurs cases "Normalisés" ne sont pas cochées, le plugin propose de normaliser les facteurs
+
+
+
+
 </body>
 </html>
