@@ -1,26 +1,24 @@
 from qgis.PyQt.QtCore import QCoreApplication
 
 class Classification:
-    def __init__(self, contrainte, tab, ind, log):
+    def __init__(self, contrainte, tab, ind):
         self.contrainte = contrainte
         self.tab = tab
         self.ind = ind
-        self.log = log
 
     def correct_param (self):
-        col = 0
-        row = 0
+        if self.tab.rowCount() == 0:
+            error_msg = self.raise_error_msg(0,-1)
+            return False, error_msg
 
-        try:
-            # Check if field name exist
-            field_name = self.tab.cellWidget(row,col).currentText()
-            list_values,row,col = self.get_params()
-            if row == -1 and col == -1:
-                self.change_attributes_values(list_values)
-            return row, col
-
-        except (ValueError, AttributeError) as error:
-            return row, col
+        list_values,row,col = self.get_params()
+        if row == -1 and col == -1:
+            self.change_attributes_values(list_values)
+            log = self.write_log(list_values)
+            return True , log
+        else:
+            error_msg = self.raise_error_msg(row,col)
+            return False, error_msg
 
     def get_params(self):
         if self.contrainte.field_type == "String":
@@ -29,41 +27,41 @@ class Classification:
             return self.get_number_reclass_param()
 
     def change_attributes_values(self,list_values):
-        self.log += QCoreApplication.translate("initialisation","{0}) Contrainte \"{1}\": Champ {2} (Type {3})\n").format(self.ind+1,self.contrainte.name,self.contrainte.field_name,self.contrainte.field_type)
         if self.contrainte.field_type == "String":
             vlayer = self.change_string_attributes_values(list_values)
         else:
             vlayer = self.change_number_attributes_values(list_values)
         self.contrainte.inputLayer.setvlayer(vlayer)
-        self.write_log()
 
-    def write_log(self):
+    def write_log(self,values):
+        log = QCoreApplication.translate("initialisation","{0}) Contrainte \"{1}\": Champ {2} (Type {3})\n").format(self.ind+1,self.contrainte.name,self.contrainte.field_name,self.contrainte.field_type)
         for r in range(self.tab.rowCount()):
-            self.log += f"\t{self.tab.cellWidget(r,2).text()}"
+            log += f"\t{values[r][-1]}"
             if self.contrainte.field_type == "String":
-                self.log += f"\t{self.tab.cellWidget(r,3).currentText()}\n"
+                log += f"\t{values[r][0]}\n"
             else:
-                start_inclus = "[" if self.tab.cellWidget(r,4).isChecked() else "]"
-                end_inclus = "]" if self.tab.cellWidget(r,6).isChecked() else "["
+                start_inclus = "[" if values[r][1] else "]"
+                end_inclus = "]" if values[r][3] else "["
 
-                self.log += f"\t{start_inclus} {self.tab.cellWidget(r,3).text()} , {self.tab.cellWidget(r,5).text()} {end_inclus}\n"
-        self.log +="\n"
+                log += f"\t{start_inclus} {values[r][0]} , {values[r][2]} {end_inclus}\n"
+        log +="\n"
+        return log
 
     def raise_error_msg (self,row,col):
-        if col == 0:
-            return QCoreApplication.translate("Sélectionner la contrainte \"{0}\" pour choisir le champ à reclassifier").format(self.contrainte.name)
+        if col == -1:
+            return QCoreApplication.translate("initialisation","Sélectionner la contrainte \"{0}\" ajouter les paramètres de reclassification").format(self.contrainte.name)
         else:
             error_msg = ""
-            if col == 2:
+            if col == 0:
                 error_msg = QCoreApplication.translate("initialisation","en entier (ou réelle)")
-            elif col == 3:
+            elif col == 1:
                 if self.contrainte.field_type == "String":
                     error_msg = QCoreApplication.translate("initialisation","Initiale (différente)")
                 else:
                     error_msg = QCoreApplication.translate("initialisation","début")
             else:
                 error_msg = QCoreApplication.translate("initialisation","finale (supérieure à la valeur Début)")
-            return QCoreApplication.translate("initialisation","Contrainte <b>\"{0}\" - Ligne {1} </b>: Saisir <b>une valeur {2}</b> valide.").format(self.contrainte.name,row + 1,error_msg)
+            return QCoreApplication.translate("initialisation","<b>Contrainte \"{0}\":</b> Saisir une valeur {1} valide à la ligne {2} .").format(self.contrainte.name,error_msg,row + 1)
 
     def get_number_reclass_param(self):
         list_values = []
@@ -71,56 +69,56 @@ class Classification:
         for row in range(self.tab.rowCount()):
             # get new value
             try:
-                new_value = float(self.tab.cellWidget(row,2).text())
+                new_value = float(self.tab.cellWidget(row,0).text())
             except ValueError:
-                return list_values,row,2
+                return list_values,row,0
 
             # get start_value
             try:
-                start_value = self.tab.cellWidget(row,3).text()
+                start_value = self.tab.cellWidget(row,1).text()
                 if start_value == "min":
-                    start_value = min(self.contrainte.field_values)
+                    start_value = min(self.contrainte.getfield_values())
                 # Convert end_value to Date or to Real
                 if field_type == "Date":
                     start_value = datetime.strptime(start_value,'%y-%m-%d')
                 else:
                     start_value = float(start_value)
             except ValueError:
-                return list_values,row,3
+                return list_values,row,1
 
             # Get end_value
             try:
-                end_value = self.tab.cellWidget(row,5).text()
+                end_value = self.tab.cellWidget(row,3).text()
                 if end_value == "max":
-                    end_value = max(self.contrainte.field_values)
+                    end_value = max(self.contrainte.getfield_values())
                 # Convert end_value to Date or to Real
                 if field_type == "Date":
                     end_value = datetime.strptime(start_value,'%y-%m-%d')
                 else:
                     end_value = float(end_value)
             except ValueError:
-                return list_values,row,5
+                return list_values,row,3
 
-            start_value_inclued = self.tab.cellWidget(row,4).isChecked()
-            end_value_inclued = self.tab.cellWidget(row,6).isChecked()
+            start_value_inclued = self.tab.cellWidget(row,2).isChecked()
+            end_value_inclued = self.tab.cellWidget(row,4).isChecked()
 
             # Check if start value < end_value
             if start_value >= end_value:
-                return list_values,row,5
+                return list_values,row,3
 
             # Compare row interval to previous row
             for values in list_values:
                 # Check if interval is in another interval
                 if self.value_is_in_range(start_value,values):
                     if start_value != values[2] or start_value_inclued:
-                        return list_values,row,3
+                        return list_values,row,1
                 if self.value_is_in_range(end_value,values):
                     if end_value != values[0] or end_value_inclued:
-                        return list_values,row,5
+                        return list_values,row,3
 
                 # Check if interval contains another interval
                 if start_value < values [0] and end_value >= values [2]:
-                    return list_values,row,5
+                    return list_values,row,3
 
 
             # Save parameter to list
@@ -133,21 +131,20 @@ class Classification:
         for row in range(self.tab.rowCount()):
             # get new value
             try:
-                new_value = float(self.tab.cellWidget(row,2).text())
+                new_value = float(self.tab.cellWidget(row,0).text())
             except ValueError:
-                return vlayer,row,2
+                return list_values,row,0
 
             # get start_value
-            start_value = self.tab.cellWidget(row,3).currentText()
+            start_value = self.tab.cellWidget(row,1).currentText()
 
             # check if initial value is duplicated
             for values in list_values:
                 if start_value == values[0]:
-                    return list_values,row,3
+                    return list_values,row,1
 
             row_values = [start_value,new_value]
             list_values.append(row_values)
-
         return list_values, -1, -1
 
     def change_string_attributes_values(self,values):
