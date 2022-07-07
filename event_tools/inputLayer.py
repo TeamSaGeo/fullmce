@@ -33,12 +33,13 @@ class InputLayer:
     def remove_element (self,element):
         self.elements.remove(element)
 
-    def field_is_duplicated (self):
+    def field_is_duplicated (self, type):
         list_field_idx = []
         for element in self.elements:
-            if element.field_idx in list_field_idx:
-                return True
-            list_field_idx.append(element.field_idx)
+            if element.type == type:
+                if element.field_idx in list_field_idx:
+                    return True
+                list_field_idx.append(element.field_idx)
         return False
 
     def setreclass_output(self,output_path):

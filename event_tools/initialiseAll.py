@@ -167,9 +167,9 @@ class initialiseAll:
         factor_function = QComboBox()
         factor_function.setFont(self.myFont)
         s_shaped = QCoreApplication.translate("initialisation","S-Shaped (Sigmoïdal)")
-        j_shaped = QCoreApplication.translate("initialisation","J-Shaped")
+        # j_shaped = QCoreApplication.translate("initialisation","J-Shaped")
         linear = QCoreApplication.translate("initialisation","Linéaire")
-        functions = [s_shaped,j_shaped,linear]
+        functions = [s_shaped,linear]
         factor_function.addItems(functions)
         tab.setCellWidget(row, 1, factor_function)
 
@@ -367,6 +367,24 @@ class initialiseAll:
         field_name.setCurrentIndex(inputData.field_idx)
         field_type.setText(inputData.field_type)
 
+    def input_row_filled(self, element, i):
+        if not element.name or element.inputLayer.path == "" or element.inputLayer.field_is_duplicated(element.type):
+            type = "contrainte" if element.type == "contraint" else "facteur"
+            msg_name = QCoreApplication.translate("initialisation","Saisir un nom pour le {0} numéro").format(type)
+            msg_path = QCoreApplication.translate("initialisation","Sélectionner une image pour le {0} numéro").format(type)
+            msg_field = QCoreApplication.translate("initialisation","<b>Champ dupliqué!</b> \nChoisir des champs différents pour les {0}s issues du même chemin que le {0} numéro").format(type)
+            error_msg = msg_name if not element.name else msg_path if element.inputLayer.path == "" else msg_field
+            button = QMessageBox.critical(
+                self.iface.dlg,
+                QCoreApplication.translate("initialisation","Erreur ..."),
+                f"{error_msg} {i+1}",
+                buttons=QMessageBox.Ok,
+                defaultButton=QMessageBox.Ok,
+            )
+            return False
+        else:
+            return True
+
     def contraintes_filled(self):
         # Re-initialize the list of contrainte not ready
         self.listContraintesNotReady = self.listContraintes.copy()
@@ -384,20 +402,7 @@ class initialiseAll:
         log = QCoreApplication.translate("initialisation","Traitement initié le {0}\n\nRépértoire de sortie: {1}\nFormat de sortie: SHP\n\nCONTRAINTES\nNombre de contraintes: {2}\n").format(now,output_dir,len(self.listContraintes))
 
         for i,contrainte in enumerate(self.listContraintes):
-            tab = self.iface.dlg.STACKED_WIDGET_RECLASS.widget(i)
-
-            if not contrainte.name or contrainte.inputLayer.path == "" or contrainte.inputLayer.field_is_duplicated():
-                msg_name = QCoreApplication.translate("initialisation","Saisir un nom pour la contrainte numéro")
-                msg_path = QCoreApplication.translate("initialisation","Sélectionner une image pour la contrainte numéro")
-                msg_field = QCoreApplication.translate("initialisation","<b>Champ dupliqué!</b> \nChoisir des champs différents pour les contraintes issues du même chemin que la contrainte numéro")
-                error_msg = msg_name if not contrainte.name else msg_path if contrainte.inputLayer.path == "" else msg_field
-                button = QMessageBox.critical(
-                    self.iface.dlg,
-                    QCoreApplication.translate("initialisation","Erreur ..."),
-                    f"{error_msg} {i+1}",
-                    buttons=QMessageBox.Ok,
-                    defaultButton=QMessageBox.Ok,
-                )
+            if not self.input_row_filled(contrainte,i):
                 return False
 
             if contrainte.ready == 2:
@@ -427,17 +432,7 @@ class initialiseAll:
         self.display_standardization_table(len(self.listFactors))
 
         for row,factor in enumerate(self.listFactors):
-            if not factor.name or factor.inputLayer.path == "":
-                msg_name = QCoreApplication.translate("initialisation","Saisir un nom pour le facteur numéro")
-                msg_path = QCoreApplication.translate("initialisation","Sélectionner une image pour le facteur numéro")
-                error_msg = msg_name if not factor.name else msg_path
-                button = QMessageBox.critical(
-                    self.iface.dlg,
-                    QCoreApplication.translate("initialisation","Erreur ..."),
-                    f"{error_msg} {row+1}",
-                    buttons=QMessageBox.Ok,
-                    defaultButton=QMessageBox.Ok,
-                )
+            if not self.input_row_filled(factor,row):
                 return False
 
             if factor.ready == 2:
