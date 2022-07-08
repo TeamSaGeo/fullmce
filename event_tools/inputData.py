@@ -28,6 +28,5 @@ class InputData:
     def getfield_values(self):
         return list(filter(None,self.inputLayer.vlayer.uniqueValues(self.field_idx,-1)))
 
-
     def __getattr__(self, item):
         return 'inputData does not have `{}` attribute.'.format(str(item))

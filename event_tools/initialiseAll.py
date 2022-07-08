@@ -390,8 +390,8 @@ class initialiseAll:
     def input_row_filled(self, element, i):
         if not element.name or element.inputLayer.path == "" or element.inputLayer.field_is_duplicated(element.type):
             type = "contrainte" if element.type == "contraint" else "facteur"
-            msg_name = QCoreApplication.translate("initialisation","Saisir un nom pour le {0} numéro {1}").format(type,i+1)
-            msg_path = QCoreApplication.translate("initialisation","Sélectionner une image pour le {0} numéro {1}").format(type,i+1)
+            msg_name = QCoreApplication.translate("initialisation","Saisir un nom pour le {0} n° {1}").format(type,i+1)
+            msg_path = QCoreApplication.translate("initialisation","Sélectionner une image pour le {0} n° {1}").format(type,i+1)
             msg_field = QCoreApplication.translate("initialisation","Champ dupliqué! Choisir des champs différents pour les {0}s issues du même fichier source.").format(type)
             error_msg = msg_name if not element.name else msg_path if element.inputLayer.path == "" else msg_field
             button = QMessageBox.critical(
@@ -450,15 +450,31 @@ class initialiseAll:
 
         # Update standardization table
         self.display_standardization_table()
+        nb_string_factor = 0
 
         for row,factor in enumerate(self.listFactors):
             if not self.input_row_filled(factor,row):
                 return False
 
+            if factor.field_type == "String":
+                error_field = QCoreApplication.translate("initialisation","Le facteur n° {0} est de type \"String\". Voulez-vous reclassifier ce facteur ? Sinon veuillez choisir un champ en entier ou réelle.").format(row+1)
+                reply = QMessageBox.question(
+                    self.iface.dlg,
+                    QCoreApplication.translate("initialisation","Question ..."),
+                    f"{error_field}",
+                    buttons=QMessageBox.Yes | QMessageBox.No,
+                    defaultButton=QMessageBox.No,
+                )
+                if reply == QMessageBox.Yes:
+                    self.listContraintes.append(factor)
+                    self.pageInd = 2
+                    self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
+                    self.iface.dlg.SB_NB_CONTRAINTE.setValue(len(self.listContraintes))
+                return False
+
             if factor.ready == 2:
                 self.listFactorsNotNormalized.remove(factor)
             else:
-                # Initialize standardization table
                 self.add_standardization_row(factor)
             # contrainte_status = QCoreApplication.translate("initialisation","PRÊTE") if contrainte.ready else QCoreApplication.translate("initialisation","NON PRÊTE")
             # log += f"{contrainte.name}\t\t{contrainte.inputLayer.path}\t\t{contrainte_status}\n"
@@ -562,7 +578,9 @@ class initialiseAll:
                 new_field_name = contrainte.field_name[:-2] + "Bl"
                 contrainte.inputLayer.delete_new_field(new_field_name)
                 return False
+            contrainte.setready(2)
             log += classification_log
+
         # Show dialog Box
         reply = QMessageBox.question(
             self.iface.dlg,
@@ -581,7 +599,7 @@ class initialiseAll:
 
     def standardization(self):
         tab = self.iface.dlg.TBL_DATA_STANDARDIZATION
-        log = QCoreApplication.translate("initialisation","Paramètres de standardization: \n")
+        log = QCoreApplication.translate("initialisation","Paramètres de standardisation: \n")
         for row,factor in enumerate(self.listFactorsNotNormalized):
             standardization = Standardization(factor,tab,row)
             correct, standardization_log = standardization.correct_param()
