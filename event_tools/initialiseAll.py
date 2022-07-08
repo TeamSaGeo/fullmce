@@ -6,8 +6,9 @@ from qgis.PyQt.QtWidgets import *
 from .inputData import InputData
 from .inputLayer import InputLayer
 from .classification import Classification
-from qgis.core import QgsVectorFileWriter, QgsField
-import os, shutil
+from . standardization import Standardization
+from qgis.core import QgsVectorFileWriter
+import os
 from datetime import datetime
 
 class initialiseAll:
@@ -24,7 +25,7 @@ class initialiseAll:
         self.listContraintes = []
         self.listContraintesNotReady = []
         self.listFactors = []
-        self.listFactorNotNormalized = []
+        self.listFactorsNotNormalized = []
         self.list_inputLayers = []
 
     def display_output_config(self):
@@ -110,7 +111,7 @@ class initialiseAll:
         # Initialize 3 input rows
         self.update_listData(self.iface.dlg.TBL_DATA_ENTREE,self.iface.dlg.SB_NB_DATA)
 
-    def display_standardization_table(self, nb_rows):
+    def display_standardization_table(self):
         tab = self.iface.dlg.TBL_DATA_STANDARDIZATION
         name = QCoreApplication.translate("initialisation","Noms")
         fonctions = QCoreApplication.translate("initialisation","Fonctions")
@@ -122,7 +123,7 @@ class initialiseAll:
         tab.horizontalHeader().setSectionResizeMode(1,QHeaderView.ResizeToContents)
         tab.horizontalHeader().setSectionResizeMode(2,QHeaderView.Stretch)
         tab.verticalHeader().setVisible(True)
-        tab.setRowCount(nb_rows)
+        tab.setRowCount(0)
         tab.setStyleSheet(
             "QTableWidget::item {border: 0px; padding: 4px;}")
 
@@ -156,8 +157,11 @@ class initialiseAll:
         # Table will fit the screen horizontally
         tab.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
-    def add_standardization_row(self,row,factor):
+    def add_standardization_row(self,factor):
         tab = self.iface.dlg.TBL_DATA_STANDARDIZATION
+        row = tab.rowCount()
+        tab.setRowCount(row + 1)
+        self.iface.dlg.SB_NB_DATA_2.setValue(row + 1)
 
         factor_name = QLineEdit()
         factor_name.setFont(self.myFont)
@@ -179,16 +183,11 @@ class initialiseAll:
         ascending = QCoreApplication.translate("initialisation","Croissant")
         descending = QCoreApplication.translate("initialisation","Décroissant")
         symmetrical = QCoreApplication.translate("initialisation","Symétrique")
-        direction = [ascending,descending,symmetrical]
+        direction = [descending,ascending,symmetrical]
         factor_direction.addItems(direction)
         tab.setCellWidget(row, 2, factor_direction)
-
-        for col in range(3,5):
-            factor_param = QLineEdit()
-            factor_param.setFont(self.myFont)
-            tab.setCellWidget(row, col, factor_param)
-
         factor_direction.currentIndexChanged.connect(lambda ind=row: self.add_standardization_param_column(tab,row,ind))
+        factor_direction.setCurrentIndex(1)
 
     def add_standardization_param_column(self,tab,row, ind):
         for col in range(3,7):
@@ -196,15 +195,13 @@ class initialiseAll:
             factor_param.setFont(self.myFont)
             tab.setCellWidget(row, col, factor_param)
         if ind == 0:
-            for col in range(5,7):
+            for col in range(3,5):
                 tab.removeCellWidget(row, col)
         elif ind == 1:
-            for col in range(3,5):
+            for col in range(5,7):
                 tab.removeCellWidget(row, col)
         tab.setStyleSheet(
             "QTableWidget::item {border: 0px; padding: 4px;}")
-
-
 
     def select_output_dir(self):
         foldername = QFileDialog.getExistingDirectory(
@@ -221,13 +218,13 @@ class initialiseAll:
                 buttons=QMessageBox.Ok,
                 defaultButton=QMessageBox.Ok,
                 )
-        elif (self.pageInd == 2 and not self.contraintes_filled()) or (self.pageInd == 3 and not self.classification()) or (self.pageInd == 5 and not self.factors_filled()):
+        elif (self.pageInd == 2 and not self.contraintes_filled()) or (self.pageInd == 3 and not self.classification()) or (self.pageInd == 5 and not self.factors_filled()) or (self.pageInd == 6 and not self.standardization()):
             self.pageInd = self.iface.dlg.STACKED_WIDGET.currentIndex()
         elif (self.pageInd == 2 and self.listContraintesNotReady == []) or (self.pageInd == 3 and self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.document().isEmpty()):
             self.pageInd = 5
             self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
             self.iface.dlg.BT_PREVIOUS.setEnabled(True)
-        elif self.pageInd == 5 and len(self.listFactorNotNormalized)== 0:
+        elif (self.pageInd == 5 and self.listFactorsNotNormalized == []) or (self.pageInd == 6 and self.iface.dlg.TE_RUN_PROCESS_NORMALISATION.document().isEmpty()):
             self.pageInd = 8
             self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
         else:
@@ -246,6 +243,12 @@ class initialiseAll:
             else:
                 self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.clear()
                 self.pageInd = 3
+        if self.pageInd == 7:
+            if self.listFactorsNotNormalized == []:
+                self.pageInd = 5
+            else:
+                self.iface.dlg.TE_RUN_PROCESS_NORMALISATION.clear()
+                self.pageInd = 6
         self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
         return self.pageInd
 
@@ -261,7 +264,6 @@ class initialiseAll:
             list_object = self.listContraintes
         else:
             self.listFactors = self.listFactors[:spinbox_value]
-            self.iface.dlg.SB_NB_DATA_2.setValue(spinbox_value)
             list_object = self.listFactors
 
         for row in range(spinbox_value):
@@ -388,14 +390,14 @@ class initialiseAll:
     def input_row_filled(self, element, i):
         if not element.name or element.inputLayer.path == "" or element.inputLayer.field_is_duplicated(element.type):
             type = "contrainte" if element.type == "contraint" else "facteur"
-            msg_name = QCoreApplication.translate("initialisation","Saisir un nom pour le {0} numéro").format(type)
-            msg_path = QCoreApplication.translate("initialisation","Sélectionner une image pour le {0} numéro").format(type)
-            msg_field = QCoreApplication.translate("initialisation","<b>Champ dupliqué!</b> \nChoisir des champs différents pour les {0}s issues du même chemin que le {0} numéro").format(type)
+            msg_name = QCoreApplication.translate("initialisation","Saisir un nom pour le {0} numéro {1}").format(type,i+1)
+            msg_path = QCoreApplication.translate("initialisation","Sélectionner une image pour le {0} numéro {1}").format(type,i+1)
+            msg_field = QCoreApplication.translate("initialisation","Champ dupliqué! Choisir des champs différents pour les {0}s issues du même fichier source.").format(type)
             error_msg = msg_name if not element.name else msg_path if element.inputLayer.path == "" else msg_field
             button = QMessageBox.critical(
                 self.iface.dlg,
                 QCoreApplication.translate("initialisation","Erreur ..."),
-                f"{error_msg} {i+1}",
+                f"{error_msg}",
                 buttons=QMessageBox.Ok,
                 defaultButton=QMessageBox.Ok,
             )
@@ -444,20 +446,20 @@ class initialiseAll:
 
     def factors_filled(self):
         # Re-initialize the list of factors
-        self.listFactorNotNormalized = self.listFactors.copy()
+        self.listFactorsNotNormalized = self.listFactors.copy()
 
         # Update standardization table
-        self.display_standardization_table(len(self.listFactors))
+        self.display_standardization_table()
 
         for row,factor in enumerate(self.listFactors):
             if not self.input_row_filled(factor,row):
                 return False
 
             if factor.ready == 2:
-                self.listFactorNotNormalized.remove(factor)
-
-            # Initialize standardization table
-            self.add_standardization_row(row,factor)
+                self.listFactorsNotNormalized.remove(factor)
+            else:
+                # Initialize standardization table
+                self.add_standardization_row(factor)
             # contrainte_status = QCoreApplication.translate("initialisation","PRÊTE") if contrainte.ready else QCoreApplication.translate("initialisation","NON PRÊTE")
             # log += f"{contrainte.name}\t\t{contrainte.inputLayer.path}\t\t{contrainte_status}\n"
 
@@ -574,6 +576,37 @@ class initialiseAll:
 
         # Write into log file
         self.save_classification_log_into_file(log)
+        return True
+
+    def standardization(self):
+        tab = self.iface.dlg.TBL_DATA_STANDARDIZATION
+        log = QCoreApplication.translate("initialisation","Paramètres de standardization: \n")
+        for row,factor in enumerate(self.listFactorsNotNormalized):
+            standardization = Standardization(factor,tab,row)
+            correct, standardization_log = standardization.correct_param()
+            if not correct :
+                button = QMessageBox.critical(
+                    self.iface.dlg,
+                    QCoreApplication.translate("initialisation","Erreur ..."),
+                    standardization_log,
+                    buttons=QMessageBox.Ok,
+                    defaultButton=QMessageBox.Ok,
+                )
+                return False
+            log += standardization_log
+        # Show dialog Box
+        reply = QMessageBox.question(
+            self.iface.dlg,
+            QCoreApplication.translate("initialisation","Question ..."),
+            QCoreApplication.translate("initialisation","Voulez-vous tout de suite normaliser les facteurs ?"),
+            buttons= QMessageBox.Cancel | QMessageBox.No | QMessageBox.Yes,
+        )
+        if reply == QMessageBox.Yes:
+            self.iface.dlg.TE_RUN_PROCESS_NORMALISATION.setText(log)
+            self.iface.dlg.TE_RUN_PROCESS_NORMALISATION.setFont(self.myFont)
+            # self.save_classified_layer_into_file()
+        elif reply == QMessageBox.Cancel:
+            return False
         return True
 
     def save_classification_log_into_file(self,log):

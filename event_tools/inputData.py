@@ -28,12 +28,6 @@ class InputData:
     def getfield_values(self):
         return list(filter(None,self.inputLayer.vlayer.uniqueValues(self.field_idx,-1)))
 
-    # def setfield (self,field_name):
-    #     self.field_name = field_name
-    #     self.field_idx = self.inputLayer.vlayer.fields().indexOf(field_name)
-    #     self.field_type = self.inputLayer.vlayer.fields().at(self.field_idx).typeName()
-    #     self.field_values = list(filter(None,self.inputLayer.vlayer.uniqueValues(self.field_idx,-1)))
-    #     return self.field_type
 
     def __getattr__(self, item):
         return 'inputData does not have `{}` attribute.'.format(str(item))
