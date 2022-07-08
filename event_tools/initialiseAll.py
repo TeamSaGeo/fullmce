@@ -118,13 +118,13 @@ class initialiseAll:
         columns = [name, fonctions, sens, "A", "B", "C", "D"]
         tab.setColumnCount(len(columns))
         tab.setHorizontalHeaderLabels(columns)
+        tab.horizontalHeader().setSectionResizeMode(0,QHeaderView.Stretch)
+        tab.horizontalHeader().setSectionResizeMode(1,QHeaderView.ResizeToContents)
+        tab.horizontalHeader().setSectionResizeMode(2,QHeaderView.Stretch)
         tab.verticalHeader().setVisible(True)
         tab.setRowCount(nb_rows)
-        tab.horizontalHeader().setSectionResizeMode(0,QHeaderView.Stretch)
-        tab.horizontalHeader().setSectionResizeMode(1,QHeaderView.Stretch)
-        tab.horizontalHeader().setSectionResizeMode(2,QHeaderView.Stretch)
         tab.setStyleSheet(
-            "QTableWidget::item {border: 0px; padding-top: 5px; padding-bottom: 5px; padding-left: 8px; padding-right: 8px;}")
+            "QTableWidget::item {border: 0px; padding: 4px;}")
 
     def display_classification_table(self, i, contrainte):
         ###---------Initialize List contrainte not ready Widget----------
@@ -162,6 +162,7 @@ class initialiseAll:
         factor_name = QLineEdit()
         factor_name.setFont(self.myFont)
         factor_name.setText(factor.name)
+        factor_name.setEnabled(False)
         tab.setCellWidget(row, 0, factor_name)
 
         factor_function = QComboBox()
@@ -173,20 +174,37 @@ class initialiseAll:
         factor_function.addItems(functions)
         tab.setCellWidget(row, 1, factor_function)
 
-        factor_sens = QComboBox()
-        factor_sens.setFont(self.myFont)
-        decroissant = QCoreApplication.translate("initialisation","Décroissant")
-        croissant = QCoreApplication.translate("initialisation","Croissant")
-        symetrique = QCoreApplication.translate("initialisation","Symétrique")
-        sens = [decroissant,croissant,symetrique]
-        factor_sens.addItems(sens)
-        tab.setCellWidget(row, 2, factor_sens)
+        factor_direction = QComboBox()
+        factor_direction.setFont(self.myFont)
+        ascending = QCoreApplication.translate("initialisation","Croissant")
+        descending = QCoreApplication.translate("initialisation","Décroissant")
+        symmetrical = QCoreApplication.translate("initialisation","Symétrique")
+        direction = [ascending,descending,symmetrical]
+        factor_direction.addItems(direction)
+        tab.setCellWidget(row, 2, factor_direction)
 
+        for col in range(3,5):
+            factor_param = QLineEdit()
+            factor_param.setFont(self.myFont)
+            tab.setCellWidget(row, col, factor_param)
+
+        factor_direction.currentIndexChanged.connect(lambda ind=row: self.add_standardization_param_column(tab,row,ind))
+
+    def add_standardization_param_column(self,tab,row, ind):
         for col in range(3,7):
             factor_param = QLineEdit()
             factor_param.setFont(self.myFont)
-            tab.setColumnWidth(col,80)
             tab.setCellWidget(row, col, factor_param)
+        if ind == 0:
+            for col in range(5,7):
+                tab.removeCellWidget(row, col)
+        elif ind == 1:
+            for col in range(3,5):
+                tab.removeCellWidget(row, col)
+        tab.setStyleSheet(
+            "QTableWidget::item {border: 0px; padding: 4px;}")
+
+
 
     def select_output_dir(self):
         foldername = QFileDialog.getExistingDirectory(
