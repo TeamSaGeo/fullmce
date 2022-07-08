@@ -28,7 +28,7 @@ class initialiseAll:
         self.listFactorsNotNormalized = []
         self.list_inputLayers = []
 
-    def display_output_config(self):
+    def display_plugin_info(self):
         concepteurpath = os.path.join(
             self.iface.plugin_dir, 'event_tools/concepteur.csv')
 
@@ -161,12 +161,12 @@ class initialiseAll:
         tab = self.iface.dlg.TBL_DATA_STANDARDIZATION
         row = tab.rowCount()
         tab.setRowCount(row + 1)
-        self.iface.dlg.SB_NB_DATA_2.setValue(row + 1)
 
         factor_name = QLineEdit()
         factor_name.setFont(self.myFont)
         factor_name.setText(factor.name)
         factor_name.setEnabled(False)
+        factor_name.setStyleSheet("QLineEdit {color: black;}")
         tab.setCellWidget(row, 0, factor_name)
 
         factor_function = QComboBox()
@@ -186,10 +186,10 @@ class initialiseAll:
         direction = [descending,ascending,symmetrical]
         factor_direction.addItems(direction)
         tab.setCellWidget(row, 2, factor_direction)
-        factor_direction.currentIndexChanged.connect(lambda ind=row: self.add_standardization_param_column(tab,row,ind))
+        factor_direction.currentIndexChanged.connect(lambda ind=row: self.add_standardization_column(tab,row,ind))
         factor_direction.setCurrentIndex(1)
 
-    def add_standardization_param_column(self,tab,row, ind):
+    def add_standardization_column(self,tab,row, ind):
         for col in range(3,7):
             factor_param = QLineEdit()
             factor_param.setFont(self.myFont)
@@ -274,8 +274,7 @@ class initialiseAll:
             path = QLineEdit()
             path.setFont(self.myFont)
             path.setEnabled(False)
-            path.setStyleSheet(
-                "QLineEdit {background-color: rgb(255, 255, 255);")
+            path.setStyleSheet("QLineEdit {color: black;}")
 
             toolButton = QToolButton()
             toolButton.setText('...')
@@ -286,6 +285,7 @@ class initialiseAll:
             field_type = QLineEdit()
             field_type.setFont(self.myFont)
             field_type.setEnabled(False)
+            field_type.setStyleSheet("QLineEdit {color: black;}")
 
             checkbox = QCheckBox()
 
@@ -463,6 +463,7 @@ class initialiseAll:
             # contrainte_status = QCoreApplication.translate("initialisation","PRÊTE") if contrainte.ready else QCoreApplication.translate("initialisation","NON PRÊTE")
             # log += f"{contrainte.name}\t\t{contrainte.inputLayer.path}\t\t{contrainte_status}\n"
 
+        self.iface.dlg.SB_NB_DATA_2.setValue(len(self.listFactorsNotNormalized))
         # log += "\n\n"
         # self.log_path = os.path.join(output_dir,"full_mce_log.txt")
         # with open(self.log_path,"w") as f:
@@ -655,7 +656,7 @@ class initialiseAll:
     def initialise_run(self):
         if self.iface.first_start is True:
             self.iface.first_start = False
-            self.display_output_config()
+            self.display_plugin_info()
 
             # On click on Suivant
             self.iface.dlg.BT_NEXT.pressed.connect(lambda: self.display_next_page())
