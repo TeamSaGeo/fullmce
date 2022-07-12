@@ -46,11 +46,7 @@ class InputLayer:
         self.reclass_output = output_path
 
     def add_new_field(self,new_field_name):
-        # vlayer = contrainte.inputLayer.vlayer
-
-        # Create new field
         vlayer_provider = self.vlayer.dataProvider()
-        # new_field_name = contrainte.field_name[:-2] + "Bl"
         new_field_idx = self.vlayer.fields().indexOf(new_field_name)
         if new_field_idx == -1:
             vlayer_provider.addAttributes([QgsField(new_field_name,QVariant.Double,"double",10,2)])
@@ -59,10 +55,10 @@ class InputLayer:
         return new_field_idx
 
     def delete_new_field(self,field_name):
-        # vlayer = contrainte.inputLayer.vlayer
         new_field_idx = self.vlayer.fields().indexOf(field_name)
-        self.vlayer.dataProvider().deleteAttributes([new_field_idx])
-        self.vlayer.updateFields()
+        if new_field_idx != -1:
+            self.vlayer.dataProvider().deleteAttributes([new_field_idx])
+            self.vlayer.updateFields()
 
     def __getattr__(self, item):
         return 'Source path does not have `{}` attribute.'.format(str(item))

@@ -14,6 +14,9 @@ class InputData:
     def setready(self, ready):
         self.ready = ready
 
+    def settype(self, type):
+        self.type = type
+
     def setinputLayer(self,inputLayer):
         self.inputLayer.remove_element(self)
         self.inputLayer = inputLayer

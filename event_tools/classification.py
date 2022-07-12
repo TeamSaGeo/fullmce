@@ -8,7 +8,7 @@ class Classification:
 
     def correct_param (self):
         if self.tab.rowCount() == 0:
-            error_msg = self.raise_error_msg(0,-1)
+            error_msg = self.error_msg(0,-1)
             return False, error_msg
 
         list_values,row,col = self.get_params()
@@ -17,7 +17,7 @@ class Classification:
             log = self.write_log(list_values)
             return True , log
         else:
-            error_msg = self.raise_error_msg(row,col)
+            error_msg = self.error_msg(row,col)
             return False, error_msg
 
     def get_params(self):
@@ -47,7 +47,7 @@ class Classification:
         log +="\n"
         return log
 
-    def raise_error_msg (self,row,col):
+    def error_msg (self,row,col):
         if col == -1:
             return QCoreApplication.translate("initialisation","Sélectionner la contrainte \"{0}\" ajouter les paramètres de reclassification").format(self.contrainte.name)
         else:

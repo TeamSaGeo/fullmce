@@ -180,8 +180,8 @@ class initialiseAll:
 
         factor_direction = QComboBox()
         factor_direction.setFont(self.myFont)
-        ascending = QCoreApplication.translate("initialisation","Croissant")
         descending = QCoreApplication.translate("initialisation","Décroissant")
+        ascending = QCoreApplication.translate("initialisation","Croissant")
         symmetrical = QCoreApplication.translate("initialisation","Symétrique")
         direction = [descending,ascending,symmetrical]
         factor_direction.addItems(direction)
@@ -450,14 +450,15 @@ class initialiseAll:
 
         # Update standardization table
         self.display_standardization_table()
-        nb_string_factor = 0
+        first_line = QCoreApplication.translate("initialisation","FACTEURS\nNombre de facteurs: {0}\n").format(len(self.listFactors))
+        log = first_line
 
         for row,factor in enumerate(self.listFactors):
             if not self.input_row_filled(factor,row):
                 return False
 
             if factor.field_type == "String":
-                error_field = QCoreApplication.translate("initialisation","Le facteur n° {0} est de type \"String\". Voulez-vous reclassifier ce facteur ? Sinon veuillez choisir un champ en entier ou réelle.").format(row+1)
+                error_field = QCoreApplication.translate("initialisation","Le facteur n° {0} est de type \"String\". Voulez-vous reclassifier ce facteur ? Sinon, veuillez choisir un autre champ de type entier ou réelle.").format(row+1)
                 reply = QMessageBox.question(
                     self.iface.dlg,
                     QCoreApplication.translate("initialisation","Question ..."),
@@ -466,9 +467,12 @@ class initialiseAll:
                     defaultButton=QMessageBox.No,
                 )
                 if reply == QMessageBox.Yes:
-                    self.listContraintes.append(factor)
+                    # Go to contrainte input table, list contrainte = 1
+                    self.listContraintes.clear()
                     self.pageInd = 2
                     self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
+                    self.iface.dlg.SB_NB_CONTRAINTE.setValue(len(self.listContraintes))
+                    self.listContraintes.append(factor)
                     self.iface.dlg.SB_NB_CONTRAINTE.setValue(len(self.listContraintes))
                 return False
 
@@ -476,14 +480,13 @@ class initialiseAll:
                 self.listFactorsNotNormalized.remove(factor)
             else:
                 self.add_standardization_row(factor)
-            # contrainte_status = QCoreApplication.translate("initialisation","PRÊTE") if contrainte.ready else QCoreApplication.translate("initialisation","NON PRÊTE")
-            # log += f"{contrainte.name}\t\t{contrainte.inputLayer.path}\t\t{contrainte_status}\n"
+
+            factor_status = QCoreApplication.translate("initialisation","NORMALISÉ") if factor.ready else QCoreApplication.translate("initialisation","NON NORMALISÉ")
+            log += f"{factor.name}\t\t{factor.inputLayer.path}\t\t{factor_status}\n"
 
         self.iface.dlg.SB_NB_DATA_2.setValue(len(self.listFactorsNotNormalized))
-        # log += "\n\n"
-        # self.log_path = os.path.join(output_dir,"full_mce_log.txt")
-        # with open(self.log_path,"w") as f:
-        #     f.write(log)
+        log += "\n\n"
+        self.save_log(log,first_line)
 
         return True
 
@@ -562,7 +565,8 @@ class initialiseAll:
             self.iface.dlg.BT_ADD_ROW_CONTRAINTE.setEnabled(True)
 
     def classification(self):
-        log = QCoreApplication.translate("initialisation","Paramètres de reclassification: \n")
+        first_line = QCoreApplication.translate("initialisation","Paramètres de reclassification: \n")
+        log = first_line
         for i,contrainte in enumerate(self.listContraintesNotReady):
             tab = self.iface.dlg.STACKED_WIDGET_RECLASS.widget(i)
             classification = Classification(contrainte, tab, i)
@@ -578,7 +582,6 @@ class initialiseAll:
                 new_field_name = contrainte.field_name[:-2] + "Bl"
                 contrainte.inputLayer.delete_new_field(new_field_name)
                 return False
-            contrainte.setready(2)
             log += classification_log
 
         # Show dialog Box
@@ -589,17 +592,20 @@ class initialiseAll:
             buttons= QMessageBox.Cancel | QMessageBox.No | QMessageBox.Yes,
         )
         if reply == QMessageBox.Yes:
-            self.save_classified_layer_into_file()
+            self.save_layer_into_file()
         elif reply == QMessageBox.Cancel:
             return False
 
         # Write into log file
-        self.save_classification_log_into_file(log)
+        self.save_log(log,first_line)
         return True
 
     def standardization(self):
         tab = self.iface.dlg.TBL_DATA_STANDARDIZATION
-        log = QCoreApplication.translate("initialisation","Paramètres de standardisation: \n")
+        first_line = QCoreApplication.translate("initialisation","Paramètres de standardisation: \n")
+        log = first_line
+        log += QCoreApplication.translate("initialisation","Facteur\t\tChamp\tFonction\t\tDirection")
+        log += "\tA\tB\tC\tD\n-----------------------------------------------------------------------------------------------\n"
         for row,factor in enumerate(self.listFactorsNotNormalized):
             standardization = Standardization(factor,tab,row)
             correct, standardization_log = standardization.correct_param()
@@ -621,20 +627,21 @@ class initialiseAll:
             buttons= QMessageBox.Cancel | QMessageBox.No | QMessageBox.Yes,
         )
         if reply == QMessageBox.Yes:
-            self.iface.dlg.TE_RUN_PROCESS_NORMALISATION.setText(log)
-            self.iface.dlg.TE_RUN_PROCESS_NORMALISATION.setFont(self.myFont)
-            # self.save_classified_layer_into_file()
+            self.save_layer_into_file()
         elif reply == QMessageBox.Cancel:
             return False
+
+        # Write into log file
+        self.save_log(log,first_line)
         return True
 
-    def save_classification_log_into_file(self,log):
+    def save_log(self,log,first_line):
         with open(self.log_path, "r") as input:
             with open(self.log_path + ".temp", "a") as output:
                 # iterate all lines from file
                 for line in input:
-                    if not line.strip("\n").startswith(QCoreApplication.translate("initialisation",'Paramètres')):
-                        # if line starts with substring 'Paramètres' then don't write it in temp file
+                    if not line.strip("\n").startswith(first_line):
+                        # if line starts with first_line substring then don't write it in temp file
                         output.write(line)
                     else:
                         break
@@ -649,21 +656,50 @@ class initialiseAll:
                 contraintes_same_input.append(contrainte)
         return contraintes_same_input
 
-    def save_classified_layer_into_file(self):
-        log = QCoreApplication.translate("initialisation","#######################################################\n\nNombre de contraintes en entrée: {0} ({1} à reclassifier)\n\nTraitement en cours. . .\n\n").format(len(self.listContraintes),len(self.listContraintesNotReady))
+    def save_layer_into_file(self):
+        if self.pageInd == 2:
+            list_object = self.listContraintes
+            list_object_not_ready = self.listContraintesNotReady
+            object_type = QCoreApplication.translate("initialisation","contrainte")
+            process_name = QCoreApplication.translate("initialisation","reclassifier")
+            process = QCoreApplication.translate("initialisation","Reclassification")
+            file_extension = "_bool.shp"
+            field_extension = "Bl"
+            text_edit = self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE
+        else:
+            list_object  = self.listFactors
+            list_object_not_ready = self.listFactorsNotNormalized
+            object_type = QCoreApplication.translate("initialisation","facteur")
+            process_name = QCoreApplication.translate("initialisation","normaliser")
+            process = QCoreApplication.translate("initialisation","Normalisation")
+            file_extension = "_fuzz.shp"
+            field_extension = "Fz"
+            text_edit = self.iface.dlg.TE_RUN_PROCESS_NORMALISATION
+
+        log = "#######################################################\n\n"
+        log += QCoreApplication.translate("initialisation","Nombre de {0}s en entrée: {1} ({2} à {3})\n\nTraitement en cours. . .\n\n").format(object_type,len(list_object),len(list_object_not_ready),process_name)
         for inputLayer in self.list_inputLayers:
-            contraintes_not_ready = self.contraintes_insame_input(inputLayer,self.listContraintesNotReady)
-            if contraintes_not_ready != []:
-                output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),inputLayer.name + "_bool.shp")
+            object_not_ready = self.contraintes_insame_input(inputLayer,list_object_not_ready)
+            if object_not_ready != []:
+                output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),inputLayer.name + file_extension)
                 inputLayer.setreclass_output(output_path)
                 QgsVectorFileWriter.writeAsVectorFormat(inputLayer.vlayer, inputLayer.reclass_output, 'utf-8',driverName='ESRI Shapefile')
-                for contrainte in contraintes_not_ready:
-                    new_field_name = contrainte.field_name[:-2] + "Bl"
-                    contrainte.inputLayer.delete_new_field(new_field_name)
-                    log += QCoreApplication.translate("initialisation","Contrainte \"{0}\" :\nLecture des paramètres\t\t[OK]\nReclassification du champ \"{1}\" - Type \"{2}\"\t\t[OK]\nSauvegarde du résultat dans le fichier {3} \t\t[OK]\n\n").format(contrainte.name,contrainte.field_name,contrainte.field_type,inputLayer.reclass_output)
-        log += QCoreApplication.translate("initialisation","Reclassification des contraintes terminés avec succès !\n\n#######################################################")
-        self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.setText(log)
-        self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.setFont(self.myFont)
+                for object in object_not_ready:
+                    new_field_name = object.field_name[:-2] + field_extension
+                    object.inputLayer.delete_new_field(new_field_name)
+                    log += QCoreApplication.translate("initialisation","{0} \"{1}\" :\nLecture des paramètres\t\t[OK]\n{2} du champ \"{3}\" - Type \"{4}\"\t\t[OK]\nSauvegarde du résultat dans le fichier {5} \t\t[OK]\n\n").format(object_type,object.name,process,object.field_name,object.field_type,inputLayer.reclass_output)
+        log += QCoreApplication.translate("initialisation","{0} des {1}s terminés avec succès !").format(process,object_type)
+        log += "\n\n#######################################################"
+        text_edit.setText(log)
+        text_edit.setFont(self.myFont)
+
+    def remove_new_fields(self):
+        for contrainte in self.listContraintesNotReady:
+            new_field_name = contrainte.field_name[:-2] + "Bl"
+            contrainte.inputLayer.delete_new_field(new_field_name)
+        for factor in self.listFactorsNotNormalized:
+            new_field_name = factor.field_name[:-2] + "Fz"
+            factor.inputLayer.delete_new_field(new_field_name)
 
     def initialise_variable_init(self):
         return self
@@ -678,10 +714,14 @@ class initialiseAll:
 
             # On click on Suivant
             self.iface.dlg.BT_NEXT.pressed.connect(lambda: self.display_next_page())
-            #On click on répertoire de sortie
+            # On click on répertoire de sortie
             self.iface.dlg.BT_OUTPUT.clicked.connect(lambda: self.select_output_dir())
-            #On click on Precedent
+            # On click on Precedent
             self.iface.dlg.BT_PREVIOUS.clicked.connect(lambda: self.display_previous_page())
+            # On click on Cancel
+            self.iface.dlg.BT_CANCEL.clicked.connect(lambda: self.remove_new_fields())
+            # On click on Close
+            self.iface.dlg.rejected.connect(lambda: self.remove_new_fields())
 
             self.init_classification_input()
             self.init_standardization_input()
