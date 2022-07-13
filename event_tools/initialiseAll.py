@@ -237,13 +237,17 @@ class initialiseAll:
         self.pageInd -= 1
         if self.pageInd == 0:
             self.iface.dlg.BT_PREVIOUS.setEnabled(False)
-        if self.pageInd == 4:
+        elif self.pageInd == 3:
+            self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.clear()
+        elif self.pageInd == 4:
             if self.listContraintesNotReady == []:
                 self.pageInd = 2
             else:
                 self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.clear()
                 self.pageInd = 3
-        if self.pageInd == 7:
+        elif self.pageInd == 6:
+            self.iface.dlg.TE_RUN_PROCESS_NORMALISATION.clear()
+        elif self.pageInd == 7:
             if self.listFactorsNotNormalized == []:
                 self.pageInd = 5
             else:
