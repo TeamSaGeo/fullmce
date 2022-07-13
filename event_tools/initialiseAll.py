@@ -171,10 +171,10 @@ class initialiseAll:
 
         factor_function = QComboBox()
         factor_function.setFont(self.myFont)
-        s_shaped = QCoreApplication.translate("initialisation","S-Shaped (Sigmoïdal)")
-        # j_shaped = QCoreApplication.translate("initialisation","J-Shaped")
         linear = QCoreApplication.translate("initialisation","Linéaire")
-        functions = [s_shaped,linear]
+        s_shaped = QCoreApplication.translate("initialisation","S-Shaped (Sigmoïdal)")
+        j_shaped = QCoreApplication.translate("initialisation","J-Shaped")
+        functions = [linear,s_shaped,j_shaped]
         factor_function.addItems(functions)
         tab.setCellWidget(row, 1, factor_function)
 
@@ -392,7 +392,7 @@ class initialiseAll:
             type = "contrainte" if element.type == "contraint" else "facteur"
             msg_name = QCoreApplication.translate("initialisation","Saisir un nom pour le {0} n° {1}").format(type,i+1)
             msg_path = QCoreApplication.translate("initialisation","Sélectionner une image pour le {0} n° {1}").format(type,i+1)
-            msg_field = QCoreApplication.translate("initialisation","Champ dupliqué! Choisir des champs différents pour les {0}s issues du même fichier source.").format(type)
+            msg_field = QCoreApplication.translate("initialisation","Champ dupliqué! Choisir des champs différents pour les {0}s issus du même fichier source.").format(type)
             error_msg = msg_name if not element.name else msg_path if element.inputLayer.path == "" else msg_field
             button = QMessageBox.critical(
                 self.iface.dlg,
@@ -432,7 +432,7 @@ class initialiseAll:
                 self.display_classification_table(i,contrainte)
 
             contrainte_status = QCoreApplication.translate("initialisation","PRÊTE") if contrainte.ready else QCoreApplication.translate("initialisation","NON PRÊTE")
-            log += f"{contrainte.name}\t\t{contrainte.inputLayer.path}\t\t{contrainte_status}\n"
+            log += f"{contrainte.name}\t\t{contrainte.inputLayer.path}\t{contrainte_status}\n"
 
         log += "\n"
         self.log_path = os.path.join(output_dir,"full_mce_log.txt")
@@ -482,7 +482,7 @@ class initialiseAll:
                 self.add_standardization_row(factor)
 
             factor_status = QCoreApplication.translate("initialisation","NORMALISÉ") if factor.ready else QCoreApplication.translate("initialisation","NON NORMALISÉ")
-            log += f"{factor.name}\t\t{factor.inputLayer.path}\t\t{factor_status}\n"
+            log += f"{factor.name}\t\t{factor.inputLayer.path}\t{factor_status}\n"
 
         self.iface.dlg.SB_NB_DATA_2.setValue(len(self.listFactorsNotNormalized))
         log += "\n\n"

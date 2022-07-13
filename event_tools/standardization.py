@@ -27,12 +27,17 @@ class Standardization:
             # if col exist
             if param :
                 try:
-                    # if (col == 3 or col == 5 ) and param_value == "min":
-                    #     param_value = min(self.factor.getfield_values())
+                    param_value = param.text()
 
-                    param_value = float(param.text())
+                    # Change param value if equal "min" or "max"
+                    if len(values) == 2 and param_value == "min":
+                        param_value = min(self.factor.getfield_values())
+                    if ((len(values) == 3 and direction != 2) or len(values) == 5)  and param_value == "max":
+                        param_value = max(self.factor.getfield_values())
 
-                    # Check if column B > A and D > C and C > B (symetrique)
+                    param_value = float(param_value)
+
+                    # Return error if not column B > A and D > C and C > B (symetrique)
                     if len(values) >= 3:
                         if param_value <= values[-1]:
                             return values,col
@@ -68,81 +73,47 @@ class Standardization:
             a = values [2]
             b = values [3]
 
-            # if sigmoidal
-            if function == 0:
-                if direction == 0:
-                    new_value = self.sigmoidal_descending(value, a, b)
-                elif direction == 1:
-                    new_value = self.sigmoidal_ascending(value, a, b)
-                else:
-                    c = values [4]
-                    d = values [5]
-                    if value < c :
-                        new_value = self.sigmoidal_ascending(value, a, b)
-                    else:
-                        new_value = self.sigmoidal_descending(value, c, d)
-
-            # if linear
+            if direction == 0:
+                new_value = self.descending (value, function, a, b)
+            elif direction == 1:
+                new_value = self.ascending(value, function, a, b)
             else:
-                # if linear decreasing
-                if direction == 0:
-                    new_value = self.linear_descending(value, a, b)
-                # if linear increasing
-                elif direction == 1:
-                    new_value = self.linear_ascending(value, a, b)
+                c = values [4]
+                d = values [5]
+                if value < c :
+                    new_value = self.ascending(value, function, a, b)
                 else:
-                    c = values [4]
-                    d = values [5]
-                    if value < c :
-                        new_value = self.linear_ascending(value, a, b)
-                    else:
-                        new_value = self.linear_descending (value, c, d)
+                    new_value = self.descending (value, function, c, d)
 
             vlayer.changeAttributeValue(feat.id(),new_field_idx, new_value)
         self.factor.inputLayer.setvlayer(vlayer)
 
-    def linear_descending (self, value, c, d):
-        if value < c:
-            return 1
-        elif value <= d:
-            return ((d - value) / (d - c))
-        else:
-            return 0
+    def f(self, x, dX, dW):
+        return {
+            0 : dX / dW,
+            1 : math.pow(math.sin(dX / dW * (3.141592653589793 / 2)), 2.0),
+            2 : 1.0 / (1.0 + math.pow((dW - dX) / dW, 2.0)),
+            }[x]
 
-    def linear_ascending (self,value, a, b):
+    def ascending (self,value, function, a, b):
         if value < a:
             return 0
         elif value <= b:
-            return ((value - a) / (b - a))
+            dX = value - a
+            dW = b - a
+            return self.f(function, dX, dW)
         else:
             return 1
 
-    def sigmoidal_ascending (self,value, a, b):
-        if value < a:
-            return 0
-        elif value <= b:
-            c = a + (b - a) / 2
-            return self.sigmoidal(value,-1,c)
-        else:
-            return 1
-
-    def sigmoidal_descending (self, value, c, d):
+    def descending (self, value, function, c, d):
         if value < c:
             return 1
         elif value <= d:
-            c_exp = c + (d - c) / 2
-            return self.sigmoidal(value,1,c_exp)
+            dX = d - value
+            dW = d - c
+            return self.f(function, dX, dW)
         else:
             return 0
-
-    def sigmoidal (self,value, a, c):
-        val_exp = a * (value - c)
-        val_exp = round (val_exp,3)
-        try:
-            result = 1 / (1 + math.exp(val_exp))
-        except OverflowError:
-	        result = float('inf')
-        return result
 
     def write_log(self,values):
         log = f"{self.row+1}) {self.factor.name}\t{self.factor.field_name}"
