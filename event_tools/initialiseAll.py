@@ -203,6 +203,49 @@ class initialiseAll:
         tab.setStyleSheet(
             "QTableWidget::item {border: 0px; padding: 4px;}")
 
+    def init_weighting_table(self):
+        tab = self.iface.dlg.TBL_JUGEMENT
+        columns = [factor.name for factor in self.listFactors]
+        nb_columns = len(columns)
+        tab.setColumnCount(nb_columns)
+        tab.setHorizontalHeaderLabels(columns)
+        tab.setRowCount(nb_columns)
+        tab.setVerticalHeaderLabels(columns)
+        tab.verticalHeader().setVisible(True)
+
+        for row in range(nb_columns):
+            for col in range (nb_columns):
+                weight = QLineEdit()
+                weight.setFont(self.myFont)
+                weight.setAlignment(Qt.AlignCenter)
+                tab.setCellWidget(row, col, weight)
+                if row == col :
+                    weight.setText("1")
+                    weight.setEnabled(False)
+                else:
+                    weight.editingFinished.connect(lambda col=col, row=row : self.set_weigthing_value(tab,row,col))
+                weight.setStyleSheet("QLineEdit {color: black;}")
+
+    def set_weigthing_value(self,tab,row,col):
+        val = tab.cellWidget(row,col).text()
+        sym = tab.cellWidget(col,row)
+        if sym and val != "":
+            try:
+                sym_val = 1 / float(val)
+                if round(sym_val,2).is_integer():
+                    decimals = 0
+                else:
+                    decimals = 5
+                sym.setText("{0:.{1}f}".format(sym_val, decimals))
+            except ValueError:
+                button = QMessageBox.critical(
+                    self.iface.dlg,
+                    QCoreApplication.translate("initialisation","Erreur ..."),
+                    QCoreApplication.translate("initialisation","Saisir une valeur en entier ou réelle valide!"),
+                    buttons=QMessageBox.Ok,
+                    defaultButton=QMessageBox.Ok,
+                    )
+
     def select_output_dir(self):
         foldername = QFileDialog.getExistingDirectory(
             self.iface.dlg, QCoreApplication.translate("initialisation","Sélectionner le répertoire de sortie"))
@@ -214,7 +257,7 @@ class initialiseAll:
             button = QMessageBox.critical(
                 self.iface.dlg,
                 QCoreApplication.translate("initialisation","Erreur ..."),
-                QCoreApplication.translate("initialisation","Choisissez un répertoire de sortie!"),
+                QCoreApplication.translate("initialisation","Choisir un répertoire de sortie!"),
                 buttons=QMessageBox.Ok,
                 defaultButton=QMessageBox.Ok,
                 )
@@ -369,7 +412,7 @@ class initialiseAll:
                 button = QMessageBox.critical(
                     self.iface.dlg,
                     QCoreApplication.translate("initialisation","Erreur ..."),
-                    QCoreApplication.translate("initialisation","Choisissez un fichier valide!"),
+                    QCoreApplication.translate("initialisation","Choisir un fichier valide!"),
                     buttons=QMessageBox.Ok,
                     defaultButton=QMessageBox.Ok,
                     )
@@ -491,7 +534,7 @@ class initialiseAll:
         self.iface.dlg.SB_NB_DATA_2.setValue(len(self.listFactorsNotNormalized))
         log += "\n\n"
         self.save_log(log,first_line)
-
+        self.init_weighting_table()
         return True
 
     def select_contrainte_not_ready(self):
