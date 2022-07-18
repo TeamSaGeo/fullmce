@@ -7,8 +7,9 @@ from .inputData import InputData
 from .inputLayer import InputLayer
 from .classification import Classification
 from . standardization import Standardization
+from .weighting import Weigthing
 from qgis.core import QgsVectorFileWriter
-import os
+import os, csv
 from datetime import datetime
 
 class initialiseAll:
@@ -20,6 +21,8 @@ class initialiseAll:
         self.myFont.setBold(False)
 
         self.pageInd = self.iface.dlg.STACKED_WIDGET.currentIndex()
+
+        self.error_title = QCoreApplication.translate("initialisation","Erreur ...")
 
         # Initialize list of InputData
         self.listContraintes = []
@@ -223,32 +226,42 @@ class initialiseAll:
                     weight.setText("1")
                     weight.setEnabled(False)
                 else:
-                    weight.editingFinished.connect(lambda col=col, row=row : self.set_weigthing_value(tab,row,col))
+                    weight.editingFinished.connect(lambda col=col, row=row : self.set_weighting_value(tab,row,col))
                 weight.setStyleSheet("QLineEdit {color: black;}")
 
-    def set_weigthing_value(self,tab,row,col):
+    def set_weighting_value(self,tab,row,col):
         val = tab.cellWidget(row,col).text()
         sym = tab.cellWidget(col,row)
         if sym and val != "":
             try:
-                sym_val = 1 / float(val)
-                if round(sym_val,2).is_integer():
-                    decimals = 0
+                val = float(val)
+                if val < 0.111 or val > 9:
+                    button = QMessageBox.information(
+                        self.iface.dlg,
+                        self.error_title,
+                        QCoreApplication.translate("initialisation","La valeur en entrée doit être entre 0.1111 et 9."),
+                        )
+                    tab.cellWidget(row,col).setText('')
                 else:
-                    decimals = 5
-                sym.setText("{0:.{1}f}".format(sym_val, decimals))
+                    reverse_val = 1 / val
+                    if round(reverse_val,2).is_integer():
+                        decimals = 0
+                    else:
+                        decimals = 5
+                    sym.setText("{0:.{1}f}".format(reverse_val, decimals))
             except ValueError:
-                button = QMessageBox.critical(
+                # Value is not numeric
+                row_name = self.tab.verticalHeaderItem(row).text()
+                col_name = self.tab.horizontalHeaderItem(col).text()
+                button = QMessageBox.information(
                     self.iface.dlg,
-                    QCoreApplication.translate("initialisation","Erreur ..."),
-                    QCoreApplication.translate("initialisation","Saisir une valeur en entier ou réelle valide!"),
-                    buttons=QMessageBox.Ok,
-                    defaultButton=QMessageBox.Ok,
+                    self.error_title,
+                    QCoreApplication.translate("initialisation","Veuillez saisir une valeur en entier ou réelle valide à la ligne {0} - colonne {1}!").format(row_name,col_name),
                     )
 
     def select_output_dir(self):
         foldername = QFileDialog.getExistingDirectory(
-            self.iface.dlg, QCoreApplication.translate("initialisation","Sélectionner le répertoire de sortie"))
+            self.iface.dlg, QCoreApplication.translate("initialisation","Veuillez sélectionner le répertoire de sortie"))
         self.iface.dlg.LE_OUTPUT_DIR.setText(foldername)
         self.iface.dlg.LE_OUTPUT_DIR.setFont(self.myFont)
 
@@ -256,8 +269,8 @@ class initialiseAll:
         if self.pageInd == 1 and not self.iface.dlg.LE_OUTPUT_DIR.text():
             button = QMessageBox.critical(
                 self.iface.dlg,
-                QCoreApplication.translate("initialisation","Erreur ..."),
-                QCoreApplication.translate("initialisation","Choisir un répertoire de sortie!"),
+                self.error_title,
+                QCoreApplication.translate("initialisation","Veuillez choisir un répertoire de sortie!"),
                 buttons=QMessageBox.Ok,
                 defaultButton=QMessageBox.Ok,
                 )
@@ -378,7 +391,7 @@ class initialiseAll:
 
     def select_source_path(self, tbl, row):
         path, _filter = QFileDialog.getOpenFileName(
-            tbl, QCoreApplication.translate("initialisation","Choisir un vecteur"), "", "*.shp")
+            tbl, QCoreApplication.translate("initialisation","Veuillez choisir un vecteur"), "", "*.shp")
 
         if self.pageInd == 2:
             inputData = self.listContraintes[row]
@@ -411,8 +424,8 @@ class initialiseAll:
             else:
                 button = QMessageBox.critical(
                     self.iface.dlg,
-                    QCoreApplication.translate("initialisation","Erreur ..."),
-                    QCoreApplication.translate("initialisation","Choisir un fichier valide!"),
+                    self.error_title,
+                    QCoreApplication.translate("initialisation","Veuillez choisir un fichier valide!"),
                     buttons=QMessageBox.Ok,
                     defaultButton=QMessageBox.Ok,
                     )
@@ -437,16 +450,14 @@ class initialiseAll:
     def input_row_filled(self, element, i):
         if not element.name or element.inputLayer.path == "" or element.inputLayer.field_is_duplicated(element.type):
             type = "contrainte" if element.type == "contraint" else "facteur"
-            msg_name = QCoreApplication.translate("initialisation","Saisir un nom pour le {0} n° {1}").format(type,i+1)
-            msg_path = QCoreApplication.translate("initialisation","Sélectionner une image pour le {0} n° {1}").format(type,i+1)
-            msg_field = QCoreApplication.translate("initialisation","Champ dupliqué! Choisir des champs différents pour les {0}s issus du même fichier source.").format(type)
+            msg_name = QCoreApplication.translate("initialisation","Veuillez saisir un nom pour le {0} n° {1}").format(type,i+1)
+            msg_path = QCoreApplication.translate("initialisation","Veuillez sélectionner une image pour le {0} n° {1}").format(type,i+1)
+            msg_field = QCoreApplication.translate("initialisation","Champ dupliqué! Veuillez choisir des champs différents pour les {0}s issus du même fichier source.").format(type)
             error_msg = msg_name if not element.name else msg_path if element.inputLayer.path == "" else msg_field
-            button = QMessageBox.critical(
+            button = QMessageBox.information(
                 self.iface.dlg,
-                QCoreApplication.translate("initialisation","Erreur ..."),
+                self.error_title,
                 f"{error_msg}",
-                buttons=QMessageBox.Ok,
-                defaultButton=QMessageBox.Ok,
             )
             return False
         else:
@@ -619,12 +630,10 @@ class initialiseAll:
             classification = Classification(contrainte, tab, i)
             correct, classification_log = classification.correct_param()
             if not correct :
-                button = QMessageBox.critical(
+                button = QMessageBox.information(
                     self.iface.dlg,
-                    QCoreApplication.translate("initialisation","Erreur ..."),
+                    self.error_title,
                     classification_log,
-                    buttons=QMessageBox.Ok,
-                    defaultButton=QMessageBox.Ok,
                 )
                 new_field_name = contrainte.field_name[:-2] + "Bl"
                 contrainte.inputLayer.delete_new_field(new_field_name)
@@ -657,12 +666,10 @@ class initialiseAll:
             standardization = Standardization(factor,tab,row)
             correct, standardization_log = standardization.correct_param()
             if not correct :
-                button = QMessageBox.critical(
+                button = QMessageBox.information(
                     self.iface.dlg,
-                    QCoreApplication.translate("initialisation","Erreur ..."),
+                    self.error_title,
                     standardization_log,
-                    buttons=QMessageBox.Ok,
-                    defaultButton=QMessageBox.Ok,
                 )
                 return False
             log += standardization_log
@@ -681,6 +688,54 @@ class initialiseAll:
         # Write into log file
         self.save_log(log,first_line)
         return True
+
+    def weighting(self):
+        tab = self.iface.dlg.TBL_JUGEMENT
+        weighting = Weigthing(tab)
+        correct, log = weighting.correct_params()
+        if correct:
+            conRatio = weighting.calculate_cr()
+            self.iface.dlg.LBL_RC_VALUE.setText(f"RC = {conRatio}")
+            if conRatio < 0.1:
+                status = QCoreApplication.translate("initialisation","RC < 0.1. Matrice de jugement cohérent et acceptable!")
+            else:
+                status = QCoreApplication.translate("initialisation","RC >= 0.1. Matrice de jugement non cohérent!\nVeuillez changer les valeurs saisies.")
+            self.iface.dlg.LBL_STATUT_MATRICE.setText(status)
+        else:
+            button = QMessageBox.information(
+                self.iface.dlg,
+                self.error_title,
+                log,
+                )
+
+    def save_matrix(self):
+        tab = self.iface.dlg.TBL_JUGEMENT
+        output_path, ok = QFileDialog.getSaveFileName(
+            self.iface.dlg, QCoreApplication.translate("initialisation","Sauvegarder la matrice de jugement"), self.iface.dlg.LE_OUTPUT_DIR.text(), 'CSV(*.csv)')
+
+        nb_columns = range(tab.columnCount())
+        headers = [tab.horizontalHeaderItem(column).text() for column in nb_columns]
+
+        with open(output_path, 'w') as csvfile:
+            writer = csv.writer(csvfile, dialect='excel', lineterminator='\n')
+
+            writer.writerow(headers)
+            for row in range(tab.rowCount()):
+                writer.writerow(tab.cellWidget(row, column).text() for column in nb_columns)
+
+    def load_matrix(self):
+        tab = self.iface.dlg.TBL_JUGEMENT
+        input_path, _filter = QFileDialog.getOpenFileName(
+            self.iface.dlg, QCoreApplication.translate("initialisation","Veuillez choisir le fichier CSV"), "", "*.csv")
+
+        if _filter:
+            with open(input_path) as csvfile:
+                reader = csv.reader(csvfile)
+                header = next(reader)
+                for row, values in enumerate(reader):
+                    for column, value in enumerate(values):
+                        if row != column:
+                            tab.cellWidget(row, column).setText(value)
 
     def save_log(self,log,first_line):
         with open(self.log_path, "r") as input:
@@ -772,3 +827,10 @@ class initialiseAll:
 
             self.init_classification_input()
             self.init_standardization_input()
+
+            # On click on Tester
+            self.iface.dlg.BT_TEST_JUGEMENT.clicked.connect(lambda : self.weighting())
+            # On click on Enregistrer
+            self.iface.dlg.BT_SAVE_MATRIX.clicked.connect(lambda: self.save_matrix())
+            # On click on Importer
+            self.iface.dlg.BT_LOAD_MATRIX.clicked.connect(lambda: self.load_matrix())

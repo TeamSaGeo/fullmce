@@ -88,7 +88,7 @@ class Standardization:
             vlayer.changeAttributeValue(feat.id(),new_field_idx, new_value)
         self.factor.inputLayer.setvlayer(vlayer)
 
-    def f(self, x, dX, dW):
+    def fuzzy_function(self, x, dX, dW):
         return {
             0 : dX / dW,
             1 : math.pow(math.sin(dX / dW * (3.141592653589793 / 2)), 2.0),
@@ -101,7 +101,7 @@ class Standardization:
         elif value <= b:
             dX = value - a
             dW = b - a
-            return self.f(function, dX, dW)
+            return self.fuzzy_function(function, dX, dW)
         else:
             return 1
 
@@ -111,7 +111,7 @@ class Standardization:
         elif value <= d:
             dX = d - value
             dW = d - c
-            return self.f(function, dX, dW)
+            return self.fuzzy_function(function, dX, dW)
         else:
             return 0
 
