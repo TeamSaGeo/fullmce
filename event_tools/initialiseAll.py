@@ -230,6 +230,8 @@ class initialiseAll:
                 weight.setStyleSheet("QLineEdit {color: black;}")
 
     def set_weighting_value(self,tab,row,col):
+        self.iface.dlg.BT_NEXT.setEnabled(False)
+
         val = tab.cellWidget(row,col).text()
         sym = tab.cellWidget(col,row)
         if sym and val != "":
@@ -265,14 +267,18 @@ class initialiseAll:
         self.iface.dlg.LE_OUTPUT_DIR.setText(foldername)
         self.iface.dlg.LE_OUTPUT_DIR.setFont(self.myFont)
 
+    def load_log_file(self):
+        with open(self.log_path, "r") as input:
+            lines = ''.join(input.readlines())
+            self.iface.dlg.TE_RUN_PROCESS.setText(lines)
+            self.iface.dlg.TE_RUN_PROCESS.setFont(self.myFont)
+
     def display_next_page(self):
         if self.pageInd == 1 and not self.iface.dlg.LE_OUTPUT_DIR.text():
-            button = QMessageBox.critical(
+            button = QMessageBox.information(
                 self.iface.dlg,
                 self.error_title,
                 QCoreApplication.translate("initialisation","Veuillez choisir un répertoire de sortie!"),
-                buttons=QMessageBox.Ok,
-                defaultButton=QMessageBox.Ok,
                 )
         elif (self.pageInd == 2 and not self.contraintes_filled()) or (self.pageInd == 3 and not self.classification()) or (self.pageInd == 5 and not self.factors_filled()) or (self.pageInd == 6 and not self.standardization()):
             self.pageInd = self.iface.dlg.STACKED_WIDGET.currentIndex()
@@ -283,10 +289,16 @@ class initialiseAll:
         elif (self.pageInd == 5 and self.listFactorsNotNormalized == []) or (self.pageInd == 6 and self.iface.dlg.TE_RUN_PROCESS_NORMALISATION.document().isEmpty()):
             self.pageInd = 8
             self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
+            self.iface.dlg.BT_NEXT.setEnabled(False)
         else:
             self.pageInd += 1
             self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
             self.iface.dlg.BT_PREVIOUS.setEnabled(True)
+            if self.pageInd == 8 or self.pageInd == 9:
+                self.iface.dlg.BT_NEXT.setEnabled(False)
+                if self.pageInd == 9:
+                    self.iface.dlg.BT_EXECUTE.setEnabled(True)
+
         return self.pageInd
 
     def display_previous_page(self):
@@ -309,6 +321,9 @@ class initialiseAll:
             else:
                 self.iface.dlg.TE_RUN_PROCESS_NORMALISATION.clear()
                 self.pageInd = 6
+            self.iface.dlg.BT_NEXT.setEnabled(True)
+        elif self.pageInd == 8:
+            self.iface.dlg.BT_EXECUTE.setEnabled(False)
         self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
         return self.pageInd
 
@@ -422,12 +437,10 @@ class initialiseAll:
                 # Append list of inputLayers
                 self.list_inputLayers.append(inputLayer)
             else:
-                button = QMessageBox.critical(
+                button = QMessageBox.information(
                     self.iface.dlg,
                     self.error_title,
                     QCoreApplication.translate("initialisation","Veuillez choisir un fichier valide!"),
-                    buttons=QMessageBox.Ok,
-                    defaultButton=QMessageBox.Ok,
                     )
 
         # Remove empty inputLayer from list
@@ -508,8 +521,9 @@ class initialiseAll:
 
         # Update standardization table
         self.display_standardization_table()
-        first_line = QCoreApplication.translate("initialisation","FACTEURS\nNombre de facteurs: {0}\n").format(len(self.listFactors))
+        first_line = QCoreApplication.translate("initialisation","FACTEURS")
         log = first_line
+        log += QCoreApplication.translate("initialisation","\nNombre de facteurs: {0}\n").format(len(self.listFactors))
 
         for row,factor in enumerate(self.listFactors):
             if not self.input_row_filled(factor,row):
@@ -527,6 +541,7 @@ class initialiseAll:
                 if reply == QMessageBox.Yes:
                     # Go to contrainte input table, list contrainte = 1
                     self.listContraintes.clear()
+                    self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.clear()
                     self.pageInd = 2
                     self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
                     self.iface.dlg.SB_NB_CONTRAINTE.setValue(len(self.listContraintes))
@@ -543,7 +558,7 @@ class initialiseAll:
             log += f"{factor.name}\t\t{factor.inputLayer.path}\t{factor_status}\n"
 
         self.iface.dlg.SB_NB_DATA_2.setValue(len(self.listFactorsNotNormalized))
-        log += "\n\n"
+        log += "\n"
         self.save_log(log,first_line)
         self.init_weighting_table()
         return True
@@ -658,9 +673,9 @@ class initialiseAll:
 
     def standardization(self):
         tab = self.iface.dlg.TBL_DATA_STANDARDIZATION
-        first_line = QCoreApplication.translate("initialisation","Paramètres de standardisation: \n")
+        first_line = QCoreApplication.translate("initialisation","Paramètres de standardisation:")
         log = first_line
-        log += QCoreApplication.translate("initialisation","Facteur\t\tChamp\tFonction\t\tDirection")
+        log += QCoreApplication.translate("initialisation","\nFacteur\tChamp\tFonction\tDirection")
         log += "\tA\tB\tC\tD\n-----------------------------------------------------------------------------------------------\n"
         for row,factor in enumerate(self.listFactorsNotNormalized):
             standardization = Standardization(factor,tab,row)
@@ -692,14 +707,21 @@ class initialiseAll:
     def weighting(self):
         tab = self.iface.dlg.TBL_JUGEMENT
         weighting = Weigthing(tab)
-        correct, log = weighting.correct_params()
+        correct, log_params = weighting.correct_params()
         if correct:
-            conRatio = weighting.calculate_cr()
+            conRatio, log_weight = weighting.calculate_cr()
             self.iface.dlg.LBL_RC_VALUE.setText(f"RC = {conRatio}")
             if conRatio < 0.1:
                 status = QCoreApplication.translate("initialisation","RC < 0.1. Matrice de jugement cohérent et acceptable!")
+                self.iface.dlg.BT_NEXT.setEnabled(True)
+                # Write into log file
+                first_line = QCoreApplication.translate("initialisation","Matrice de jugement: ")
+                log = f"{first_line}\n{log_params}\n\n{log_weight}\nRC = {conRatio}\t{status}\n\n"
+                self.save_log(log,first_line)
+                self.load_log_file()
             else:
                 status = QCoreApplication.translate("initialisation","RC >= 0.1. Matrice de jugement non cohérent!\nVeuillez changer les valeurs saisies.")
+                self.iface.dlg.BT_NEXT.setEnabled(False)
             self.iface.dlg.LBL_STATUT_MATRICE.setText(status)
         else:
             button = QMessageBox.information(
@@ -707,6 +729,7 @@ class initialiseAll:
                 self.error_title,
                 log,
                 )
+            self.iface.dlg.BT_NEXT.setEnabled(False)
 
     def save_matrix(self):
         tab = self.iface.dlg.TBL_JUGEMENT
@@ -718,7 +741,6 @@ class initialiseAll:
 
         with open(output_path, 'w') as csvfile:
             writer = csv.writer(csvfile, dialect='excel', lineterminator='\n')
-
             writer.writerow(headers)
             for row in range(tab.rowCount()):
                 writer.writerow(tab.cellWidget(row, column).text() for column in nb_columns)
@@ -740,10 +762,9 @@ class initialiseAll:
     def save_log(self,log,first_line):
         with open(self.log_path, "r") as input:
             with open(self.log_path + ".temp", "a") as output:
-                # iterate all lines from file
+                # # if line starts with first_line substring then don't write it in temp file
                 for line in input:
                     if not line.strip("\n").startswith(first_line):
-                        # if line starts with first_line substring then don't write it in temp file
                         output.write(line)
                     else:
                         break
