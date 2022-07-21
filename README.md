@@ -29,10 +29,10 @@ Classification:
 11) Les résultats finaux sont de type Double et arrondissés au 2 centièmes près (2 chiffres après la virgule) \*
 
 Standardization:
- ![alt text](https://github.com/famenontsoa/fullmce_Sarah/blob/main/images/linear.png?raw=true)
   Fonction Linéaire:
+![alt text](https://github.com/famenontsoa/fullmce_Sarah/blob/main/images/linear.png?raw=true)
+![alt text](https://github.com/famenontsoa/fullmce_Sarah/blob/main/images/linear_shape.png?raw=true)
 
-       ![alt text](https://github.com/famenontsoa/fullmce_Sarah/blob/main/images/linear_shape.png?raw=true)
 1) nombre minimal des facteurs = 3, nombre maximale = 15
 2) chaque facteur correspond à un et un seul champ issu d'un seul fichier source
 3) un fichier source peut contenir un ou plusieurs facteurs
