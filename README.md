@@ -32,6 +32,7 @@ Standardization:
   Fonction Linéaire:
 
        ![alt text](https://github.com/famenontsoa/fullmce_Sarah/blob/main/images/linear_shape.png?raw=true)
+
        ![alt text](https://github.com/famenontsoa/fullmce_Sarah/blob/main/images/linear.png?raw=true)
 
 1) nombre minimal des facteurs = 3, nombre maximale = 15
