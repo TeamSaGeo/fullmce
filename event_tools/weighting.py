@@ -56,14 +56,14 @@ class Weigthing:
                     col_name = self.tab.horizontalHeaderItem(col).text()
                     error_msg = QCoreApplication.translate("initialisation","Veuillez saisir une valeur en entier ou réelle valide à la ligne <b>{0}</b> à la colonne <b>{1}</b>!").format(row_name,col_name)
                     return False, error_msg
+        self.calculate_cr()
         return True, log
 
     def calculate_cr(self):
         sum_columns = self.sum_columns()
-        layers_weight, log_weight = self.layers_weight(sum_columns)
-        lambda_value = self.lambda_parameter(layers_weight)
+        self.layers_weight, self.log_weight = self.layers_weight(sum_columns)
+        lambda_value = self.lambda_parameter(self.layers_weight)
         conIndex = ( lambda_value - self.nb_columns ) / (self.nb_columns - 1)
         randomConsIndex = {1:0.0 , 2:0.0 , 3:0.58 , 4:0.9 , 5:1.12 , 6:1.24 , 7:1.32 ,
                             8:1.41 , 9:1.45 , 10:1.49 , 11:1.51 , 12:1.48 , 13:1.56 , 14:1.57 , 15:1.59}
-        conRatio = round(conIndex / randomConsIndex[self.nb_columns],2)
-        return conRatio, log_weight
+        self.conRatio = round(conIndex / randomConsIndex[self.nb_columns],2)

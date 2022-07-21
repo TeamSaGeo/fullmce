@@ -8,7 +8,8 @@ from .inputLayer import InputLayer
 from .classification import Classification
 from . standardization import Standardization
 from .weighting import Weigthing
-from qgis.core import QgsVectorFileWriter
+from .aggregation import Aggregation
+from qgis.core import QgsVectorFileWriter, QgsExpression, QgsExpressionContext, QgsExpressionContextUtils
 import os, csv
 from datetime import datetime
 
@@ -73,7 +74,7 @@ class initialiseAll:
             Qt.TextBrowserInteraction)
         self.iface.dlg.LBL_ROHY.setOpenExternalLinks(True)
 
-    def display_input_config(self, columns, tbl, sb):
+    def display_input_table(self, columns, tbl, sb):
         tbl.setColumnCount(len(columns))
         tbl.setHorizontalHeaderLabels(columns)
         # Table will fit the screen horizontally
@@ -90,7 +91,7 @@ class initialiseAll:
         type = QCoreApplication.translate("initialisation","Type")
         ready = QCoreApplication.translate("initialisation","Prêts")
         columns = [name, path, "", field, type, ready]
-        self.display_input_config(columns,self.iface.dlg.TBL_CONTRAINTE,self.iface.dlg.SB_NB_CONTRAINTE)
+        self.display_input_table(columns,self.iface.dlg.TBL_CONTRAINTE,self.iface.dlg.SB_NB_CONTRAINTE)
 
         # Listen to list of contraintes not ready
         self.iface.dlg.LV_CONTRAINTE_NOT_READY.itemSelectionChanged.connect(
@@ -109,7 +110,7 @@ class initialiseAll:
         columns[-1] = normalized
 
         # Initialize standardization input table
-        self.display_input_config(columns,self.iface.dlg.TBL_DATA_ENTREE,self.iface.dlg.SB_NB_DATA)
+        self.display_input_table(columns,self.iface.dlg.TBL_DATA_ENTREE,self.iface.dlg.SB_NB_DATA)
 
         # Initialize 3 input rows
         self.update_listData(self.iface.dlg.TBL_DATA_ENTREE,self.iface.dlg.SB_NB_DATA)
@@ -706,17 +707,17 @@ class initialiseAll:
 
     def weighting(self):
         tab = self.iface.dlg.TBL_JUGEMENT
-        weighting = Weigthing(tab)
-        correct, log_params = weighting.correct_params()
+        self.weighting = Weigthing(tab)
+        correct, log_params = self.weighting.correct_params()
         if correct:
-            conRatio, log_weight = weighting.calculate_cr()
+            conRatio = self.weighting.conRatio
             self.iface.dlg.LBL_RC_VALUE.setText(f"RC = {conRatio}")
             if conRatio < 0.1:
                 status = QCoreApplication.translate("initialisation","RC < 0.1. Matrice de jugement cohérent et acceptable!")
                 self.iface.dlg.BT_NEXT.setEnabled(True)
                 # Write into log file
                 first_line = QCoreApplication.translate("initialisation","Matrice de jugement: ")
-                log = f"{first_line}\n{log_params}\n\n{log_weight}\nRC = {conRatio}\t{status}\n\n"
+                log = f"{first_line}\n{log_params}\n\n{self.weighting.log_weight}\nRC = {conRatio}\t{status}\n\n"
                 self.save_log(log,first_line)
                 self.load_log_file()
             else:
@@ -730,6 +731,19 @@ class initialiseAll:
                 log,
                 )
             self.iface.dlg.BT_NEXT.setEnabled(False)
+
+    def aggregate(self):
+        # Check if factors are from same source
+        inputLayer = self.listFactors[0].inputLayer
+        factors_same_source = self.objects_same_source(inputLayer,self.listFactors[1:])
+        if len(factors_same_source) == len(self.listFactors[1:]):
+            aggregation = Aggregation(self.listFactors, self.weighting.layers_weight)
+            button = QMessageBox.information(
+                self.iface.dlg,
+                self.error_title,
+                aggregation.getexpression(),
+                )
+            # aggregation.aggregate(inputLayer)
 
     def save_matrix(self):
         tab = self.iface.dlg.TBL_JUGEMENT
@@ -757,7 +771,11 @@ class initialiseAll:
                 for row, values in enumerate(reader):
                     for column, value in enumerate(values):
                         if row != column:
-                            tab.cellWidget(row, column).setText(value)
+                            cellwidget = tab.cellWidget(row, column)
+                            if cellwidget :
+                                cellwidget.setText(value)
+                            else:
+                                break
 
     def save_log(self,log,first_line):
         with open(self.log_path, "r") as input:
@@ -772,12 +790,12 @@ class initialiseAll:
         # replace file with original name
         os.replace(self.log_path + ".temp", self.log_path)
 
-    def contraintes_insame_input(self, inputLayer, list_contraintes):
-        contraintes_same_input = []
-        for contrainte in inputLayer.elements:
-            if contrainte in list_contraintes:
-                contraintes_same_input.append(contrainte)
-        return contraintes_same_input
+    def objects_same_source(self, inputLayer, list_objects):
+        objects_same_source = []
+        for element in inputLayer.elements:
+            if element in list_objects:
+                objects_same_source.append(element)
+        return objects_same_source
 
     def save_layer_into_file(self):
         if self.pageInd == 2:
@@ -802,7 +820,7 @@ class initialiseAll:
         log = "#######################################################\n\n"
         log += QCoreApplication.translate("initialisation","Nombre de {0}s en entrée: {1} ({2} à {3})\n\nTraitement en cours. . .\n\n").format(object_type,len(list_object),len(list_object_not_ready),process_name)
         for inputLayer in self.list_inputLayers:
-            object_not_ready = self.contraintes_insame_input(inputLayer,list_object_not_ready)
+            object_not_ready = self.objects_same_source(inputLayer,list_object_not_ready)
             if object_not_ready != []:
                 output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),inputLayer.name + file_extension)
                 inputLayer.setreclass_output(output_path)
@@ -837,14 +855,15 @@ class initialiseAll:
 
             # On click on Suivant
             self.iface.dlg.BT_NEXT.pressed.connect(lambda: self.display_next_page())
-            # On click on répertoire de sortie
-            self.iface.dlg.BT_OUTPUT.clicked.connect(lambda: self.select_output_dir())
             # On click on Precedent
             self.iface.dlg.BT_PREVIOUS.clicked.connect(lambda: self.display_previous_page())
             # On click on Cancel
             self.iface.dlg.BT_CANCEL.clicked.connect(lambda: self.remove_new_fields())
             # On click on Close
             self.iface.dlg.rejected.connect(lambda: self.remove_new_fields())
+
+            # On click on répertoire de sortie
+            self.iface.dlg.BT_OUTPUT.clicked.connect(lambda: self.select_output_dir())
 
             self.init_classification_input()
             self.init_standardization_input()
@@ -855,3 +874,5 @@ class initialiseAll:
             self.iface.dlg.BT_SAVE_MATRIX.clicked.connect(lambda: self.save_matrix())
             # On click on Importer
             self.iface.dlg.BT_LOAD_MATRIX.clicked.connect(lambda: self.load_matrix())
+            # On click on RUN
+            self.iface.dlg.BT_EXECUTE.clicked.connect(lambda : self.aggregate())
