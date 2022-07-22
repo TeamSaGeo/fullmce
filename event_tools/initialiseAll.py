@@ -639,7 +639,7 @@ class initialiseAll:
             self.iface.dlg.BT_ADD_ROW_CONTRAINTE.setEnabled(True)
 
     def classification(self):
-        first_line = QCoreApplication.translate("initialisation","Paramètres de reclassification: \n")
+        first_line = QCoreApplication.translate("initialisation","Paramètres de reclassification:")
         log = first_line
         for i,contrainte in enumerate(self.listContraintesNotReady):
             tab = self.iface.dlg.STACKED_WIDGET_RECLASS.widget(i)
@@ -798,7 +798,7 @@ class initialiseAll:
         return objects_same_source
 
     def save_layer_into_file(self):
-        if self.pageInd == 2:
+        if self.pageInd == 3:
             list_object = self.listContraintes
             list_object_not_ready = self.listContraintesNotReady
             object_type = QCoreApplication.translate("initialisation","contrainte")

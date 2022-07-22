@@ -644,66 +644,7 @@
           <string>Paramètres de reclassification des contraintes</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_10">
-          <item row="0" column="0">
-           <widget class="QGroupBox" name="groupBox">
-            <property name="maximumSize">
-             <size>
-              <width>235</width>
-              <height>332</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <weight>50</weight>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="title">
-             <string>Liste des contraintes à reclassifier</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_11">
-             <item row="0" column="0">
-              <widget class="QListWidget" name="LV_CONTRAINTE_NOT_READY">
-               <property name="frameShape">
-                <enum>QFrame::NoFrame</enum>
-               </property>
-               <property name="alternatingRowColors">
-                <bool>false</bool>
-               </property>
-               <property name="selectionBehavior">
-                <enum>QAbstractItemView::SelectRows</enum>
-               </property>
-               <property name="spacing">
-                <number>5</number>
-               </property>
-               <property name="selectionRectVisible">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
           <item row="0" column="2">
-           <spacer name="horizontalSpacer_7">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Expanding</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>8</width>
-              <height>329</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="0" column="3">
            <widget class="QGroupBox" name="GB_RECLASS">
             <property name="minimumSize">
              <size>
@@ -808,6 +749,49 @@
                </property>
                <property name="currentIndex">
                 <number>-1</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QGroupBox" name="groupBox">
+            <property name="maximumSize">
+             <size>
+              <width>235</width>
+              <height>332</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="title">
+             <string>Liste des contraintes à reclassifier</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_11">
+             <item row="0" column="0">
+              <widget class="QListWidget" name="LV_CONTRAINTE_NOT_READY">
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="alternatingRowColors">
+                <bool>false</bool>
+               </property>
+               <property name="selectionBehavior">
+                <enum>QAbstractItemView::SelectRows</enum>
+               </property>
+               <property name="spacing">
+                <number>5</number>
+               </property>
+               <property name="selectionRectVisible">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
