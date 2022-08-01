@@ -741,15 +741,18 @@ class initialiseAll:
         # Check if factors are from same source
         inputLayer = self.listFactors[0].inputLayer
         factors_same_source = self.objects_same_source(inputLayer,self.listFactors[1:])
-        # if all factors in same source
-        if len(factors_same_source) == len(self.listFactors[1:]):
-            aggregation = Aggregation(self.listFactors, self.weighting.layers_weight)
+        contraints_same_source = self.objects_same_source(inputLayer,self.listContraintes)
+        # if all factors and all contraints in same source
+        if (len(factors_same_source) == len(self.listFactors[1:])) \
+        and (len(contraints_same_source) == len(self.listContraintes)):
+            aggregation = Aggregation(self.listFactors, self.listContraintes, self.weighting.layers_weight)
             button = QMessageBox.information(
                 self.iface.dlg,
                 self.error_title,
                 aggregation.getexpression(),
                 )
-            # aggregation.aggregate(inputLayer)
+            output_dir = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),inputLayer.name + "_result.shp" )
+            aggregation.aggregate(inputLayer, output_dir)
 
     def save_matrix(self):
         tab = self.iface.dlg.TBL_JUGEMENT

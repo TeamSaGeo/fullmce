@@ -1,29 +1,30 @@
 from qgis.core import QgsExpression, QgsExpressionContext, QgsExpressionContextUtils
+import processing
 
 class Aggregation:
-    def __init__(self, factors, weights):
+    def __init__(self, factors,contraintes, weights):
         self.factors = factors
+        self.contraintes = contraintes
         self.weights = weights
 
     def getexpression(self):
         expression = list()
         for i,factor in enumerate(self.factors):
             expression.append("\"" + factor.field_name + "\"" + '*' + str(round(self.weights[i],5)))
-        return '+'.join(expression)
+        sum = '+'.join(expression)
+        product = '*'.join([("\"" + contrainte.field_name + "\"") for contrainte in self.contraintes])
+        return ("(" + sum + ") * " + product)
 
-    def aggregate(self, list_inputLayers):
-        expression = QgsExpression(self.getexpression())
-
-        for inputLayer in list_inputLayers:
-            processing.run('qgis:fieldcalculator',
-               {"INPUT": inputLayer.path,
-               "FIELD_NAME": 'WLC' ,
-               "FIELD_TYPE": 2,
-               "FIELD_LENGTH": 10,
-               "FIELD_PRECISION": 3,
-               "NEW_FIELD": True ,
-               "FORMULA": expression,
-               "OUTPUT": inputLayer.path + ".temp"})
+    def aggregate(self, inputLayer, output_dir):
+        result = processing.run('qgis:fieldcalculator',
+            {"INPUT": inputLayer.path,
+            "FIELD_NAME": 'WLC' ,
+            "FIELD_TYPE": 0,
+            "FIELD_LENGTH": 10,
+            "FIELD_PRECISION": 3,
+            "NEW_FIELD": True ,
+            "FORMULA": self.getexpression(),
+            "OUTPUT": output_dir})
         # new_field_idx = inputLayer.add_new_field("WLC")
         # vlayer = inputLayer.vlayer
         # # context = QgsExpressionContext()
