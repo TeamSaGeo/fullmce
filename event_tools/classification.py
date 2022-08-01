@@ -34,7 +34,7 @@ class Classification:
         self.contrainte.inputLayer.setvlayer(vlayer)
 
     def write_log(self,values):
-        log = QCoreApplication.translate("initialisation","{0}) Contrainte \"{1}\": Champ {2} (Type {3})\n").format(self.ind+1,self.contrainte.name,self.contrainte.field_name,self.contrainte.field_type)
+        log = QCoreApplication.translate("initialisation","\n{0}) Contrainte \"{1}\": Champ {2} (Type {3})\n").format(self.ind+1,self.contrainte.name,self.contrainte.field_name,self.contrainte.field_type)
         for r in range(self.tab.rowCount()):
             log += f"\t{values[r][-1]}"
             if self.contrainte.field_type == "String":
@@ -42,14 +42,12 @@ class Classification:
             else:
                 start_inclus = "[" if values[r][1] else "]"
                 end_inclus = "]" if values[r][3] else "["
-
                 log += f"\t{start_inclus} {values[r][0]} , {values[r][2]} {end_inclus}\n"
-        log +="\n"
         return log
 
     def error_msg (self,row,col):
         if col == -1:
-            return QCoreApplication.translate("initialisation","Sélectionner la contrainte \"{0}\" ajouter les paramètres de reclassification").format(self.contrainte.name)
+            return QCoreApplication.translate("initialisation","Sélectionner la contrainte \"{0}\" afin d'ajouter les paramètres de reclassification").format(self.contrainte.name)
         else:
             error_msg = ""
             if col == 0:
@@ -69,7 +67,11 @@ class Classification:
         for row in range(self.tab.rowCount()):
             # get new value
             try:
-                new_value = float(self.tab.cellWidget(row,0).text())
+                new_value = self.tab.cellWidget(row,0).text()
+                if new_value == "null":
+                    new_value == None
+                else:
+                    new_value = int(new_value)
             except ValueError:
                 return list_values,row,0
 
@@ -131,7 +133,11 @@ class Classification:
         for row in range(self.tab.rowCount()):
             # get new value
             try:
-                new_value = float(self.tab.cellWidget(row,0).text())
+                new_value = self.tab.cellWidget(row,0).text()
+                if new_value == "null":
+                    new_value == None
+                else:
+                    new_value = int(new_value)
             except ValueError:
                 return list_values,row,0
 
