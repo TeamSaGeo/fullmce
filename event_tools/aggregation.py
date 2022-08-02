@@ -1,5 +1,5 @@
 from qgis.core import QgsExpression, QgsExpressionContext, QgsExpressionContextUtils
-import processing
+import processing, os
 
 class Aggregation:
     def __init__(self, factors,contraintes, weights):
@@ -15,16 +15,22 @@ class Aggregation:
         product = '*'.join([("\"" + contrainte.field_name + "\"") for contrainte in self.contraintes])
         return ("(" + sum + ") * " + product)
 
-    def aggregate(self, inputLayer, output_dir):
-        result = processing.run('qgis:fieldcalculator',
-            {"INPUT": inputLayer.path,
-            "FIELD_NAME": 'WLC' ,
+    def aggregate(self, inputpath, output_path):
+        return processing.run('qgis:fieldcalculator',
+            {"INPUT": inputpath,
+            "FIELD_NAME": 'MCE_RESULT' ,
             "FIELD_TYPE": 0,
             "FIELD_LENGTH": 10,
             "FIELD_PRECISION": 3,
             "NEW_FIELD": True ,
             "FORMULA": self.getexpression(),
-            "OUTPUT": output_dir})
+            "OUTPUT": output_path})
+
+    def merge(self,paths, output_path):
+        return processing.run("qgis:mergevectorlayers",
+        {"LAYERS":paths,
+        "OUTPUT": output_path})
+        # gsProcessingException
         # new_field_idx = inputLayer.add_new_field("WLC")
         # vlayer = inputLayer.vlayer
         # # context = QgsExpressionContext()

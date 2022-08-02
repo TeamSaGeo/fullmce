@@ -740,19 +740,45 @@ class initialiseAll:
     def aggregate(self):
         # Check if factors are from same source
         inputLayer = self.listFactors[0].inputLayer
-        factors_same_source = self.objects_same_source(inputLayer,self.listFactors[1:])
-        contraints_same_source = self.objects_same_source(inputLayer,self.listContraintes)
+        inputdata = self.listFactors[1:] + self.listContraintes
+
+        aggregation = Aggregation(self.listFactors, self.listContraintes, self.weighting.layers_weight)
+        output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),"resultat_final.shp" )
+
+        result = False
+        # button = QMessageBox.information(
+        #     self.iface.dlg,
+        #     self.error_title,
+        #     aggregation.getexpression(),
+        #     )
+
         # if all factors and all contraints in same source
-        if (len(factors_same_source) == len(self.listFactors[1:])) \
-        and (len(contraints_same_source) == len(self.listContraintes)):
-            aggregation = Aggregation(self.listFactors, self.listContraintes, self.weighting.layers_weight)
+        if len(self.objects_same_source(inputLayer,inputdata)) == len(inputdata) :
+            result = aggregation.aggregate(inputLayer.path,output_path)
+
+        # if factor and contrainte same geometrique type => merge
+        elif self.objects_same_geometry_type(inputLayer.vlayer.geometryType()):
+            merged_layers = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),"result_merged.shp" )
+            list_path = [input.path for input in self.list_inputLayers]
+            result = aggregation.merge(list_path, merged_layers)
+            if result:
+                result = aggregation.aggregate(merged_layers,output_path)
+
+        # else cannot aggregate
+        else:
             button = QMessageBox.information(
-                self.iface.dlg,
-                self.error_title,
-                aggregation.getexpression(),
-                )
-            output_dir = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),inputLayer.name + "_result.shp" )
-            aggregation.aggregate(inputLayer, output_dir)
+            self.iface.dlg,
+            self.error_title,
+            QCoreApplication.translate("initialisation","Agrégation impossible! Les couches sources doivent être du même type de géométrie."),
+            )
+
+        if result:
+            self.iface.dlg.BT_EXECUTE.clicked.setEnabled(False)
+            button = QMessageBox.information(
+            self.iface.dlg,
+            self.error_title,
+            QCoreApplication.translate("initialisation","Agrégation terminée avec succès"),
+            )
 
     def save_matrix(self):
         tab = self.iface.dlg.TBL_JUGEMENT
@@ -799,6 +825,17 @@ class initialiseAll:
         # replace file with original name
         os.replace(self.log_path + ".temp", self.log_path)
 
+    def objects_same_geometry_type(self, geometry_type):
+        objects_same_geometry_type = []
+        for input in self.list_inputLayers:
+            if input.vlayer.geometryType() == geometry_type:
+                objects_same_geometry_type.append(input)
+        if len(self.list_inputLayers) == len(objects_same_geometry_type):
+            return True
+        else:
+            return False
+        # return objects_same_geometry_type
+
     def objects_same_source(self, inputLayer, list_objects):
         objects_same_source = []
         for element in inputLayer.elements:
@@ -810,28 +847,18 @@ class initialiseAll:
         if text_edit == self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE :
             list_object = self.listContraintes
             list_object_not_ready = self.listContraintesNotReady
-            # object_type = QCoreApplication.translate("initialisation","contrainte")
-            # process_name = QCoreApplication.translate("initialisation","reclassifier")
             process = QCoreApplication.translate("initialisation","Reclassification")
             file_extension = "_bool.shp"
             field_extension = "Bl"
-            # text_edit = self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE
         else:
             list_object  = self.listFactors
             list_object_not_ready = self.listFactorsNotNormalized
-            # object_type = QCoreApplication.translate("initialisation","facteur")
-            # process_name = QCoreApplication.translate("initialisation","normaliser")
             process = QCoreApplication.translate("initialisation","Normalisation")
             file_extension = "_fuzz.shp"
             field_extension = "Fz"
-            # text_edit = self.iface.dlg.TE_RUN_PROCESS_NORMALISATION
 
-        # cursor = text_edit.textCursor()
         text_edit.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
         text_edit.append("#######################################################\nSauvegarde du résultat de:\n")
-        # QApplication.processEvents(QEventLoop.AllEvents, 20)
-        # text_edit.append(QCoreApplication.translate("initialisation","Nombre de {0}s en entrée: {1} ({2} à {3})Traitement en cours ...\n\n").format(object_type,len(list_object),len(list_object_not_ready),process_name))
-        # QApplication.processEvents()
         for inputLayer in self.list_inputLayers:
             object_not_ready = self.objects_same_source(inputLayer,list_object_not_ready)
             if object_not_ready != []:
@@ -842,8 +869,7 @@ class initialiseAll:
                     new_field_name = object.field_name[:-2] + field_extension
                     object.inputLayer.delete_new_field(new_field_name)
                     text_edit.append(QCoreApplication.translate("initialisation","\"{0}\" dans le fichier {1}\n").format(object.name,inputLayer.reclass_output))
-                    # QApplication.processEvents(QEventLoop.AllEvents, 20)
-        text_edit.append(QCoreApplication.translate("initialisation","{0} terminés avec succès !").format(process))
+        text_edit.append(QCoreApplication.translate("initialisation","{0} terminés avec succès!").format(process))
         text_edit.append("#######################################################")
         return True
 
