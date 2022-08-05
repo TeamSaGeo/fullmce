@@ -53,8 +53,8 @@ class Standardization:
         order_error = ""
         if col >= 4:
             previous_col_name = self.tab.horizontalHeaderItem(col-1).text()
-            order_error = QCoreApplication.translate("initialisation"," (strictement supérieure à celle de la colonne {0})").format(previous_col_name)
-        return QCoreApplication.translate("initialisation","<b>Facteur \"{0}\":</b> Saisir une valeur en entier (ou réelle) valide à la colonne {1}{2}.").format(self.factor.name,col_name,order_error)
+            order_error = QCoreApplication.translate("normalisation"," (strictement supérieure à celle de la colonne {0})").format(previous_col_name)
+        return QCoreApplication.translate("normalisation","<b>Facteur \"{0}\":</b> Saisir une valeur en entier (ou réelle) valide à la colonne {1}{2}.").format(self.factor.name,col_name,order_error)
 
     def change_attributes_values(self, values):
         vlayer = self.factor.inputLayer.vlayer

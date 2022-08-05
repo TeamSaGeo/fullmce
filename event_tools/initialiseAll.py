@@ -491,7 +491,8 @@ class initialiseAll:
         # Start writing log
         now = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
         output_dir = self.iface.dlg.LE_OUTPUT_DIR.text()
-        log = QCoreApplication.translate("initialisation","Traitement initié le {0}\n\nRépértoire de sortie: {1}\nFormat de sortie: SHP\n\nCONTRAINTES\nNombre de contraintes: {2}\n").format(now,output_dir,len(self.listContraintes))
+        log = QCoreApplication.translate("classification",
+        "Traitement initié le {0}\n\nRépértoire de sortie: {1}\nFormat de sortie: SHP\n\n-----------CLASSIFICATION----------\nNombre de contraintes: {2}\n").format(now,output_dir,len(self.listContraintes))
 
         for i,contrainte in enumerate(self.listContraintes):
             if not self.input_row_filled(contrainte,i):
@@ -503,7 +504,7 @@ class initialiseAll:
                 # Initialize reclassification table
                 self.display_classification_table(i,contrainte)
 
-            contrainte_status = QCoreApplication.translate("initialisation","PRÊTE") if contrainte.ready else QCoreApplication.translate("initialisation","NON PRÊTE")
+            contrainte_status = QCoreApplication.translate("classification","PRÊTE") if contrainte.ready else QCoreApplication.translate("initialisation","NON PRÊTE")
             log += f"{contrainte.name}\t{contrainte.inputLayer.path}\t{contrainte_status}\n"
 
         log += "\n"
@@ -522,19 +523,19 @@ class initialiseAll:
 
         # Update standardization table
         self.display_standardization_table()
-        first_line = QCoreApplication.translate("initialisation","\nFACTEURS")
+        first_line = QCoreApplication.translate("normalisation","\n----------NORMALISATION----------")
         log = first_line
-        log += QCoreApplication.translate("initialisation","\nNombre de facteurs: {0}\n").format(len(self.listFactors))
+        log += QCoreApplication.translate("normalisation","\nNombre de facteurs: {0}\n").format(len(self.listFactors))
 
         for row,factor in enumerate(self.listFactors):
             if not self.input_row_filled(factor,row):
                 return False
 
             if factor.field_type == "String":
-                error_field = QCoreApplication.translate("initialisation","Le facteur n° {0} est de type \"String\". Voulez-vous reclassifier ce facteur ? Sinon, veuillez choisir un autre champ de type entier ou réelle.").format(row+1)
+                error_field = QCoreApplication.translate("normalisation","Le facteur n° {0} est de type \"String\". Voulez-vous reclassifier ce facteur ? Sinon, veuillez choisir un autre champ de type entier ou réelle.").format(row+1)
                 reply = QMessageBox.question(
                     self.iface.dlg,
-                    QCoreApplication.translate("initialisation","Question ..."),
+                    QCoreApplication.translate("normalisation","Question ..."),
                     f"{error_field}",
                     buttons=QMessageBox.Yes | QMessageBox.No,
                     defaultButton=QMessageBox.No,
@@ -555,7 +556,7 @@ class initialiseAll:
             else:
                 self.add_standardization_row(factor)
 
-            factor_status = QCoreApplication.translate("initialisation","NORMALISÉ") if factor.ready else QCoreApplication.translate("initialisation","NON NORMALISÉ")
+            factor_status = QCoreApplication.translate("normalisation","NORMALISÉ") if factor.ready else QCoreApplication.translate("normalisation","NON NORMALISÉ")
             log += f"{factor.name}\t{factor.inputLayer.path}\t{factor_status}\n"
 
         self.iface.dlg.SB_NB_DATA_2.setValue(len(self.listFactorsNotNormalized))
@@ -639,7 +640,7 @@ class initialiseAll:
             self.iface.dlg.BT_ADD_ROW_CONTRAINTE.setEnabled(True)
 
     def classification(self):
-        first_line = QCoreApplication.translate("initialisation","Paramètres de reclassification:")
+        first_line = QCoreApplication.translate("classification","Paramètres de reclassification:")
         log = first_line
         for i,contrainte in enumerate(self.listContraintesNotReady):
             tab = self.iface.dlg.STACKED_WIDGET_RECLASS.widget(i)
@@ -662,9 +663,9 @@ class initialiseAll:
 
     def standardization(self):
         tab = self.iface.dlg.TBL_DATA_STANDARDIZATION
-        first_line = QCoreApplication.translate("initialisation","Paramètres de standardisation:")
+        first_line = QCoreApplication.translate("normalisation","Paramètres de standardisation:")
         log = first_line
-        log += QCoreApplication.translate("initialisation","\nFacteur\tChamp\tFonction\tDirection")
+        log += QCoreApplication.translate("normalisation","\nFacteur\tChamp\tFonction\tDirection")
         log += "\tA\tB\tC\tD\n----------------------------------------------------------------------------------------------------------------------------\n"
         for i,factor in enumerate(self.listFactorsNotNormalized):
             standardization = Standardization(factor,tab,i)
@@ -686,10 +687,10 @@ class initialiseAll:
     def run_process (self):
         if self.pageInd == 4:
             text_edit = self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE
-            question = QCoreApplication.translate("initialisation","reclassifier les contraintes")
+            question = QCoreApplication.translate("classification","reclassifier les contraintes")
         else:
             text_edit = self.iface.dlg.TE_RUN_PROCESS_NORMALISATION
-            question = QCoreApplication.translate("initialisation","normaliser les facteurs")
+            question = QCoreApplication.translate("normalisation","normaliser les facteurs")
 
         if text_edit.toPlainText().endswith("#"):
             return True
@@ -717,15 +718,17 @@ class initialiseAll:
             conRatio = self.weighting.conRatio
             self.iface.dlg.LBL_RC_VALUE.setText(f"RC = {conRatio}")
             if conRatio < 0.1:
-                status = QCoreApplication.translate("initialisation","RC < 0.1. Matrice de jugement cohérent et acceptable!")
+                status = QCoreApplication.translate("ponderation","RC < 0.1. Matrice de jugement cohérent et acceptable!")
                 self.iface.dlg.BT_NEXT.setEnabled(True)
                 # Write into log file
-                first_line = QCoreApplication.translate("initialisation","Matrice de jugement: ")
-                log = f"{first_line}\n{log_params}\n\n{self.weighting.log_weight}\nRC = {conRatio}\t{status}\n\n"
+                first_line = QCoreApplication.translate("ponderation","----------PONDÉRATION----------")
+                log = first_line
+                log += QCoreApplication.translate("ponderation","\nMatrice de jugement:")
+                log += f"\n{log_params}\n\n{self.weighting.log_weight}\nRC = {conRatio}\t{status}\n\n"
                 self.save_log(log,first_line)
                 self.load_log_file(self.iface.dlg.TE_RUN_PROCESS)
             else:
-                status = QCoreApplication.translate("initialisation","RC >= 0.1. Matrice de jugement non cohérent!\nVeuillez changer les valeurs saisies.")
+                status = QCoreApplication.translate("ponderation","RC >= 0.1. Matrice de jugement non cohérent!\nVeuillez changer les valeurs saisies.")
                 self.iface.dlg.BT_NEXT.setEnabled(False)
             self.iface.dlg.LBL_STATUT_MATRICE.setText(status)
         else:
@@ -737,34 +740,39 @@ class initialiseAll:
             self.iface.dlg.BT_NEXT.setEnabled(False)
 
     def aggregate(self):
-        if self.inputs_same_crs():
+        first_layer = self.list_inputLayers[0]
+        first_line = QCoreApplication.translate("agregation","----------AGGRÉGATION----------")
+        log = first_line
+
+        # if all factors and all contraints in same crs
+        if self.inputs_same_crs(first_layer.vlayer.crs()):
             aggregation = Aggregation(self.listFactors, self.listContraintes, self.weighting.layers_weight)
-            input_path = self.list_inputLayers[0].path
+            input_path = first_layer.path
 
             if len(self.list_inputLayers) != 1:
                 for i,input in enumerate(self.list_inputLayers[1:]):
                     output_temp_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),"output"+f"{i}"+".shp" )
                     result = aggregation.joinbylocation(input_path,input.path,output_temp_path)
-                    os.remove(input_path)
+                    if i > 0:
+                        os.remove(input_path)
                     input_path = output_temp_path
 
-            # if all factors and all contraints in same source
+            expression = aggregation.getexpression()
             output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),"resultat_final.shp" )
-            result = aggregation.aggregate(input_path,output_path)
-            self.iface.dlg.BT_EXECUTE.setEnabled(False)
-            button = QMessageBox.information(
-            self.iface.dlg,
-            self.error_title,
-            QCoreApplication.translate("initialisation","Agrégation terminée avec succès"),
-            )
+            result = aggregation.aggregate(input_path,expression,output_path)
+            log += QCoreApplication.translate("agregation","\nFormule = ") + expression
+            status = QCoreApplication.translate("agregation","Agrégation terminée avec succès!")
+            log += QCoreApplication.translate("agregation","\nFichier de sortie: ") + output_path + f"\n{status}"
+            button = QMessageBox.information(self.iface.dlg,QCoreApplication.translate("agregation","Résultat"),status,)
 
         # else cannot aggregate
         else:
-            button = QMessageBox.information(
-            self.iface.dlg,
-            self.error_title,
-            QCoreApplication.translate("initialisation","Agrégation impossible! Les couches sources doivent être du même type de géométrie."),
-            )
+            log += QCoreApplication.translate("agregation","Agrégation impossible! Les couches sources ne sont pas du même type de géométrie.")
+            button = QMessageBox.information(self.iface.dlg,self.error_title,log,)
+
+        self.save_log(log,first_line)
+        self.load_log_file(self.iface.dlg.TE_RUN_PROCESS)
+        self.iface.dlg.BT_EXECUTE.setEnabled(False)
 
     def save_matrix(self):
         tab = self.iface.dlg.TBL_JUGEMENT
@@ -811,19 +819,11 @@ class initialiseAll:
         # replace file with original name
         os.replace(self.log_path + ".temp", self.log_path)
 
-    def inputs_same_crs(self):
-        input = self.list_inputLayers[0]
-        crs = input.vlayer.crs()
-        i = 1
-
-        while input.vlayer.crs() == crs and i < len(self.list_inputLayers):
-            input = self.list_inputLayers[i]
-            i += 1
-
-        if i == len(self.list_inputLayers):
-            return True
-        else:
-            return False
+    def inputs_same_crs(self,crs):
+        for input in self.list_inputLayers[1:]:
+            if input.vlayer.crs() != crs:
+                return False
+        return True
 
     def objects_same_source(self, inputLayer, list_objects):
         objects_same_source = []

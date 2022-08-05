@@ -16,7 +16,7 @@ class Weigthing:
 
     def layers_weight(self,sum_columns):
         weight = []
-        log = QCoreApplication.translate("initialisation","Poids des facteurs:\n")
+        log = QCoreApplication.translate("ponderation","Poids des facteurs:\n")
         for row in range(self.nb_columns):
             sum = 0
             for col in range(self.nb_columns):
@@ -54,7 +54,7 @@ class Weigthing:
                 except ValueError:
                     # Value is None
                     col_name = self.tab.horizontalHeaderItem(col).text()
-                    error_msg = QCoreApplication.translate("initialisation","Veuillez saisir une valeur en entier ou réelle valide à la ligne <b>{0}</b> à la colonne <b>{1}</b>!").format(row_name,col_name)
+                    error_msg = QCoreApplication.translate("ponderation","Veuillez saisir une valeur en entier ou réelle valide à la ligne <b>{0}</b> à la colonne <b>{1}</b>!").format(row_name,col_name)
                     return False, error_msg
         self.calculate_cr()
         return True, log

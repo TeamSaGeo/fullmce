@@ -34,7 +34,7 @@ class Classification:
         self.contrainte.inputLayer.setvlayer(vlayer)
 
     def write_log(self,values):
-        log = QCoreApplication.translate("initialisation","\n{0}) Contrainte \"{1}\": Champ {2} (Type {3})\n").format(self.ind+1,self.contrainte.name,self.contrainte.field_name,self.contrainte.field_type)
+        log = QCoreApplication.translate("classification","\n{0}) Contrainte \"{1}\": Champ {2} (Type {3})\n").format(self.ind+1,self.contrainte.name,self.contrainte.field_name,self.contrainte.field_type)
         for r in range(self.tab.rowCount()):
             log += f"\t{values[r][-1]}"
             if self.contrainte.field_type == "String":
@@ -47,19 +47,19 @@ class Classification:
 
     def error_msg (self,row,col):
         if col == -1:
-            return QCoreApplication.translate("initialisation","Sélectionner la contrainte \"{0}\" afin d'ajouter les paramètres de reclassification").format(self.contrainte.name)
+            return QCoreApplication.translate("classification","Sélectionner la contrainte \"{0}\" afin d'ajouter les paramètres de reclassification").format(self.contrainte.name)
         else:
             error_msg = ""
             if col == 0:
-                error_msg = QCoreApplication.translate("initialisation","en entier (ou réelle)")
+                error_msg = QCoreApplication.translate("classification","en entier (ou réelle)")
             elif col == 1:
                 if self.contrainte.field_type == "String":
-                    error_msg = QCoreApplication.translate("initialisation","Initiale (différente)")
+                    error_msg = QCoreApplication.translate("classification","Initiale (différente)")
                 else:
-                    error_msg = QCoreApplication.translate("initialisation","début")
+                    error_msg = QCoreApplication.translate("classification","début")
             else:
-                error_msg = QCoreApplication.translate("initialisation","finale (supérieure à la valeur Début)")
-            return QCoreApplication.translate("initialisation","<b>Contrainte \"{0}\":</b> Saisir une valeur {1} valide à la ligne {2} .").format(self.contrainte.name,error_msg,row + 1)
+                error_msg = QCoreApplication.translate("classification","finale (supérieure à la valeur Début)")
+            return QCoreApplication.translate("classification","<b>Contrainte \"{0}\":</b> Saisir une valeur {1} valide à la ligne {2} .").format(self.contrainte.name,error_msg,row + 1)
 
     def get_number_reclass_param(self):
         list_values = []
