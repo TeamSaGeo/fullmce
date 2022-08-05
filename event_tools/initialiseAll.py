@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from qgis.PyQt.QtCore import Qt, QCoreApplication, QEventLoop
+from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtGui import QFont, QTextCursor
 from qgis.PyQt.QtWidgets import *
 from .inputData import InputData
@@ -9,8 +9,8 @@ from .classification import Classification
 from . standardization import Standardization
 from .weighting import Weigthing
 from .aggregation import Aggregation
-from qgis.core import QgsVectorFileWriter, QgsExpression, QgsExpressionContext, QgsExpressionContextUtils
-import os, csv, time
+from qgis.core import QgsVectorFileWriter
+import os, csv
 from datetime import datetime
 
 class initialiseAll:
@@ -137,8 +137,7 @@ class initialiseAll:
         ###---------Initialize Tab Widget----------
         tab = QTableWidget()
 
-        value = QCoreApplication.translate("initialisation","Nouvelle valeur")
-        columns = [value]
+        columns = [QCoreApplication.translate("initialisation","Nouvelle valeur")]
         if contrainte.field_type == "String":
             init_value = QCoreApplication.translate("initialisation","Valeur Initiale")
             columns.append(init_value)
@@ -738,31 +737,26 @@ class initialiseAll:
             self.iface.dlg.BT_NEXT.setEnabled(False)
 
     def aggregate(self):
-        # Check if factors are from same source
-        inputLayer = self.listFactors[0].inputLayer
-        inputdata = self.listFactors[1:] + self.listContraintes
+        if self.inputs_same_crs():
+            aggregation = Aggregation(self.listFactors, self.listContraintes, self.weighting.layers_weight)
+            input_path = self.list_inputLayers[0].path
 
-        aggregation = Aggregation(self.listFactors, self.listContraintes, self.weighting.layers_weight)
-        output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),"resultat_final.shp" )
+            if len(self.list_inputLayers) != 1:
+                for i,input in enumerate(self.list_inputLayers[1:]):
+                    output_temp_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),"output"+f"{i}"+".shp" )
+                    result = aggregation.joinbylocation(input_path,input.path,output_temp_path)
+                    os.remove(input_path)
+                    input_path = output_temp_path
 
-        result = False
-        # button = QMessageBox.information(
-        #     self.iface.dlg,
-        #     self.error_title,
-        #     aggregation.getexpression(),
-        #     )
-
-        # if all factors and all contraints in same source
-        if len(self.objects_same_source(inputLayer,inputdata)) == len(inputdata) :
-            result = aggregation.aggregate(inputLayer.path,output_path)
-
-        # if factor and contrainte same geometrique type => merge
-        elif self.objects_same_geometry_type(inputLayer.vlayer.geometryType()):
-            merged_layers = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),"result_merged.shp" )
-            list_path = [input.path for input in self.list_inputLayers]
-            result = aggregation.merge(list_path, merged_layers)
-            if result:
-                result = aggregation.aggregate(merged_layers,output_path)
+            # if all factors and all contraints in same source
+            output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),"resultat_final.shp" )
+            result = aggregation.aggregate(input_path,output_path)
+            self.iface.dlg.BT_EXECUTE.setEnabled(False)
+            button = QMessageBox.information(
+            self.iface.dlg,
+            self.error_title,
+            QCoreApplication.translate("initialisation","Agrégation terminée avec succès"),
+            )
 
         # else cannot aggregate
         else:
@@ -770,14 +764,6 @@ class initialiseAll:
             self.iface.dlg,
             self.error_title,
             QCoreApplication.translate("initialisation","Agrégation impossible! Les couches sources doivent être du même type de géométrie."),
-            )
-
-        if result:
-            self.iface.dlg.BT_EXECUTE.clicked.setEnabled(False)
-            button = QMessageBox.information(
-            self.iface.dlg,
-            self.error_title,
-            QCoreApplication.translate("initialisation","Agrégation terminée avec succès"),
             )
 
     def save_matrix(self):
@@ -825,16 +811,19 @@ class initialiseAll:
         # replace file with original name
         os.replace(self.log_path + ".temp", self.log_path)
 
-    def objects_same_geometry_type(self, geometry_type):
-        objects_same_geometry_type = []
-        for input in self.list_inputLayers:
-            if input.vlayer.geometryType() == geometry_type:
-                objects_same_geometry_type.append(input)
-        if len(self.list_inputLayers) == len(objects_same_geometry_type):
+    def inputs_same_crs(self):
+        input = self.list_inputLayers[0]
+        crs = input.vlayer.crs()
+        i = 1
+
+        while input.vlayer.crs() == crs and i < len(self.list_inputLayers):
+            input = self.list_inputLayers[i]
+            i += 1
+
+        if i == len(self.list_inputLayers):
             return True
         else:
             return False
-        # return objects_same_geometry_type
 
     def objects_same_source(self, inputLayer, list_objects):
         objects_same_source = []
