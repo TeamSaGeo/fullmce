@@ -9,11 +9,10 @@ This plugin is a full multicriteria evaluation (MCE) tool for vector data. It al
 ### About
 - Le log est sauvegardé dans le fichier "full\_mce\_log.txt" dans le répertoire de sortie choisit par l'utilisateur \*
 
-Classification:
-1) nombre minimal des contraintes = 0, nombre maximale = illimité
+### Classification:
+1) le nombre minimal des contraintes = 0, nombre maximale = illimité
 2) chaque contrainte correspond à un et un seul champ issu d'un seul fichier source
 3) un fichier source peut contenir un ou plusieurs contraintes
-4) un champ d'un fichier source correspond à un et un seul contrainte
 5) un contrainte doit contenir au moins un nom, un fichier source, un status (prêt ou pas prêt)
 6) Si une ou plusieurs cases "Prêts" ne sont pas cochées, le plugin propose de reclassifier les contraintes correspondants
 7) Par défaut, la nouvelle valeur d'un contrainte reclassifé est égale à 0 et de type réel
@@ -30,8 +29,8 @@ Classification:
 
 Standardization:
   Fonction Linéaire:
-  
-  ![alt text](https://github.com/famenontsoa/fullmce_Sarah/blob/main/images/linear_shape.png?raw=true)  ![alt text](https://github.com/famenontsoa/fullmce_Sarah/blob/main/images/linear.png?raw=true) 
+
+  ![alt text](https://github.com/famenontsoa/fullmce_Sarah/blob/main/images/linear_shape.png?raw=true)  ![alt text](https://github.com/famenontsoa/fullmce_Sarah/blob/main/images/linear.png?raw=true)
 
 1) nombre minimal des facteurs = 3, nombre maximale = 15
 2) chaque facteur correspond à un et un seul champ issu d'un seul fichier source
@@ -47,3 +46,9 @@ Standardization:
 9) Les résultats de la standardisation sont stockés des champs portant les suffixes "Fz" (qui remplace les 2 derniers caractères du nom du champ) dans des fichiers portant les suffixes "\_fuzz"
 10) Les résultats finaux sont de type Double et arrondissés au 2 centièmes près (2 chiffres après la virgule)
 11) Pour le cas des fonctions sigmoidal, les résultats de la standardisation sont égales à "inf" si | a \* (value - b)| > 709.78271 (La valeur max de la fonction exp en python) et supérieur à 110,000 digits
+
+Aggrégation:
+
+1) si les contraintes et les facteurs sont issus de différents sources, le plugin calcul l'agrégation à partir des entités qui ont une jointure entre les sources
+2) si aucun contrainte est inséré, alors le formule = somme des Facteurs(i) * Poids(i)
+sino le formule = somme des [Facteurs(i) * Poids(i) ] * produits des contraintes

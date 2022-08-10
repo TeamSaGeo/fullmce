@@ -59,7 +59,7 @@ class Standardization:
     def change_attributes_values(self, values):
         vlayer = self.factor.inputLayer.vlayer
         new_field_name = self.factor.field_name[:-2] + "Fz"
-        new_field_idx = self.factor.inputLayer.add_new_field(new_field_name)
+        new_field_idx = self.factor.inputLayer.add_new_field(new_field_name,"double")
 
         function = values[0]
         direction = values[1]
@@ -91,7 +91,7 @@ class Standardization:
     def fuzzy_function(self, x, dX, dW):
         return {
             0 : dX / dW,
-            1 : math.pow(math.sin(dX / dW * (3.141592653589793 / 2)), 2.0),
+            1 : math.pow(math.sin(dX / dW * (math.pi / 2)), 2.0),
             2 : 1.0 / (1.0 + math.pow((dW - dX) / dW, 2.0)),
             }[x]
 

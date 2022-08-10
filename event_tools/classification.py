@@ -156,7 +156,7 @@ class Classification:
     def change_string_attributes_values(self,values):
         vlayer = self.contrainte.inputLayer.vlayer
         new_field_name = self.contrainte.field_name[:-2] + "Bl"
-        new_field_idx = self.contrainte.inputLayer.add_new_field(new_field_name)
+        new_field_idx = self.contrainte.inputLayer.add_new_field(new_field_name,"int")
         features = vlayer.getFeatures()
         vlayer.startEditing()
         for feat in features:
@@ -184,7 +184,7 @@ class Classification:
     def change_number_attributes_values(self, values):
         vlayer = self.contrainte.inputLayer.vlayer
         new_field_name = self.contrainte.field_name[:-2] + "Bl"
-        new_field_idx = self.contrainte.inputLayer.add_new_field(new_field_name)
+        new_field_idx = self.contrainte.inputLayer.add_new_field(new_field_name,"int")
         features = vlayer.getFeatures()
         vlayer.startEditing()
         for feat in features:

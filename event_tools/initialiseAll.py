@@ -494,7 +494,9 @@ class initialiseAll:
         log = QCoreApplication.translate("classification",
         "Traitement initié le {0}\n\nRépértoire de sortie: {1}\nFormat de sortie: SHP\n\n-----------CLASSIFICATION----------\nNombre de contraintes: {2}\n").format(now,output_dir,len(self.listContraintes))
 
+        # For each listContraintes ...
         for i,contrainte in enumerate(self.listContraintes):
+            # Check if each row is filled
             if not self.input_row_filled(contrainte,i):
                 return False
 
@@ -523,7 +525,7 @@ class initialiseAll:
 
         # Update standardization table
         self.display_standardization_table()
-        first_line = QCoreApplication.translate("normalisation","\n----------NORMALISATION----------")
+        first_line = QCoreApplication.translate("normalisation","----------NORMALISATION----------")
         log = first_line
         log += QCoreApplication.translate("normalisation","\nNombre de facteurs: {0}\n").format(len(self.listFactors))
 
@@ -655,8 +657,8 @@ class initialiseAll:
                 new_field_name = contrainte.field_name[:-2] + "Bl"
                 contrainte.inputLayer.delete_new_field(new_field_name)
                 return False
-            log += classification_log
-        # Write into log file
+            log += classification_log +"\n"
+        # Write log into log file
         self.save_log(log,first_line)
         self.load_log_file(self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE)
         return True
@@ -680,7 +682,6 @@ class initialiseAll:
             log += standardization_log
         # Write into log file
         self.save_log(log,first_line)
-        text_edit = self.iface.dlg.TE_RUN_PROCESS_NORMALISATION
         self.load_log_file(self.iface.dlg.TE_RUN_PROCESS_NORMALISATION)
         return True
 
@@ -703,7 +704,7 @@ class initialiseAll:
                 buttons= QMessageBox.Cancel | QMessageBox.No | QMessageBox.Yes,
             )
             if reply == QMessageBox.Yes:
-                layer_saved = self.save_layer_into_file(text_edit)
+                self.save_layer_into_file(text_edit)
                 return False
             elif reply == QMessageBox.No:
                 return True
@@ -713,6 +714,7 @@ class initialiseAll:
     def weighting(self):
         tab = self.iface.dlg.TBL_JUGEMENT
         self.weighting = Weigthing(tab)
+        # Check if param are correct
         correct, log_params = self.weighting.correct_params()
         if correct:
             conRatio = self.weighting.conRatio
@@ -720,7 +722,7 @@ class initialiseAll:
             if conRatio < 0.1:
                 status = QCoreApplication.translate("ponderation","RC < 0.1. Matrice de jugement cohérent et acceptable!")
                 self.iface.dlg.BT_NEXT.setEnabled(True)
-                # Write into log file
+                # Write log into log file
                 first_line = QCoreApplication.translate("ponderation","----------PONDÉRATION----------")
                 log = first_line
                 log += QCoreApplication.translate("ponderation","\nMatrice de jugement:")
@@ -747,11 +749,18 @@ class initialiseAll:
         # if all factors and all contraints in same crs
         if self.inputs_same_crs(first_layer.vlayer.crs()):
             aggregation = Aggregation(self.listFactors, self.listContraintes, self.weighting.layers_weight)
+
+            if not first_layer.name.endswith("_bool") and not first_layer.name.endswith("_fuzz"):
+                first_layer.vlayer.commitChanges()
             input_path = first_layer.path
 
             if len(self.list_inputLayers) != 1:
                 for i,input in enumerate(self.list_inputLayers[1:]):
                     output_temp_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),"output"+f"{i}"+".shp" )
+                    if not input.name.endswith("_bool") and not input.name.endswith("_fuzz"):
+                        fuzz_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),input.name + "_fuzz.shp")
+                        QgsVectorFileWriter.writeAsVectorFormat(input.vlayer, fuzz_path, 'utf-8',driverName='ESRI Shapefile')
+                        input.setpath(fuzz_path)
                     result = aggregation.joinbylocation(input_path,input.path,output_temp_path)
                     if i > 0:
                         os.remove(input_path)
@@ -761,7 +770,7 @@ class initialiseAll:
             output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),"resultat_final.shp" )
             result = aggregation.aggregate(input_path,expression,output_path)
             log += QCoreApplication.translate("agregation","\nFormule = ") + expression
-            status = QCoreApplication.translate("agregation","Agrégation terminée avec succès!")
+            status = QCoreApplication.translate("agregation","\nAgrégation terminée avec succès!")
             log += QCoreApplication.translate("agregation","\nFichier de sortie: ") + output_path + f"\n{status}"
             button = QMessageBox.information(self.iface.dlg,QCoreApplication.translate("agregation","Résultat"),status,)
 
@@ -771,7 +780,7 @@ class initialiseAll:
             button = QMessageBox.information(self.iface.dlg,self.error_title,log,)
 
         self.save_log(log,first_line)
-        self.load_log_file(self.iface.dlg.TE_RUN_PROCESS)
+        self.iface.dlg.TE_RUN_PROCESS.append(log)
         self.iface.dlg.BT_EXECUTE.setEnabled(False)
 
     def save_matrix(self):
@@ -860,7 +869,7 @@ class initialiseAll:
                     text_edit.append(QCoreApplication.translate("initialisation","\"{0}\" dans le fichier {1}\n").format(object.name,inputLayer.reclass_output))
         text_edit.append(QCoreApplication.translate("initialisation","{0} terminés avec succès!").format(process))
         text_edit.append("#######################################################")
-        return True
+        # return True
 
     def remove_new_fields(self):
         for contrainte in self.listContraintesNotReady:

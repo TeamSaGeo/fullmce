@@ -45,11 +45,12 @@ class InputLayer:
     def setreclass_output(self,output_path):
         self.reclass_output = output_path
 
-    def add_new_field(self,new_field_name):
+    def add_new_field(self,new_field_name,typeName):
         vlayer_provider = self.vlayer.dataProvider()
         new_field_idx = self.vlayer.fields().indexOf(new_field_name)
         if new_field_idx == -1:
-            vlayer_provider.addAttributes([QgsField(new_field_name,QVariant.Double,"double",10,2)])
+            type = QVariant.Double if typeName == "double" else QVariant.Int
+            vlayer_provider.addAttributes([QgsField(new_field_name,type,typeName,10,2)])
             self.vlayer.updateFields()
             new_field_idx = self.vlayer.fields().indexOf(new_field_name)
         return new_field_idx
