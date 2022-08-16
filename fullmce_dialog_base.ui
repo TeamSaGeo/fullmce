@@ -671,7 +671,7 @@
              </font>
             </property>
             <property name="title">
-             <string>Paramètres de reclassification</string>
+             <string>Paramètres de reclassification (par défaut nouvelle valeur = 0)</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>

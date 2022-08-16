@@ -18,7 +18,7 @@ class Aggregation:
     def aggregate(self, inputpath, expression, output_path):
         return processing.run('qgis:fieldcalculator',
             {"INPUT": inputpath,
-            "FIELD_NAME": 'MCE_RESULT' ,
+            "FIELD_NAME": 'WLC' ,
             "FIELD_TYPE": 0,
             "FIELD_LENGTH": 10,
             "FIELD_PRECISION": 3,

@@ -15,6 +15,10 @@ class Classification:
         if row == -1 and col == -1:
             self.change_attributes_values(list_values)
             log = self.write_log(list_values)
+            # update contrainte attributs
+            new_field_name = self.contrainte.field_name[:-2] + "Bl"
+            self.contrainte.setfield_idx(self.contrainte.inputLayer.vlayer.fields().indexFromName(new_field_name))
+            self.contrainte.setready(2)
             return True , log
         else:
             error_msg = self.error_msg(row,col)
@@ -206,7 +210,6 @@ class Classification:
                 new_value = values[row][4]
 
             vlayer.changeAttributeValue(feat.id(),new_field_idx, new_value)
-
         return vlayer
 
     def value_is_in_range(self,value,values):

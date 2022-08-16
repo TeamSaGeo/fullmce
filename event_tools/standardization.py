@@ -12,6 +12,10 @@ class Standardization:
         if col == -1:
             self.change_attributes_values(values)
             log = self.write_log(values)
+            # update factor attributs
+            new_field_name = self.factor.field_name[:-2] + "Fz"
+            self.factor.setfield_idx(self.factor.inputLayer.vlayer.fields().indexFromName(new_field_name))
+            self.factor.setready(2)
             return True , log
         else:
             error_msg = self.error_msg(col)
@@ -88,35 +92,40 @@ class Standardization:
             vlayer.changeAttributeValue(feat.id(),new_field_idx, new_value)
         self.factor.inputLayer.setvlayer(vlayer)
 
-    def fuzzy_function(self, x, dX, dW):
+    def fuzzy_function(self, x, dX, dW, exp):
         return {
-            0 : dX / dW,
-            1 : math.pow(math.sin(dX / dW * (math.pi / 2)), 2.0),
-            2 : 1.0 / (1.0 + math.pow((dW - dX) / dW, 2.0)),
+            0 : dX / dW,    #lineaire
+            # 1 : math.pow(math.sin(dX / dW * (math.pi / 2)), 2.0), #sigmoid
+            1 : 1.0 / (1.0 + math.exp(exp)),
+            # 2 : 1.0 / (1.0 + math.pow((dW - dX) / dW, 2.0)),    #j-shaped
             }[x]
 
     def ascending (self,value, function, a, b):
-        if value < a:
+        if value <= a:
             return 0
-        elif value <= b:
+        elif value < b:
             dX = value - a
             dW = b - a
-            return self.fuzzy_function(function, dX, dW)
+            # exp = - a * (value - b)
+            exp = - 1 * (value - (a+b)/2)
+            return self.fuzzy_function(function, dX, dW, exp)
         else:
             return 1
 
     def descending (self, value, function, c, d):
-        if value < c:
+        if value <= c:
             return 1
-        elif value <= d:
+        elif value < d:
             dX = d - value
             dW = d - c
-            return self.fuzzy_function(function, dX, dW)
+            # exp = c * (value - d)
+            exp = value - (c + d)/2
+            return self.fuzzy_function(function, dX, dW, exp)
         else:
             return 0
 
     def write_log(self,values):
-        log = f"{self.row+1}) {self.factor.name}\t{self.factor.field_name}"
+        log = f"{self.row+1}) {self.factor.name}  {self.factor.field_name}"
         for i,value in enumerate(values):
             value_index = value
             if i == 0 or i == 1:

@@ -46,7 +46,7 @@ class Weigthing:
 
         for row in range(self.nb_columns):
             row_name = self.tab.verticalHeaderItem(row).text()
-            log += f"\n{row_name}\t"
+            log += f"\n{row_name}    "
             for col in range(self.nb_columns):
                 try:
                     param = float(self.tab.cellWidget(row,col).text())
