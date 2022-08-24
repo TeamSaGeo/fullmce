@@ -314,7 +314,7 @@ class initialiseAll:
             else:
                 self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.clear()
                 self.pageInd = 3
-        elif self.pageInd == 2 :
+        elif self.pageInd == 5 :
             self.update_listData(self.iface.dlg.TBL_DATA_ENTREE,self.iface.dlg.SB_NB_DATA)
         elif self.pageInd == 6:
             self.iface.dlg.TE_RUN_PROCESS_NORMALISATION.clear()
@@ -507,7 +507,7 @@ class initialiseAll:
                     button = QMessageBox.information(
                         self.iface.dlg,
                         self.error_title,
-                        QCoreApplication.translate("initialisation","Le contrainte <b>{0}</b> de type \"String\" ne devrait pas être \"Prêt\"").format(contrainte.name)
+                        QCoreApplication.translate("initialisation","Le contrainte <b>{0}</b> de type \"String\" ne devrait pas être \"Prêt\". Veuillez reclassifier ce contrainte.").format(contrainte.name)
                     )
                     return False
                 self.listContraintesNotReady.remove(contrainte)
@@ -547,6 +547,13 @@ class initialiseAll:
                 list_string_factors.append(factor)
 
             if factor.ready == 2:
+                if factor.field_type == "Date" or factor.field_type == "Datetime":
+                    button = QMessageBox.information(
+                        self.iface.dlg,
+                        self.error_title,
+                        QCoreApplication.translate("initialisation","Le facteur <b>{0}</b> de type {1} ne devrait pas être \"Normalisé\". Veuillez normaliser ce facteur.").format(factor.name, factor.field_type)
+                    )
+                    return False
                 self.listFactorsNotNormalized.remove(factor)
             else:
                 self.add_standardization_row(factor)
@@ -709,13 +716,9 @@ class initialiseAll:
                 QCoreApplication.translate("initialisation","Voulez-vous tout de suite {0} ?").format(question),
                 buttons= QMessageBox.Cancel | QMessageBox.No | QMessageBox.Yes,
             )
-            if reply == QMessageBox.Yes:
-                self.save_layer_into_file(text_edit)
-                return False
-            elif reply == QMessageBox.No:
-                return True
-            elif reply == QMessageBox.Cancel:
-                return False
+            if reply != QMessageBox.Cancel:
+                self.save_layer_into_file(reply,text_edit)
+            return False
 
     def weighting(self):
         tab = self.iface.dlg.TBL_JUGEMENT
@@ -782,7 +785,7 @@ class initialiseAll:
 
         # else cannot aggregate
         else:
-            log += QCoreApplication.translate("agregation","Agrégation impossible! Les couches sources ne sont pas du même type de géométrie.")
+            log += QCoreApplication.translate("agregation","\nAgrégation impossible! Les couches sources ne sont pas du même type de géométrie.")
             button = QMessageBox.information(self.iface.dlg,self.error_title,log,)
 
         self.save_log(log,first_line)
@@ -847,7 +850,7 @@ class initialiseAll:
                 objects_same_source.append(element)
         return objects_same_source
 
-    def save_layer_into_file(self,text_edit):
+    def save_layer_into_file(self,reply,text_edit):
         if text_edit == self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE :
             list_object = self.listContraintes
             list_object_not_ready = self.listContraintesNotReady
@@ -864,31 +867,44 @@ class initialiseAll:
         text_edit.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
         separator = "#######################################################"
         text_edit.append(separator + QCoreApplication.translate("initialisation","\nSauvegarde du résultat de:\n"))
-        for inputLayer in self.list_inputLayers:
-            object_not_ready = self.objects_same_source(inputLayer,list_object_not_ready)
-            if object_not_ready != []:
-                output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),inputLayer.name + file_extension)
-                inputLayer.setreclass_output(output_path)
-                QgsVectorFileWriter.writeAsVectorFormat(inputLayer.vlayer, inputLayer.reclass_output, 'utf-8',driverName='ESRI Shapefile')
-                for object in object_not_ready:
-                    new_field_name = object.field_name[:-2] + field_extension
-                    # Remove temp fields
-                    object.inputLayer.delete_new_field(new_field_name)
-                    # Set object new path and new field
-                    object.inputLayer.setpath(inputLayer.reclass_output)
-                    object.inputLayer.isValid()
-                    object.setfield_idx(object.inputLayer.vlayer.fields().indexFromName(new_field_name))
-                    text_edit.append(QCoreApplication.translate("initialisation","\"{0}\" dans le fichier {1}\n").format(object.name,inputLayer.reclass_output))
+
+        if reply == QMessageBox.Yes:
+            for inputLayer in self.list_inputLayers:
+                object_not_ready = self.objects_same_source(inputLayer,list_object_not_ready)
+                if object_not_ready != []:
+                    output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),inputLayer.name + file_extension)
+                    inputLayer.setreclass_output(output_path)
+                    QgsVectorFileWriter.writeAsVectorFormat(inputLayer.vlayer, inputLayer.reclass_output, 'utf-8',driverName='ESRI Shapefile')
+                    for object in object_not_ready:
+                        new_field_name = object.field_name[:-2] + field_extension
+                        # Remove temp fields
+                        object.inputLayer.delete_new_field(new_field_name)
+                        # Set object new path and new field and status
+                        object.inputLayer.setpath(inputLayer.reclass_output)
+                        object.inputLayer.isValid()
+                        object.setfield_idx(object.inputLayer.vlayer.fields().indexFromName(new_field_name))
+                        object.setready(2)
+                        text_edit.append(QCoreApplication.translate("initialisation","\"{0}\" dans le champ {2} du fichier {1}\n").format(object.name,inputLayer.path, object.field_name))
+        else:
+            for object in list_object_not_ready:
+                new_field_name = object.field_name[:-2] + field_extension
+                object.setfield_idx(object.inputLayer.vlayer.fields().indexFromName(new_field_name))
+                object.setready(2)
+                text_edit.append(QCoreApplication.translate("initialisation","\"{0}\" dans le champ {2} du fichier {1}\n").format(object.name,object.inputLayer.path, object.field_name))
+
         text_edit.append(QCoreApplication.translate("initialisation","{0} terminés avec succès!").format(process))
         text_edit.append(separator)
+        text_edit.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
 
     def remove_new_fields(self):
         for contrainte in self.listContraintesNotReady:
-            new_field_name = contrainte.field_name[:-2] + "Bl"
-            contrainte.inputLayer.delete_new_field(new_field_name)
+            if not contrainte.inputLayer.path.endswith("_bool.shp"):
+                new_field_name = contrainte.field_name[:-2] + "Bl"
+                contrainte.inputLayer.delete_new_field(new_field_name)
         for factor in self.listFactorsNotNormalized:
-            new_field_name = factor.field_name[:-2] + "Fz"
-            factor.inputLayer.delete_new_field(new_field_name)
+            if not factor.inputLayer.path.endswith("_fuzz.shp"):
+                new_field_name = factor.field_name[:-2] + "Fz"
+                factor.inputLayer.delete_new_field(new_field_name)
 
     def initialise_variable_init(self):
         return self

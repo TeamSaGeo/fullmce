@@ -1,4 +1,5 @@
 from qgis.PyQt.QtCore import QCoreApplication
+from datetime import datetime
 
 class Classification:
     def __init__(self, contrainte, tab, ind):
@@ -13,12 +14,8 @@ class Classification:
 
         list_values,row,col = self.get_params()
         if row == -1 and col == -1:
-            self.change_attributes_values(list_values)
             log = self.write_log(list_values)
-            # update contrainte attributs
-            new_field_name = self.contrainte.field_name[:-2] + "Bl"
-            self.contrainte.setfield_idx(self.contrainte.inputLayer.vlayer.fields().indexFromName(new_field_name))
-            self.contrainte.setready(2)
+            self.change_attributes_values(list_values)
             return True , log
         else:
             error_msg = self.error_msg(row,col)
@@ -36,6 +33,8 @@ class Classification:
         else:
             vlayer = self.change_number_attributes_values(list_values)
         self.contrainte.inputLayer.setvlayer(vlayer)
+        # self.factor.setnew_field_name(new_field_name)
+        # self.factor.setready(2)
 
     def write_log(self,values):
         log = QCoreApplication.translate("classification","\n{0}) Contrainte \"{1}\": Champ {2} (Type {3})\n").format(self.ind+1,self.contrainte.name,self.contrainte.field_name,self.contrainte.field_type)
@@ -86,7 +85,7 @@ class Classification:
                     start_value = min(self.contrainte.getfield_values())
                 # Convert end_value to Date or to Real
                 if field_type == "Date":
-                    start_value = datetime.strptime(start_value,'%y-%m-%d')
+                    start_value = datetime.strptime(start_value,'%Y-%m-%d')
                 else:
                     start_value = float(start_value)
             except ValueError:
@@ -99,7 +98,7 @@ class Classification:
                     end_value = max(self.contrainte.getfield_values())
                 # Convert end_value to Date or to Real
                 if field_type == "Date":
-                    end_value = datetime.strptime(start_value,'%y-%m-%d')
+                    end_value = datetime.strptime(start_value,'%Y-%m-%d')
                 else:
                     end_value = float(end_value)
             except ValueError:
