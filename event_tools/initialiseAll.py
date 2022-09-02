@@ -682,7 +682,7 @@ class initialiseAll:
             text_edit = self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE
         else:
             first_line = QCoreApplication.translate("normalisation","Paramètres de standardisation:")
-            log = first_line + QCoreApplication.translate("normalisation","\nFacteur   Champ   Fonction   Direction")\
+            log = first_line + QCoreApplication.translate("normalisation","\nFacteur\tChamp\tFonction\tDirection")\
             + "\tA\tB\tC\tD\n----------------------------------------------------------------------------------------------------------------------------\n"
             list_inputdata = self.listFactorsNotNormalized
             text_edit = self.iface.dlg.TE_RUN_PROCESS_NORMALISATION
@@ -758,7 +758,7 @@ class initialiseAll:
             button = QMessageBox.information(
                 self.iface.dlg,
                 self.error_title,
-                log,
+                log_params,
                 )
             self.iface.dlg.BT_NEXT.setEnabled(False)
 
@@ -776,6 +776,8 @@ class initialiseAll:
         return True, maxInput
 
     def aggregate(self):
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+
         inputs_same_crs, max_size_layer = self.inputLayer_same_crs()
         first_line = QCoreApplication.translate("agregation","----------AGGRÉGATION----------")
         log = first_line
@@ -814,6 +816,7 @@ class initialiseAll:
             button = QMessageBox.information(self.iface.dlg,self.error_title,log,)
 
         self.save_log(log,first_line)
+        QApplication.restoreOverrideCursor()
         self.iface.dlg.TE_RUN_PROCESS.append(log)
         self.iface.dlg.BT_EXECUTE.setEnabled(False)
 

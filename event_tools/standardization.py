@@ -49,7 +49,8 @@ class Standardization:
                     # Return error if not column B > A and D > C and C > B (symetrique)
                     if len(values) >= 3:
                         if param_value <= values[-1]:
-                            return values,col
+                            if len(values) != 4 or param_value < values[-1]:
+                                return values,col
 
                     values.append(param_value)
                 except ValueError:
