@@ -3,7 +3,7 @@ from qgis.PyQt.QtCore import QCoreApplication
 class Weigthing:
     def __init__(self, tab):
         self.tab = tab
-        self.nb_columns = self.tab.columnCount()
+        self.nb_columns = self.tab.rowCount()
 
     def sum_columns(self):
         sum_columns = []
@@ -15,25 +15,24 @@ class Weigthing:
         return sum_columns
 
     def layers_weight(self,sum_columns):
-        weight = []
         log = QCoreApplication.translate("ponderation","Poids des facteurs:\n")
+        weight = []
         for row in range(self.nb_columns):
             sum = 0
             for col in range(self.nb_columns):
                 sum += float(self.tab.cellWidget(row,col).text()) / sum_columns[col]
             w = sum / self.nb_columns
             weight.append(w)
+            self.tab.cellWidget(row,self.nb_columns).setText("{0:.5f}".format(w))
             log += f"{self.tab.horizontalHeaderItem(row).text()}:\t{round(w,5)}\n"
         return weight, log
 
     def lambda_parameter(self,weight):
-        self.nb_columns = self.tab.columnCount()
-
-        # value * weight
         lambda_sum = 0
         for row in range(self.nb_columns):
             sum = 0
             for col in range(self.nb_columns):
+                # value * weight
                 sum += float(self.tab.cellWidget(row,col).text()) * weight[col]
             lambda_sum += sum / weight[row]
 
@@ -42,11 +41,11 @@ class Weigthing:
     def correct_params(self):
         log = "\t"
         for column in range(self.nb_columns):
-            log += f"{self.tab.horizontalHeaderItem(column).text()}\t\t"
+            log += f"{self.tab.horizontalHeaderItem(column).text()}\t"
 
         for row in range(self.nb_columns):
             row_name = self.tab.verticalHeaderItem(row).text()
-            log += f"\n{row_name}    "
+            log += f"\n{row_name}\t"
             for col in range(self.nb_columns):
                 try:
                     param = float(self.tab.cellWidget(row,col).text())

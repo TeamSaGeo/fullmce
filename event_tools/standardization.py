@@ -1,5 +1,5 @@
 
-from qgis.PyQt.QtCore import QCoreApplication, QDate
+from qgis.PyQt.QtCore import QCoreApplication, QDate, QDateTime
 import math
 from datetime import datetime
 
@@ -23,6 +23,7 @@ class Standardization:
         function = self.tab.cellWidget(self.row,1).currentIndex()
         direction = self.tab.cellWidget(self.row,2).currentIndex()
         values = [function, direction]
+        field_type = self.factor.field_type
 
         for col in range(3,7):
             param = self.tab.cellWidget(self.row,col)
@@ -38,7 +39,7 @@ class Standardization:
                     if ((len(values) == 3 and direction != 2) or len(values) == 5)  and param_value == "max":
                         param_value = self.factor.get_maximum_value()
 
-                    if self.factor.field_type != "Date":
+                    if field_type != "Date":
                         param_value = float(param_value)
                     elif type(param_value) == str:
                         param_value = QDate.fromString(param_value, "yyyy-MM-dd")
@@ -56,17 +57,10 @@ class Standardization:
 
         return values,-1
 
-    def error_msg(self, col):
-        col_name = self.tab.horizontalHeaderItem(col).text()
-        order_error = ""
-        if col >= 4:
-            previous_col_name = self.tab.horizontalHeaderItem(col-1).text()
-            order_error = QCoreApplication.translate("normalisation"," (strictement supérieure à celle de la colonne {0})").format(previous_col_name)
-        return QCoreApplication.translate("normalisation","<b>Facteur \"{0}\":</b> Saisir une valeur de type <b>{3}</b> valide à la colonne {1}{2}.").format(self.factor.name,col_name,order_error, self.factor.field_type)
-
     def change_attributes_values(self, values):
         vlayer = self.factor.inputLayer.vlayer
-        new_field_name = self.factor.field_name[:-2] + "Fz"
+        # new_field_name = self.factor.field_name[:-2] + "Fz"
+        new_field_name = self.factor.name + "Fz"
         new_field_idx = self.factor.inputLayer.add_new_field(new_field_name,"double")
 
         function = values[0]
@@ -96,8 +90,30 @@ class Standardization:
 
                 vlayer.changeAttributeValue(feat.id(),new_field_idx, new_value)
         self.factor.inputLayer.setvlayer(vlayer)
-        # self.factor.setnew_field_name(new_field_name)
-        # self.factor.setready(2)
+
+    def write_log(self,values):
+        log = f"{self.row+1}) {self.factor.name}  {self.factor.field_name}"
+        for i,value in enumerate(values):
+            value_index = value
+            if i == 0 or i == 1:
+                value = self.tab.cellWidget(self.row,i+1).currentText()
+            if type(value) == QDate :
+                value = value.toString("yyyy-MM-dd")
+            log += f"\t{value}"
+
+            # Add tabulation if direction is descending
+            if i == 1 and value_index == 0:
+                log += "\t\t"
+        log +="\n\n"
+        return log
+
+    def error_msg(self, col):
+        col_name = self.tab.horizontalHeaderItem(col).text()
+        order_error = ""
+        if col >= 4:
+            previous_col_name = self.tab.horizontalHeaderItem(col-1).text()
+            order_error = QCoreApplication.translate("normalisation"," (strictement supérieure à celle de la colonne {0})").format(previous_col_name)
+        return QCoreApplication.translate("normalisation","<b>Facteur \"{0}\":</b> Saisir une valeur de type <b>{3}</b> valide à la colonne {1}{2}.").format(self.factor.name,col_name,order_error, self.factor.field_type)
 
     def fuzzy_function(self, x, dX, dW, exp):
         return {
@@ -148,21 +164,3 @@ class Standardization:
             return self.fuzzy_function(function, dX, dW, exp)
         else:
             return 0
-
-    def write_log(self,values):
-        log = f"{self.row+1}) {self.factor.name}  {self.factor.field_name}"
-        for i,value in enumerate(values):
-            value_index = value
-            if i == 0 or i == 1:
-                value = self.tab.cellWidget(self.row,i+1).currentText()
-            if type(value) == QDate :
-                value = value.toString("yyyy-MM-dd")
-                log += f"\t{value}"
-            else:
-                log += f"\t{value}"
-
-            # Add tabulation if direction is descending
-            if i == 1 and value_index == 0:
-                log += "\t\t"
-        log +="\n\n"
-        return log

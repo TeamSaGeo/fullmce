@@ -1,4 +1,4 @@
-from qgis.PyQt.QtCore import QCoreApplication
+from qgis.PyQt.QtCore import QCoreApplication, QDate , QDateTime
 from datetime import datetime
 
 class Classification:
@@ -33,8 +33,6 @@ class Classification:
         else:
             vlayer = self.change_number_attributes_values(list_values)
         self.contrainte.inputLayer.setvlayer(vlayer)
-        # self.factor.setnew_field_name(new_field_name)
-        # self.factor.setready(2)
 
     def write_log(self,values):
         log = QCoreApplication.translate("classification","\n{0}) Contrainte \"{1}\": Champ {2} (Type {3})\n").format(self.ind+1,self.contrainte.name,self.contrainte.field_name,self.contrainte.field_type)
@@ -43,6 +41,12 @@ class Classification:
             if self.contrainte.field_type == "String":
                 log += f"\t{values[r][0]}\n"
             else:
+                if type(values[r][0]) == QDate :
+                    values[r][0] = values[r][0].toString("yyyy-MM-dd")
+
+                if type(values[r][2]) == QDate:
+                    values[r][2] = values[r][2].toString("yyyy-MM-dd")
+
                 start_inclus = "[" if values[r][1] else "]"
                 end_inclus = "]" if values[r][3] else "["
                 log += f"\t{start_inclus} {values[r][0]} , {values[r][2]} {end_inclus}\n"
@@ -82,12 +86,14 @@ class Classification:
             try:
                 start_value = self.tab.cellWidget(row,1).text()
                 if start_value == "min":
-                    start_value = min(self.contrainte.getfield_values())
+                    start_value = self.contrainte.get_mimimum_value()
                 # Convert end_value to Date or to Real
-                if field_type == "Date":
-                    start_value = datetime.strptime(start_value,'%Y-%m-%d')
-                else:
+                if field_type != "Date":
                     start_value = float(start_value)
+                elif type(start_value) == str:
+                    start_value = datetime.strptime(start_value,'%Y-%m-%d').date()
+                    if not start_value:
+                        return list_values,row,1
             except ValueError:
                 return list_values,row,1
 
@@ -95,12 +101,14 @@ class Classification:
             try:
                 end_value = self.tab.cellWidget(row,3).text()
                 if end_value == "max":
-                    end_value = max(self.contrainte.getfield_values())
+                    end_value = self.contrainte.get_maximum_value()
                 # Convert end_value to Date or to Real
-                if field_type == "Date":
-                    end_value = datetime.strptime(start_value,'%Y-%m-%d')
-                else:
+                if field_type != "Date":
                     end_value = float(end_value)
+                elif type(end_value) == str:
+                    end_value = datetime.strptime(end_value,'%Y-%m-%d').date()
+                    if not end_value:
+                        return list_values,row,3
             except ValueError:
                 return list_values,row,3
 
@@ -120,11 +128,9 @@ class Classification:
                 if self.value_is_in_range(end_value,values):
                     if end_value != values[0] or end_value_inclued:
                         return list_values,row,3
-
                 # Check if interval contains another interval
                 if start_value < values [0] and end_value >= values [2]:
                     return list_values,row,3
-
 
             # Save parameter to list
             row_values = [start_value, start_value_inclued, end_value, end_value_inclued, new_value]
@@ -158,7 +164,8 @@ class Classification:
 
     def change_string_attributes_values(self,values):
         vlayer = self.contrainte.inputLayer.vlayer
-        new_field_name = self.contrainte.field_name[:-2] + "Bl"
+        # new_field_name = self.contrainte.field_name[:-2] + "Bl"
+        new_field_name = self.contrainte.name + "Bl"
         new_field_idx = self.contrainte.inputLayer.add_new_field(new_field_name,"int")
         features = vlayer.getFeatures()
         vlayer.startEditing()
@@ -186,7 +193,8 @@ class Classification:
 
     def change_number_attributes_values(self, values):
         vlayer = self.contrainte.inputLayer.vlayer
-        new_field_name = self.contrainte.field_name[:-2] + "Bl"
+        # new_field_name = self.contrainte.field_name[:-2] + "Bl"
+        new_field_name = self.contrainte.name + "Bl"
         new_field_idx = self.contrainte.inputLayer.add_new_field(new_field_name,"int")
         features = vlayer.getFeatures()
         vlayer.startEditing()

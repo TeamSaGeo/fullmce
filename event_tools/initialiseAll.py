@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-
 from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtGui import QFont, QTextCursor
 from qgis.PyQt.QtWidgets import *
 from .inputData import InputData
 from .inputLayer import InputLayer
 from .classification import Classification
-from . standardization import Standardization
+from .standardization import Standardization
 from .weighting import Weigthing
 from .aggregation import Aggregation
 from qgis.core import QgsVectorFileWriter
@@ -73,24 +72,27 @@ class initialiseAll:
             Qt.TextBrowserInteraction)
         self.iface.dlg.LBL_ROHY.setOpenExternalLinks(True)
 
-    def display_input_table(self, columns, tbl, sb):
+    def init_inputData_table(self, columns, tbl, sb):
         tbl.setColumnCount(len(columns))
         tbl.setHorizontalHeaderLabels(columns)
         # Table will fit the screen horizontally
         tbl.horizontalHeader().setSectionResizeMode(1,QHeaderView.Stretch)
         tbl.horizontalHeader().setSectionResizeMode(2,QHeaderView.ResizeToContents)
-        tbl.horizontalHeader().setSectionResizeMode(5,QHeaderView.ResizeToContents)
+        tbl.horizontalHeader().setSectionResizeMode(5,QHeaderView.Interactive)
+        tbl.horizontalHeader().setSectionResizeMode(6,QHeaderView.ResizeToContents)
+
         # Listen to spinbox
         sb.valueChanged.connect(lambda: self.update_listData(tbl,sb))
 
-    def init_classification_input(self):
+    def init_classification_table(self):
         name = QCoreApplication.translate("initialisation","Noms")
         path = QCoreApplication.translate("initialisation","Chemins")
         field = QCoreApplication.translate("initialisation","Champ")
         type = QCoreApplication.translate("initialisation","Type")
+        scr = QCoreApplication.translate("initialisation","SCR")
         ready = QCoreApplication.translate("initialisation","Prêts")
-        columns = [name, path, "", field, type, ready]
-        self.display_input_table(columns,self.iface.dlg.TBL_CONTRAINTE,self.iface.dlg.SB_NB_CONTRAINTE)
+        columns = [name, path, "", field, type, scr, ready]
+        self.init_inputData_table(columns,self.iface.dlg.TBL_CONTRAINTE,self.iface.dlg.SB_NB_CONTRAINTE)
 
         # Listen to list of contraintes not ready
         self.iface.dlg.LV_CONTRAINTE_NOT_READY.itemSelectionChanged.connect(
@@ -101,7 +103,7 @@ class initialiseAll:
         self.iface.dlg.BT_ADD_ROW_CONTRAINTE.clicked.connect(
             lambda : self.add_classification_row())
 
-    def init_standardization_input(self):
+    def init_standardization_table(self):
         # Get columns name
         tab = self.iface.dlg.TBL_CONTRAINTE
         columns =  [tab.horizontalHeaderItem(col).text() for col in range(tab.columnCount())]
@@ -109,12 +111,12 @@ class initialiseAll:
         columns[-1] = normalized
 
         # Initialize standardization input table
-        self.display_input_table(columns,self.iface.dlg.TBL_DATA_ENTREE,self.iface.dlg.SB_NB_DATA)
+        self.init_inputData_table(columns,self.iface.dlg.TBL_DATA_ENTREE,self.iface.dlg.SB_NB_DATA)
 
         # Initialize 3 input rows
         self.update_listData(self.iface.dlg.TBL_DATA_ENTREE,self.iface.dlg.SB_NB_DATA)
 
-    def display_standardization_table(self):
+    def display_standardization_params(self):
         tab = self.iface.dlg.TBL_DATA_STANDARDIZATION
         name = QCoreApplication.translate("initialisation","Noms")
         fonctions = QCoreApplication.translate("initialisation","Fonctions")
@@ -130,7 +132,7 @@ class initialiseAll:
         tab.setStyleSheet(
             "QTableWidget::item {border: 0px; padding: 4px;}")
 
-    def display_classification_table(self, i, contrainte):
+    def display_classification_params(self, i, contrainte):
         ###---------Initialize List contrainte not ready Widget----------
         self.iface.dlg.LV_CONTRAINTE_NOT_READY.addItem(contrainte.name)
 
@@ -208,22 +210,28 @@ class initialiseAll:
 
     def init_weighting_table(self):
         tab = self.iface.dlg.TBL_JUGEMENT
-        columns = [factor.name for factor in self.listFactors]
-        nb_columns = len(columns)
-        tab.setColumnCount(nb_columns)
-        tab.setHorizontalHeaderLabels(columns)
-        tab.setRowCount(nb_columns)
-        tab.setVerticalHeaderLabels(columns)
+        rows = [factor.name for factor in self.listFactors]
+        nb_rows = len(rows)
+        tab.setRowCount(nb_rows)
+        tab.setVerticalHeaderLabels(rows)
+        tab.setColumnCount(nb_rows + 1 )
+        rows.append(QCoreApplication.translate("weigthing","Poids"))
+        tab.setHorizontalHeaderLabels(rows)
         tab.verticalHeader().setVisible(True)
 
-        for row in range(nb_columns):
-            for col in range (nb_columns):
+        for row in range(nb_rows):
+            for col in range (nb_rows + 1):
+                # Initialize edit line input
                 weight = QLineEdit()
                 weight.setFont(self.myFont)
                 weight.setAlignment(Qt.AlignCenter)
                 tab.setCellWidget(row, col, weight)
+
+                # Set text
                 if row == col :
                     weight.setText("1")
+                    weight.setEnabled(False)
+                elif col == nb_rows:
                     weight.setEnabled(False)
                 else:
                     weight.editingFinished.connect(lambda col=col, row=row : self.set_weighting_value(tab,row,col))
@@ -328,7 +336,6 @@ class initialiseAll:
         elif self.pageInd == 8:
             self.iface.dlg.BT_EXECUTE.setEnabled(False)
         self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
-        return self.pageInd
 
     def update_listData(self,tbl,sb):
         # Row count
@@ -348,6 +355,7 @@ class initialiseAll:
             # Initialise input widget
             name = QLineEdit()
             name.setFont(self.myFont)
+            name.setMaxLength(8)
 
             path = QLineEdit()
             path.setFont(self.myFont)
@@ -365,6 +373,11 @@ class initialiseAll:
             field_type.setEnabled(False)
             field_type.setStyleSheet("QLineEdit {color: black;}")
 
+            scr = QLineEdit()
+            scr.setFont(self.myFont)
+            scr.setEnabled(False)
+            scr.setStyleSheet("QLineEdit {color: black;}")
+
             checkbox = QCheckBox()
 
             # Set inputData name, path, button, checkbox
@@ -373,7 +386,8 @@ class initialiseAll:
             tbl.setCellWidget(row, 2, toolButton)
             tbl.setCellWidget(row, 3, field_name)
             tbl.setCellWidget(row, 4, field_type)
-            tbl.setCellWidget(row, 5, checkbox)
+            tbl.setCellWidget(row, 5, scr)
+            tbl.setCellWidget(row, 6, checkbox)
             tbl.setStyleSheet(
                 "QTableWidget::item {border: 0px; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px;}")
 
@@ -388,7 +402,7 @@ class initialiseAll:
             name.setText(list_object[row].name)
             path.setText(list_object[row].inputLayer.path)
             if path.text() != "" :
-                self.update_field_items(list_object[row],field_name,field_type)
+                self.update_field_items(list_object[row],field_name,field_type,scr)
             checkbox.setCheckState(list_object[row].ready)
 
             # Handle items
@@ -407,6 +421,16 @@ class initialiseAll:
                 return inputLayer
         return None
 
+    def update_row_param(self, inputData, inputLayer, tbl, row, path):
+        # Update inputData attribute
+        inputData.setinputLayer(inputLayer)
+        # Update table field
+        tbl.cellWidget(row, 1).setText(path)
+        field_name = tbl.cellWidget(row, 3)
+        field_type = tbl.cellWidget(row, 4)
+        scr = tbl.cellWidget(row, 5)
+        self.update_field_items(inputData,field_name,field_type,scr)
+
     def select_source_path(self, tbl, row):
         path, _filter = QFileDialog.getOpenFileName(
             tbl, QCoreApplication.translate("initialisation","Veuillez choisir un vecteur"), "", "*.shp")
@@ -419,25 +443,12 @@ class initialiseAll:
         # Search If inputLayer is in list of inputLayer
         inputLayer = self.same_source_path(path)
         if  inputLayer != None:
-            # Update inputData attribute
-            inputData.setinputLayer(inputLayer)
-            # Update table field
-            tbl.cellWidget(row, 1).setText(path)
-            field_name = tbl.cellWidget(row, 3)
-            field_type = tbl.cellWidget(row, 4)
-            self.update_field_items(inputData,field_name,field_type)
+            self.update_row_param(inputData,inputLayer,tbl,row,path)
         else:
             # Else create new inputLayer
             inputLayer = InputLayer(path)
             if inputLayer.isValid():
-                # Update inputData attribute
-                inputData.setinputLayer(inputLayer)
-                # Update table field
-                tbl.cellWidget(row, 1).setText(path)
-                field_name = tbl.cellWidget(row, 3)
-                field_type = tbl.cellWidget(row, 4)
-                self.update_field_items(inputData,field_name,field_type)
-                # Append list of inputLayers
+                self.update_row_param(inputData,inputLayer,tbl,row, path)
                 self.list_inputLayers.append(inputLayer)
             else:
                 button = QMessageBox.information(
@@ -456,12 +467,13 @@ class initialiseAll:
             inputData.setfield_idx(idx)
             tab.cellWidget(row,4).setText(inputData.field_type)
 
-    def update_field_items(self,inputData,field_name,field_type):
+    def update_field_items(self,inputData,field_name,field_type, scr):
         field_name.clear()
         for field in inputData.inputLayer.vlayer.fields():
             field_name.addItem(field.name())
         field_name.setCurrentIndex(inputData.field_idx)
         field_type.setText(inputData.field_type)
+        scr.setText(inputData.inputLayer.vlayer.crs().description())
 
     def input_row_filled(self, element, i):
         if not element.name or element.inputLayer.path == "" or element.inputLayer.field_is_duplicated(element.type):
@@ -513,7 +525,7 @@ class initialiseAll:
                 self.listContraintesNotReady.remove(contrainte)
             else:
                 # Initialize reclassification table
-                self.display_classification_table(i,contrainte)
+                self.display_classification_params(i,contrainte)
 
             contrainte_status = QCoreApplication.translate("classification","PRÊTE") if contrainte.ready else QCoreApplication.translate("initialisation","NON PRÊTE")
             log += f"{contrainte.name}    {contrainte.inputLayer.path}    {contrainte.field_name}    {contrainte_status}\n"
@@ -533,7 +545,7 @@ class initialiseAll:
         self.listFactorsNotNormalized = self.listFactors.copy()
 
         # Update standardization table
-        self.display_standardization_table()
+        self.display_standardization_params()
         first_line = QCoreApplication.translate("normalisation","----------NORMALISATION----------")
         log = first_line
         log += QCoreApplication.translate("normalisation","\nNombre de facteurs: {0}\n").format(len(self.listFactors))
@@ -750,18 +762,31 @@ class initialiseAll:
                 )
             self.iface.dlg.BT_NEXT.setEnabled(False)
 
+    def inputLayer_same_crs(self):
+        maxInput = self.list_inputLayers[0]
+        max = maxInput.vlayer.featureCount()
+        crs = maxInput.vlayer.crs()
+        for input in self.list_inputLayers[1:] :
+            length = input.vlayer.featureCount()
+            if input.vlayer.crs() != crs:
+                return False, maxInput
+            if max < length:
+                max = length
+                maxInput = input
+        return True, maxInput
+
     def aggregate(self):
-        first_layer = self.list_inputLayers[0]
+        inputs_same_crs, max_size_layer = self.inputLayer_same_crs()
         first_line = QCoreApplication.translate("agregation","----------AGGRÉGATION----------")
         log = first_line
 
         # if all factors and all contraints in same crs
-        if self.inputs_same_crs(first_layer.vlayer.crs()):
+        if inputs_same_crs:
             aggregation = Aggregation(self.listFactors, self.listContraintes, self.weighting.layers_weight)
 
-            if not first_layer.name.endswith("_bool") and not first_layer.name.endswith("_fuzz"):
-                first_layer.vlayer.commitChanges()
-            input_path = first_layer.path
+            if not max_size_layer.name.endswith("_bool") and not max_size_layer.name.endswith("_fuzz"):
+                max_size_layer.vlayer.commitChanges()
+            input_path = max_size_layer.path
 
             if len(self.list_inputLayers) != 1:
                 for i,input in enumerate(self.list_inputLayers[1:]):
@@ -837,13 +862,7 @@ class initialiseAll:
         # replace file with original name
         os.replace(self.log_path + ".temp", self.log_path)
 
-    def inputs_same_crs(self,crs):
-        for input in self.list_inputLayers[1:]:
-            if input.vlayer.crs() != crs:
-                return False
-        return True
-
-    def objects_same_source(self, inputLayer, list_objects):
+    def objects_same_inputLayer(self, inputLayer, list_objects):
         objects_same_source = []
         for element in inputLayer.elements:
             if element in list_objects:
@@ -870,13 +889,14 @@ class initialiseAll:
 
         if reply == QMessageBox.Yes:
             for inputLayer in self.list_inputLayers:
-                object_not_ready = self.objects_same_source(inputLayer,list_object_not_ready)
+                object_not_ready = self.objects_same_inputLayer(inputLayer,list_object_not_ready)
                 if object_not_ready != []:
                     output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),inputLayer.name + file_extension)
                     inputLayer.setreclass_output(output_path)
                     QgsVectorFileWriter.writeAsVectorFormat(inputLayer.vlayer, inputLayer.reclass_output, 'utf-8',driverName='ESRI Shapefile')
                     for object in object_not_ready:
-                        new_field_name = object.field_name[:-2] + field_extension
+                        # new_field_name = object.field_name[:-2] + field_extension
+                        new_field_name = object.name + field_extension
                         # Remove temp fields
                         object.inputLayer.delete_new_field(new_field_name)
                         # Set object new path and new field and status
@@ -887,7 +907,8 @@ class initialiseAll:
                         text_edit.append(QCoreApplication.translate("initialisation","\"{0}\" dans le champ {2} du fichier {1}\n").format(object.name,inputLayer.path, object.field_name))
         else:
             for object in list_object_not_ready:
-                new_field_name = object.field_name[:-2] + field_extension
+                # new_field_name = object.field_name[:-2] + field_extension
+                new_field_name = object.name + field_extension
                 object.setfield_idx(object.inputLayer.vlayer.fields().indexFromName(new_field_name))
                 object.setready(2)
                 text_edit.append(QCoreApplication.translate("initialisation","\"{0}\" dans le champ {2} du fichier {1}\n").format(object.name,object.inputLayer.path, object.field_name))
@@ -899,11 +920,13 @@ class initialiseAll:
     def remove_new_fields(self):
         for contrainte in self.listContraintesNotReady:
             if not contrainte.inputLayer.path.endswith("_bool.shp"):
-                new_field_name = contrainte.field_name[:-2] + "Bl"
+                # new_field_name = contrainte.field_name[:-2] + "Bl"
+                new_field_name = contrainte.name + "Bl"
                 contrainte.inputLayer.delete_new_field(new_field_name)
         for factor in self.listFactorsNotNormalized:
             if not factor.inputLayer.path.endswith("_fuzz.shp"):
-                new_field_name = factor.field_name[:-2] + "Fz"
+                # new_field_name = factor.field_name[:-2] + "Fz"
+                new_field_name = factor.name + "Fz"
                 factor.inputLayer.delete_new_field(new_field_name)
 
     def initialise_variable_init(self):
@@ -929,8 +952,8 @@ class initialiseAll:
             # On click on répertoire de sortie
             self.iface.dlg.BT_OUTPUT.clicked.connect(lambda: self.select_output_dir())
 
-            self.init_classification_input()
-            self.init_standardization_input()
+            self.init_classification_table()
+            self.init_standardization_table()
 
             # On click on Tester
             self.iface.dlg.BT_TEST_JUGEMENT.clicked.connect(self.weighting)
