@@ -49,7 +49,7 @@ class Weigthing:
             for col in range(self.nb_columns):
                 try:
                     param = float(self.tab.cellWidget(row,col).text())
-                    log += f"{param}\t\t"
+                    log += f"{param}\t"
                 except ValueError:
                     # Value is None
                     col_name = self.tab.horizontalHeaderItem(col).text()

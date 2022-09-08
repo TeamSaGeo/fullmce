@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import Qt, QCoreApplication
+from qgis.PyQt.QtCore import Qt, QCoreApplication, QEventLoop, QTimer
 from qgis.PyQt.QtGui import QFont, QTextCursor
 from qgis.PyQt.QtWidgets import *
+from qgis.core import QgsVectorFileWriter, QgsProcessingFeedback
 from .inputData import InputData
 from .inputLayer import InputLayer
 from .classification import Classification
 from .standardization import Standardization
 from .weighting import Weigthing
 from .aggregation import Aggregation
-from qgis.core import QgsVectorFileWriter
-import os, csv
+import os, csv, glob
 from datetime import datetime
 
 class initialiseAll:
@@ -758,8 +758,7 @@ class initialiseAll:
             button = QMessageBox.information(
                 self.iface.dlg,
                 self.error_title,
-                log_params,
-                )
+                log_params,)
             self.iface.dlg.BT_NEXT.setEnabled(False)
 
     def inputLayer_same_crs(self):
@@ -775,50 +774,89 @@ class initialiseAll:
                 maxInput = input
         return True, maxInput
 
-    def aggregate(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+    def append_edittext(self, text):
+        self.iface.dlg.TE_RUN_PROCESS.append(text)
+        self.iface.dlg.TE_RUN_PROCESS.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
+        loop = QEventLoop()
+        QTimer.singleShot(2000, loop.quit)
+        loop.exec_()
 
-        inputs_same_crs, max_size_layer = self.inputLayer_same_crs()
+    def aggregate(self):
+        self.iface.dlg.TE_RUN_PROCESS.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
         first_line = QCoreApplication.translate("agregation","----------AGGRÉGATION----------")
         log = first_line
 
         # if all factors and all contraints in same crs
-        if inputs_same_crs:
-            aggregation = Aggregation(self.listFactors, self.listContraintes, self.weighting.layers_weight)
+        test = QCoreApplication.translate("agregation","Vérification des CRS des facteurs et des contraintes ...")
+        self.append_edittext(first_line + "\n" + test )
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        inputs_same_crs, max_size_layer = self.inputLayer_same_crs()
+        status = ""
 
+        if inputs_same_crs:
+            test_result = QCoreApplication.translate("agregation","Super! Les couches sources sont du même type de géométrie.\n\nCréation du formule ...")
+            self.append_edittext(test_result)
+
+            # Get expression
+            aggregation = Aggregation(self.listFactors, self.listContraintes, self.weighting.layers_weight)
+            expression = aggregation.getexpression()
+            formule = QCoreApplication.translate("agregation","Formule = ") + expression
+            self.append_edittext(formule)
+
+            # Commit changes if modified max_size_layer not saved
             if not max_size_layer.name.endswith("_bool") and not max_size_layer.name.endswith("_fuzz"):
                 max_size_layer.vlayer.commitChanges()
-            input_path = max_size_layer.path
 
+            # if multiple layers, Join them by location
+            input_path = max_size_layer.path
+            output_dir = self.iface.dlg.LE_OUTPUT_DIR.text()
             if len(self.list_inputLayers) != 1:
-                for i,input in enumerate(self.list_inputLayers[1:]):
-                    output_temp_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),"output"+f"{i}"+".shp" )
+                self.list_inputLayers.remove(max_size_layer)
+                for i,input in enumerate(self.list_inputLayers):
+                    output_temp_path = os.path.join(output_dir,"output"+f"{i}"+".shp" )
+                    # Commit changes if modified layers not saved
                     if not input.name.endswith("_bool") and not input.name.endswith("_fuzz"):
-                        fuzz_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),input.name + "_fuzz.shp")
+                        fuzz_path = os.path.join(output_dir,input.name + "_fuzz.shp")
                         QgsVectorFileWriter.writeAsVectorFormat(input.vlayer, fuzz_path, 'utf-8',driverName='ESRI Shapefile')
                         input.setpath(fuzz_path)
+                    # joinbylocation
                     result = aggregation.joinbylocation(input_path,input.path,output_temp_path)
                     if i > 0:
-                        os.remove(input_path)
+                        self.remove_temp_file(input_path)
                     input_path = output_temp_path
 
-            expression = aggregation.getexpression()
-            output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),"resultat_final.shp" )
+            # Agregate
+            self.append_edittext("\nLancement de l'agrégation ...")
+            output_path = os.path.join(output_dir,"resultat_final.shp" )
             result = aggregation.aggregate(input_path,expression,output_path)
-            log += QCoreApplication.translate("agregation","\nFormule = ") + expression
-            status = QCoreApplication.translate("agregation","\nAgrégation terminée avec succès!")
-            log += QCoreApplication.translate("agregation","\nFichier de sortie: ") + output_path + f"\n{status}"
-            button = QMessageBox.information(self.iface.dlg,QCoreApplication.translate("agregation","Résultat"),status,)
 
+            # Write result
+            output_log = QCoreApplication.translate("agregation","Sauvegarde du résultat dans ") + output_path
+            self.append_edittext(output_log)
+            log = "\n".join([log,formule,output_log])
+            status = QCoreApplication.translate("agregation","\nAgrégation terminée avec succès!")
+
+            # Iterate over the list of temp filepaths & remove each file.
+            if input_path != max_size_layer.path:
+                self.remove_temp_file(input_path)
         # else cannot aggregate
         else:
-            log += QCoreApplication.translate("agregation","\nAgrégation impossible! Les couches sources ne sont pas du même type de géométrie.")
-            button = QMessageBox.information(self.iface.dlg,self.error_title,log,)
+            status = QCoreApplication.translate("agregation","\nAgrégation impossible! Les couches sources ne sont pas du même type de géométrie.")
 
-        self.save_log(log,first_line)
         QApplication.restoreOverrideCursor()
-        self.iface.dlg.TE_RUN_PROCESS.append(log)
-        self.iface.dlg.BT_EXECUTE.setEnabled(False)
+        button = QMessageBox.information(self.iface.dlg,QCoreApplication.translate("agregation","Résultat"),status,)
+        self.append_edittext(status)
+        log += status
+        self.save_log(log,first_line)
+
+    def remove_temp_file(self, input_path):
+        filename, extension = os.path.splitext(input_path)
+        fileList = glob.glob(f"{filename}"+".*")
+        for filePath in fileList:
+            try:
+                os.remove(filePath)
+            except:
+                QgsProcessingFeedback.pushInfo(QCoreApplication.translate("agregation","\nError while deleting file") + filePath)
 
     def save_matrix(self):
         tab = self.iface.dlg.TBL_JUGEMENT
@@ -931,6 +969,7 @@ class initialiseAll:
                 # new_field_name = factor.field_name[:-2] + "Fz"
                 new_field_name = factor.name + "Fz"
                 factor.inputLayer.delete_new_field(new_field_name)
+        QApplication.restoreOverrideCursor()
 
     def initialise_variable_init(self):
         return self
