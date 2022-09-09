@@ -105,7 +105,7 @@ class Standardization:
             # Add tabulation if direction is descending
             if i == 1 and value_index == 0:
                 log += "\t\t"
-        log +="\n\n"
+        log +="\n"
         return log
 
     def error_msg(self, col):

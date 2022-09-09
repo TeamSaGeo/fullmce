@@ -239,7 +239,6 @@ class initialiseAll:
 
     def set_weighting_value(self,tab,row,col):
         self.iface.dlg.BT_NEXT.setEnabled(False)
-
         val = tab.cellWidget(row,col).text()
         sym = tab.cellWidget(col,row)
         if sym and val != "":
@@ -249,7 +248,7 @@ class initialiseAll:
                     button = QMessageBox.information(
                         self.iface.dlg,
                         self.error_title,
-                        QCoreApplication.translate("initialisation","La valeur en entrée doit être entre 0.1111 et 9."),
+                        QCoreApplication.translate("initialisation","La valeur en entrée doit être comprise entre 0.1111 et 9."),
                         )
                     tab.cellWidget(row,col).setText('')
                 else:
@@ -261,8 +260,8 @@ class initialiseAll:
                     sym.setText("{0:.{1}f}".format(reverse_val, decimals))
             except ValueError:
                 # Value is not numeric
-                row_name = self.tab.verticalHeaderItem(row).text()
-                col_name = self.tab.horizontalHeaderItem(col).text()
+                row_name = tab.verticalHeaderItem(row).text()
+                col_name = tab.horizontalHeaderItem(col).text()
                 button = QMessageBox.information(
                     self.iface.dlg,
                     self.error_title,
@@ -811,8 +810,9 @@ class initialiseAll:
             input_path = max_size_layer.path
             output_dir = self.iface.dlg.LE_OUTPUT_DIR.text()
             if len(self.list_inputLayers) != 1:
-                self.list_inputLayers.remove(max_size_layer)
-                for i,input in enumerate(self.list_inputLayers):
+                list_inputLayers = self.list_inputLayers.copy()
+                list_inputLayers.remove(max_size_layer)
+                for i,input in enumerate(list_inputLayers):
                     output_temp_path = os.path.join(output_dir,"output"+f"{i}"+".shp" )
                     # Commit changes if modified layers not saved
                     if not input.name.endswith("_bool") and not input.name.endswith("_fuzz"):
@@ -935,28 +935,28 @@ class initialiseAll:
                     output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),inputLayer.name + file_extension)
                     inputLayer.setreclass_output(output_path)
                     QgsVectorFileWriter.writeAsVectorFormat(inputLayer.vlayer, inputLayer.reclass_output, 'utf-8',driverName='ESRI Shapefile')
+                    self.set_fields(object_not_ready,field_extension,inputLayer, text_edit,True)
+                    # Remove temp fields
                     for object in object_not_ready:
-                        # new_field_name = object.field_name[:-2] + field_extension
-                        new_field_name = object.name + field_extension
-                        # Remove temp fields
-                        object.inputLayer.delete_new_field(new_field_name)
-                        # Set object new path and new field and status
-                        object.inputLayer.setpath(inputLayer.reclass_output)
-                        object.inputLayer.isValid()
-                        object.setfield_idx(object.inputLayer.vlayer.fields().indexFromName(new_field_name))
-                        object.setready(2)
-                        text_edit.append(QCoreApplication.translate("initialisation","\"{0}\" dans le champ {2} du fichier {1}\n").format(object.name,inputLayer.path, object.field_name))
+                        inputLayer.delete_new_field(object.field_name)
+                    # Set object new path
+                    inputLayer.setpath(inputLayer.reclass_output)
+                    inputLayer.isValid()
         else:
-            for object in list_object_not_ready:
-                # new_field_name = object.field_name[:-2] + field_extension
-                new_field_name = object.name + field_extension
-                object.setfield_idx(object.inputLayer.vlayer.fields().indexFromName(new_field_name))
-                object.setready(2)
-                text_edit.append(QCoreApplication.translate("initialisation","\"{0}\" dans le champ {2} du fichier {1}\n").format(object.name,object.inputLayer.path, object.field_name))
-
+            self.set_fields(list_object_not_ready,field_extension,inputLayer, text_edit,False)
         text_edit.append(QCoreApplication.translate("initialisation","{0} terminés avec succès!").format(process))
         text_edit.append(separator)
         text_edit.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
+
+    def set_fields(self,object_not_ready,field_extension, inputLayer, text_edit, new_path):
+        for object in object_not_ready:
+            # new_field_name = object.field_name[:-2] + field_extension
+            # Set object status
+            new_field_name = object.name + field_extension
+            object.setfield_idx(inputLayer.vlayer.fields().indexFromName(new_field_name))
+            object.setready(2)
+            path = inputLayer.reclass_output if new_path else object.inputLayer.path
+            text_edit.append(QCoreApplication.translate("initialisation","\"{0}\" dans le champ {2} du fichier {1}\n").format(object.name,path, object.field_name))
 
     def remove_new_fields(self):
         for contrainte in self.listContraintesNotReady:
