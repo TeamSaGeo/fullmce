@@ -777,7 +777,7 @@ class initialiseAll:
         self.iface.dlg.TE_RUN_PROCESS.append(text)
         self.iface.dlg.TE_RUN_PROCESS.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
         loop = QEventLoop()
-        QTimer.singleShot(2000, loop.quit)
+        QTimer.singleShot(1000, loop.quit)
         loop.exec_()
 
     def aggregate(self):
@@ -846,6 +846,7 @@ class initialiseAll:
         QApplication.restoreOverrideCursor()
         button = QMessageBox.information(self.iface.dlg,QCoreApplication.translate("agregation","Résultat"),status,)
         self.append_edittext(status)
+        self.iface.dlg.BT_EXECUTE.setEnabled(False)
         log += status
         self.save_log(log,first_line)
 
@@ -943,7 +944,7 @@ class initialiseAll:
                     inputLayer.setpath(inputLayer.reclass_output)
                     inputLayer.isValid()
         else:
-            self.set_fields(list_object_not_ready,field_extension,inputLayer, text_edit,False)
+            self.set_fields(list_object_not_ready,field_extension,None, text_edit,False)
         text_edit.append(QCoreApplication.translate("initialisation","{0} terminés avec succès!").format(process))
         text_edit.append(separator)
         text_edit.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
@@ -953,6 +954,8 @@ class initialiseAll:
             # new_field_name = object.field_name[:-2] + field_extension
             # Set object status
             new_field_name = object.name + field_extension
+            if not inputLayer:
+                inputLayer = object.inputLayer
             object.setfield_idx(inputLayer.vlayer.fields().indexFromName(new_field_name))
             object.setready(2)
             path = inputLayer.reclass_output if new_path else object.inputLayer.path
