@@ -314,6 +314,9 @@ class initialiseAll:
         elif self.pageInd == 2 :
             self.update_listData(self.iface.dlg.TBL_CONTRAINTE,self.iface.dlg.SB_NB_CONTRAINTE)
         elif self.pageInd == 3:
+            if self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.toPlainText().endswith("#"):
+                self.pageInd = 2
+                self.update_listData(self.iface.dlg.TBL_CONTRAINTE,self.iface.dlg.SB_NB_CONTRAINTE)
             self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.clear()
         elif self.pageInd == 4:
             if self.listContraintesNotReady == []:
@@ -324,7 +327,11 @@ class initialiseAll:
         elif self.pageInd == 5 :
             self.update_listData(self.iface.dlg.TBL_DATA_ENTREE,self.iface.dlg.SB_NB_DATA)
         elif self.pageInd == 6:
+            if self.iface.dlg.TE_RUN_PROCESS_NORMALISATION.toPlainText().endswith("#"):
+                self.pageInd = 5
+                self.update_listData(self.iface.dlg.TBL_DATA_ENTREE,self.iface.dlg.SB_NB_DATA)
             self.iface.dlg.TE_RUN_PROCESS_NORMALISATION.clear()
+            self.pageInd == 5
         elif self.pageInd == 7:
             if self.listFactorsNotNormalized == []:
                 self.pageInd = 5
@@ -781,6 +788,7 @@ class initialiseAll:
         loop.exec_()
 
     def aggregate(self):
+        self.iface.dlg.BT_EXECUTE.setEnabled(False)
         self.iface.dlg.TE_RUN_PROCESS.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
         first_line = QCoreApplication.translate("agregation","----------AGGRÉGATION----------")
         log = first_line
@@ -846,7 +854,6 @@ class initialiseAll:
         QApplication.restoreOverrideCursor()
         button = QMessageBox.information(self.iface.dlg,QCoreApplication.translate("agregation","Résultat"),status,)
         self.append_edittext(status)
-        self.iface.dlg.BT_EXECUTE.setEnabled(False)
         log += status
         self.save_log(log,first_line)
 
@@ -949,16 +956,16 @@ class initialiseAll:
         text_edit.append(separator)
         text_edit.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
 
-    def set_fields(self,object_not_ready,field_extension, inputLayer, text_edit, new_path):
+    def set_fields(self,object_not_ready,field_extension, inputLayer, text_edit, new_output_path):
         for object in object_not_ready:
             # new_field_name = object.field_name[:-2] + field_extension
             # Set object status
             new_field_name = object.name + field_extension
-            if not inputLayer:
+            if not new_output_path:
                 inputLayer = object.inputLayer
             object.setfield_idx(inputLayer.vlayer.fields().indexFromName(new_field_name))
             object.setready(2)
-            path = inputLayer.reclass_output if new_path else object.inputLayer.path
+            path = inputLayer.reclass_output if new_output_path else object.inputLayer.path
             text_edit.append(QCoreApplication.translate("initialisation","\"{0}\" dans le champ {2} du fichier {1}\n").format(object.name,path, object.field_name))
 
     def remove_new_fields(self):
@@ -990,7 +997,7 @@ class initialiseAll:
             # On click on Precedent
             self.iface.dlg.BT_PREVIOUS.clicked.connect(lambda: self.display_previous_page())
             # On click on Cancel
-            self.iface.dlg.BT_CANCEL.clicked.connect(lambda: self.remove_new_fields())
+            # self.iface.dlg.BT_CANCEL.clicked.connect(lambda: self.remove_new_fields())
             # On click on Close
             self.iface.dlg.rejected.connect(lambda: self.remove_new_fields())
 
