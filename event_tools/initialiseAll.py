@@ -591,6 +591,8 @@ class initialiseAll:
                 self.pageInd = 2
                 self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
                 # extend list contrainte
+                for factor in list_string_factors:
+                    factor.type = "contraint"
                 self.listContraintes.extend(list_string_factors)
                 self.iface.dlg.SB_NB_CONTRAINTE.setValue(len(self.listContraintes))
             return False
