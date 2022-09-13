@@ -318,12 +318,8 @@ class initialiseAll:
                 self.pageInd = 2
                 self.update_listData(self.iface.dlg.TBL_CONTRAINTE,self.iface.dlg.SB_NB_CONTRAINTE)
             self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.clear()
-        elif self.pageInd == 4:
-            if self.listContraintesNotReady == []:
-                self.pageInd = 2
-            else:
-                self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE.clear()
-                self.pageInd = 3
+        elif self.pageInd == 4 and self.listContraintesNotReady == []:
+            self.pageInd = 2
         elif self.pageInd == 5 :
             self.update_listData(self.iface.dlg.TBL_DATA_ENTREE,self.iface.dlg.SB_NB_DATA)
         elif self.pageInd == 6:
@@ -335,9 +331,6 @@ class initialiseAll:
         elif self.pageInd == 7:
             if self.listFactorsNotNormalized == []:
                 self.pageInd = 5
-            else:
-                self.iface.dlg.TE_RUN_PROCESS_NORMALISATION.clear()
-                self.pageInd = 6
             self.iface.dlg.BT_NEXT.setEnabled(True)
         elif self.pageInd == 8:
             self.iface.dlg.BT_EXECUTE.setEnabled(False)
@@ -537,7 +530,8 @@ class initialiseAll:
             log += f"{contrainte.name}    {contrainte.inputLayer.path}    {contrainte.field_name}    {contrainte_status}\n"
 
         log += "\n"
-        self.log_path = os.path.join(output_dir,"full_mce_log.txt")
+        now = datetime.now().strftime("%Y%m%d")
+        self.log_path = os.path.join(output_dir,"fullmce_log"+ now + ".txt")
         with open(self.log_path,"w") as f:
             f.write(log)
 
@@ -969,17 +963,18 @@ class initialiseAll:
             text_edit.append(QCoreApplication.translate("initialisation","\"{0}\" dans le champ {2} du fichier {1}\n").format(object.name,path, object.field_name))
 
     def remove_new_fields(self):
-        for contrainte in self.listContraintesNotReady:
-            if not contrainte.inputLayer.path.endswith("_bool.shp"):
-                # new_field_name = contrainte.field_name[:-2] + "Bl"
-                new_field_name = contrainte.name + "Bl"
-                contrainte.inputLayer.delete_new_field(new_field_name)
-        for factor in self.listFactorsNotNormalized:
-            if not factor.inputLayer.path.endswith("_fuzz.shp"):
-                # new_field_name = factor.field_name[:-2] + "Fz"
-                new_field_name = factor.name + "Fz"
-                factor.inputLayer.delete_new_field(new_field_name)
         QApplication.restoreOverrideCursor()
+        if self.pageInd == 9:
+            for contrainte in self.listContraintesNotReady:
+                if not contrainte.inputLayer.path.endswith("_bool.shp"):
+                    # new_field_name = contrainte.field_name[:-2] + "Bl"
+                    new_field_name = contrainte.name + "Bl"
+                    contrainte.inputLayer.delete_new_field(new_field_name)
+            for factor in self.listFactorsNotNormalized:
+                if not factor.inputLayer.path.endswith("_fuzz.shp"):
+                    # new_field_name = factor.field_name[:-2] + "Fz"
+                    new_field_name = factor.name + "Fz"
+                    factor.inputLayer.delete_new_field(new_field_name)
 
     def initialise_variable_init(self):
         return self
