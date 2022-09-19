@@ -58,7 +58,7 @@ class Classification:
         else:
             error_msg = ""
             if col == 0:
-                error_msg = QCoreApplication.translate("classification","en entier (ou réelle)")
+                error_msg = QCoreApplication.translate("classification","en entier")
             elif col == 1:
                 if self.contrainte.field_type == "String":
                     error_msg = QCoreApplication.translate("classification","Initiale (différente)")
