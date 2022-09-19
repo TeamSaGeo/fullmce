@@ -1,4 +1,4 @@
-from qgis.core import QgsFeatureRequest
+from qgis.core import QgsFeatureRequest, QgsMessageLog
 import processing
 
 class Aggregation:
@@ -16,7 +16,8 @@ class Aggregation:
         return ("(" + sum + ") * " + (product if product else "1"))
 
     def aggregate(self, inputpath, expression, output_path):
-        return processing.run('qgis:fieldcalculator',
+        try:
+            return processing.run('qgis:fieldcalculator',
             {"INPUT": inputpath,
             "FIELD_NAME": 'WLC' ,
             "FIELD_TYPE": 0,
@@ -25,13 +26,21 @@ class Aggregation:
             "NEW_FIELD": True ,
             "FORMULA": expression,
             "OUTPUT": output_path})
+        except Exception as e:
+            QgsMessageLog.logMessage(str(e), level=Qgis.Critical)
+            return str(e)
+
 
     def joinbylocation(self,inputpath,joinpath,output_path):
-        context = processing.tools.dataobjects.createContext()
-        context.setInvalidGeometryCheck(QgsFeatureRequest.GeometryNoCheck)
-        processing.run("qgis:joinattributesbylocation",
-        {"INPUT":inputpath,
-        "JOIN":joinpath,
-        "PREDICATE":0,
-        "METHOD":1,
-        "OUTPUT":output_path}, context=context)
+        try:
+            context = processing.tools.dataobjects.createContext()
+            context.setInvalidGeometryCheck(QgsFeatureRequest.GeometryNoCheck)
+            return processing.run("qgis:joinattributesbylocation",
+            {"INPUT":inputpath,
+            "JOIN":joinpath,
+            "PREDICATE":0,
+            "METHOD":1,
+            "OUTPUT":output_path}, context=context)
+        except Exception as e:
+            QgsMessageLog.logMessage(str(e), level=Qgis.Critical)
+            return str(e)

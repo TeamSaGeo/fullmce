@@ -22,7 +22,7 @@ class initialiseAll:
 
         self.pageInd = self.iface.dlg.STACKED_WIDGET.currentIndex()
 
-        self.error_title = QCoreApplication.translate("initialisation","Erreur ...")
+        self.error_title = QCoreApplication.translate("full_mce","Erreur ...")
 
         # Initialize list of InputData
         self.listContraintes = []
@@ -61,12 +61,12 @@ class initialiseAll:
             self.iface.dlg.GB_CONCEPTEUR.setLayout(conceptbox)
 
         # Populate TE_INFO
-        text = QCoreApplication.translate("initialisation","Ce plugin a été spécialement dévéloppé par l'Institut Pasteur de Madagascar dans le cadre d'une étude sur la surveillance constante du paludisme et la détermination des zones prioritaires aux Campagnes d'Aspertion Intra-Domiciliaire (CAID) à Madagascar. Son utilisation est privilégié dans le domaine de la santé publique.")
+        text = QCoreApplication.translate("full_mce","Ce plugin a été spécialement dévéloppé par l'Institut Pasteur de Madagascar dans le cadre d'une étude sur la surveillance constante du paludisme et la détermination des zones prioritaires aux Campagnes d'Aspertion Intra-Domiciliaire (CAID) à Madagascar. Son utilisation est privilégié dans le domaine de la santé publique.")
         self.iface.dlg.TE_INFO.setText(text)
 
         # Populate LBL_ROHY
         self.iface.dlg.LBL_ROHY.setText(
-              "<a href=\"mailto:sfamenontsoa@pasteur.mg\">" + QCoreApplication.translate("initialisation","Suggestions ou Remarques") + "</a>")
+              "<a href=\"mailto:sfamenontsoa@pasteur.mg\">" + QCoreApplication.translate("full_mce","Suggestions ou Remarques") + "</a>")
         self.iface.dlg.LBL_ROHY.setTextFormat(Qt.RichText)
         self.iface.dlg.LBL_ROHY.setTextInteractionFlags(
             Qt.TextBrowserInteraction)
@@ -85,12 +85,12 @@ class initialiseAll:
         sb.valueChanged.connect(lambda: self.update_listData(tbl,sb))
 
     def init_classification_table(self):
-        name = QCoreApplication.translate("initialisation","Noms")
-        path = QCoreApplication.translate("initialisation","Chemins")
-        field = QCoreApplication.translate("initialisation","Champ")
-        type = QCoreApplication.translate("initialisation","Type")
-        scr = QCoreApplication.translate("initialisation","SCR")
-        ready = QCoreApplication.translate("initialisation","Prêts")
+        name = QCoreApplication.translate("full_mce","Noms")
+        path = QCoreApplication.translate("full_mce","Chemins")
+        field = QCoreApplication.translate("full_mce","Champ")
+        type = QCoreApplication.translate("full_mce","Type")
+        scr = QCoreApplication.translate("full_mce","SCR")
+        ready = QCoreApplication.translate("full_mce","Prêts")
         columns = [name, path, "", field, type, scr, ready]
         self.init_inputData_table(columns,self.iface.dlg.TBL_CONTRAINTE,self.iface.dlg.SB_NB_CONTRAINTE)
 
@@ -107,7 +107,7 @@ class initialiseAll:
         # Get columns name
         tab = self.iface.dlg.TBL_CONTRAINTE
         columns =  [tab.horizontalHeaderItem(col).text() for col in range(tab.columnCount())]
-        normalized = QCoreApplication.translate("initialisation","Normalisés")
+        normalized = QCoreApplication.translate("full_mce","Normalisés")
         columns[-1] = normalized
 
         # Initialize standardization input table
@@ -118,9 +118,9 @@ class initialiseAll:
 
     def display_standardization_params(self):
         tab = self.iface.dlg.TBL_DATA_STANDARDIZATION
-        name = QCoreApplication.translate("initialisation","Noms")
-        fonctions = QCoreApplication.translate("initialisation","Fonctions")
-        sens = QCoreApplication.translate("initialisation","Sens")
+        name = QCoreApplication.translate("full_mce","Noms")
+        fonctions = QCoreApplication.translate("full_mce","Fonctions")
+        sens = QCoreApplication.translate("full_mce","Sens")
         columns = [name, fonctions, sens, "A", "B", "C", "D"]
         tab.setColumnCount(len(columns))
         tab.setHorizontalHeaderLabels(columns)
@@ -139,15 +139,15 @@ class initialiseAll:
         ###---------Initialize Tab Widget----------
         tab = QTableWidget()
 
-        columns = [QCoreApplication.translate("initialisation","Nouvelle valeur")]
+        columns = [QCoreApplication.translate("full_mce","Nouvelle valeur")]
         if contrainte.field_type == "String":
-            init_value = QCoreApplication.translate("initialisation","Valeur Initiale")
+            init_value = QCoreApplication.translate("full_mce","Valeur Initiale")
             columns.append(init_value)
         else:
-            start_value = QCoreApplication.translate("initialisation","Début")
-            start_value_inclued =QCoreApplication.translate("initialisation","Inclus")
-            end_value = QCoreApplication.translate("initialisation","Fin")
-            end_value_inclued= QCoreApplication.translate("initialisation","Inclus")
+            start_value = QCoreApplication.translate("full_mce","Début")
+            start_value_inclued =QCoreApplication.translate("full_mce","Inclus")
+            end_value = QCoreApplication.translate("full_mce","Fin")
+            end_value_inclued= QCoreApplication.translate("full_mce","Inclus")
             columns.extend([start_value, start_value_inclued,end_value,end_value_inclued])
         tab.setColumnCount(len(columns))
         tab.setHorizontalHeaderLabels(columns)
@@ -175,9 +175,9 @@ class initialiseAll:
 
         factor_function = QComboBox()
         factor_function.setFont(self.myFont)
-        linear = QCoreApplication.translate("initialisation","Linéaire")
-        s_shaped = QCoreApplication.translate("initialisation","S-Shaped (Sigmoïdal)")
-        # j_shaped = QCoreApplication.translate("initialisation","J-Shaped")
+        linear = QCoreApplication.translate("full_mce","Linéaire")
+        s_shaped = QCoreApplication.translate("full_mce","S-Shaped (Sigmoïdal)")
+        # j_shaped = QCoreApplication.translate("full_mce","J-Shaped")
         # functions = [linear,s_shaped,j_shaped]
         functions = [linear,s_shaped]
         factor_function.addItems(functions)
@@ -185,9 +185,9 @@ class initialiseAll:
 
         factor_direction = QComboBox()
         factor_direction.setFont(self.myFont)
-        descending = QCoreApplication.translate("initialisation","Décroissant")
-        ascending = QCoreApplication.translate("initialisation","Croissant")
-        symmetrical = QCoreApplication.translate("initialisation","Symétrique")
+        descending = QCoreApplication.translate("full_mce","Décroissant")
+        ascending = QCoreApplication.translate("full_mce","Croissant")
+        symmetrical = QCoreApplication.translate("full_mce","Symétrique")
         direction = [descending,ascending,symmetrical]
         factor_direction.addItems(direction)
         tab.setCellWidget(row, 2, factor_direction)
@@ -215,7 +215,7 @@ class initialiseAll:
         tab.setRowCount(nb_rows)
         tab.setVerticalHeaderLabels(rows)
         tab.setColumnCount(nb_rows + 1 )
-        rows.append(QCoreApplication.translate("weigthing","Poids"))
+        rows.append(QCoreApplication.translate("weighting","Poids"))
         tab.setHorizontalHeaderLabels(rows)
         tab.verticalHeader().setVisible(True)
 
@@ -248,7 +248,7 @@ class initialiseAll:
                     button = QMessageBox.information(
                         self.iface.dlg,
                         self.error_title,
-                        QCoreApplication.translate("initialisation","La valeur en entrée doit être comprise entre 0.1111 et 9."),
+                        QCoreApplication.translate("full_mce","La valeur en entrée doit être comprise entre 0.1111 et 9."),
                         )
                     tab.cellWidget(row,col).setText('')
                 else:
@@ -265,12 +265,12 @@ class initialiseAll:
                 button = QMessageBox.information(
                     self.iface.dlg,
                     self.error_title,
-                    QCoreApplication.translate("initialisation","Veuillez saisir une valeur en entier ou réelle valide à la ligne {0} - colonne {1}!").format(row_name,col_name),
+                    QCoreApplication.translate("full_mce","Veuillez saisir une valeur en entier ou réelle valide à la ligne {0} - colonne {1}!").format(row_name,col_name),
                     )
 
     def select_output_dir(self):
         foldername = QFileDialog.getExistingDirectory(
-            self.iface.dlg, QCoreApplication.translate("initialisation","Veuillez sélectionner le répertoire de sortie"))
+            self.iface.dlg, QCoreApplication.translate("full_mce","Veuillez sélectionner le répertoire de sortie"))
         self.iface.dlg.LE_OUTPUT_DIR.setText(foldername)
 
     def load_log_file(self, text_edit):
@@ -283,7 +283,7 @@ class initialiseAll:
             button = QMessageBox.information(
                 self.iface.dlg,
                 self.error_title,
-                QCoreApplication.translate("initialisation","Veuillez choisir un répertoire de sortie!"),
+                QCoreApplication.translate("full_mce","Veuillez choisir un répertoire de sortie!"),
                 )
         elif (self.pageInd == 2 and not self.contraintes_filled()) \
             or ((self.pageInd == 3 or self.pageInd == 6 )and not self.run_process()) \
@@ -432,7 +432,7 @@ class initialiseAll:
 
     def select_source_path(self, tbl, row):
         path, _filter = QFileDialog.getOpenFileName(
-            tbl, QCoreApplication.translate("initialisation","Veuillez choisir un vecteur"), "", "*.shp")
+            tbl, QCoreApplication.translate("full_mce","Veuillez choisir un vecteur"), "", "*.shp")
 
         if self.pageInd == 2:
             inputData = self.listContraintes[row]
@@ -453,7 +453,7 @@ class initialiseAll:
                 button = QMessageBox.information(
                     self.iface.dlg,
                     self.error_title,
-                    QCoreApplication.translate("initialisation","Veuillez choisir un fichier valide!"),
+                    QCoreApplication.translate("full_mce","Veuillez choisir un fichier valide!"),
                     )
 
         # Remove empty inputLayer from list
@@ -477,9 +477,9 @@ class initialiseAll:
     def input_row_filled(self, element, i):
         if not element.name or element.inputLayer.path == "" or element.inputLayer.field_is_duplicated(element.type):
             type = "contrainte" if element.type == "contraint" else "facteur"
-            msg_name = QCoreApplication.translate("initialisation","Veuillez saisir un nom pour le {0} n° {1}").format(type,i+1)
-            msg_path = QCoreApplication.translate("initialisation","Veuillez sélectionner une image pour le {0} n° {1}").format(type,i+1)
-            msg_field = QCoreApplication.translate("initialisation","Champ dupliqué! Veuillez choisir des champs différents pour les {0}s issus du même fichier source.").format(type)
+            msg_name = QCoreApplication.translate("full_mce","Veuillez saisir un nom pour le {0} n° {1}").format(type,i+1)
+            msg_path = QCoreApplication.translate("full_mce","Veuillez sélectionner une image pour le {0} n° {1}").format(type,i+1)
+            msg_field = QCoreApplication.translate("full_mce","Champ dupliqué! Veuillez choisir des champs différents pour les {0}s issus du même fichier source.").format(type)
             error_msg = msg_name if not element.name else msg_path if element.inputLayer.path == "" else msg_field
             button = QMessageBox.information(
                 self.iface.dlg,
@@ -518,7 +518,7 @@ class initialiseAll:
                     button = QMessageBox.information(
                         self.iface.dlg,
                         self.error_title,
-                        QCoreApplication.translate("initialisation","Le contrainte <b>{0}</b> de type \"String\" ne devrait pas être \"Prêt\". Veuillez reclassifier ce contrainte.").format(contrainte.name)
+                        QCoreApplication.translate("full_mce","Le contrainte <b>{0}</b> de type \"String\" ne devrait pas être \"Prêt\". Veuillez reclassifier ce contrainte.").format(contrainte.name)
                     )
                     return False
                 self.listContraintesNotReady.remove(contrainte)
@@ -526,7 +526,7 @@ class initialiseAll:
                 # Initialize reclassification table
                 self.display_classification_params(i,contrainte)
 
-            contrainte_status = QCoreApplication.translate("classification","PRÊTE") if contrainte.ready else QCoreApplication.translate("initialisation","NON PRÊTE")
+            contrainte_status = QCoreApplication.translate("classification","PRÊTE") if contrainte.ready else QCoreApplication.translate("full_mce","NON PRÊTE")
             log += f"{contrainte.name}    {contrainte.inputLayer.path}    {contrainte.field_name}    {contrainte_status}\n"
 
         log += "\n"
@@ -563,7 +563,7 @@ class initialiseAll:
                     button = QMessageBox.information(
                         self.iface.dlg,
                         self.error_title,
-                        QCoreApplication.translate("initialisation","Le facteur <b>{0}</b> de type {1} ne devrait pas être \"Normalisé\". Veuillez normaliser ce facteur.").format(factor.name, factor.field_type)
+                        QCoreApplication.translate("full_mce","Le facteur <b>{0}</b> de type {1} ne devrait pas être \"Normalisé\". Veuillez normaliser ce facteur.").format(factor.name, factor.field_type)
                     )
                     return False
                 self.listFactorsNotNormalized.remove(factor)
@@ -683,7 +683,7 @@ class initialiseAll:
             list_inputdata = self.listContraintesNotReady
             text_edit = self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE
         else:
-            first_line = QCoreApplication.translate("normalisation","Paramètres de standardisation:")
+            first_line = QCoreApplication.translate("normalisation","Paramètres de normalisation:")
             log = first_line + QCoreApplication.translate("normalisation","\nFacteur\tChamp\tFonction\tDirection")\
             + "\tA\tB\tC\tD\n----------------------------------------------------------------------------------------------------------------------------\n"
             list_inputdata = self.listFactorsNotNormalized
@@ -726,8 +726,8 @@ class initialiseAll:
             # Show dialog Box
             reply = QMessageBox.question(
                 self.iface.dlg,
-                QCoreApplication.translate("initialisation","Question ..."),
-                QCoreApplication.translate("initialisation","Voulez-vous tout de suite {0} ?").format(question),
+                QCoreApplication.translate("full_mce","Question ..."),
+                QCoreApplication.translate("full_mce","Voulez-vous tout de suite {0} ?").format(question),
                 buttons= QMessageBox.Cancel | QMessageBox.No | QMessageBox.Yes,
             )
             if reply != QMessageBox.Cancel:
@@ -743,17 +743,17 @@ class initialiseAll:
             conRatio = self.weighting.conRatio
             self.iface.dlg.LBL_RC_VALUE.setText(f"RC = {conRatio}")
             if conRatio < 0.1:
-                status = QCoreApplication.translate("ponderation","RC < 0.1. Matrice de jugement cohérent et acceptable!")
+                status = QCoreApplication.translate("weighting","RC < 0.1. Matrice de jugement cohérent et acceptable!")
                 self.iface.dlg.BT_NEXT.setEnabled(True)
                 # Write log into log file
-                first_line = QCoreApplication.translate("ponderation","----------PONDÉRATION----------")
+                first_line = QCoreApplication.translate("weighting","----------PONDÉRATION----------")
                 log = first_line
-                log += QCoreApplication.translate("ponderation","\nMatrice de jugement:")
+                log += QCoreApplication.translate("weighting","\nMatrice de jugement:")
                 log += f"\n{log_params}\n\n{self.weighting.log_weight}\nRC = {conRatio}\t{status}\n\n"
                 self.save_log(log,first_line)
                 self.load_log_file(self.iface.dlg.TE_RUN_PROCESS)
             else:
-                status = QCoreApplication.translate("ponderation","RC >= 0.1. Matrice de jugement non cohérent!\nVeuillez changer les valeurs saisies.")
+                status = QCoreApplication.translate("weighting","RC >= 0.1. Matrice de jugement non cohérent!\nVeuillez changer les valeurs saisies.")
                 self.iface.dlg.BT_NEXT.setEnabled(False)
             self.iface.dlg.LBL_STATUT_MATRICE.setText(status)
         else:
@@ -786,24 +786,24 @@ class initialiseAll:
     def aggregate(self):
         self.iface.dlg.BT_EXECUTE.setEnabled(False)
         self.iface.dlg.TE_RUN_PROCESS.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
-        first_line = QCoreApplication.translate("agregation","----------AGGRÉGATION----------")
+        first_line = QCoreApplication.translate("aggregation","----------AGRÉGATION----------")
         log = first_line
 
         # if all factors and all contraints in same crs
-        test = QCoreApplication.translate("agregation","Vérification des CRS des facteurs et des contraintes ...")
+        test = QCoreApplication.translate("aggregation","Vérification des SCR des facteurs et des contraintes ...")
         self.append_edittext(first_line + "\n" + test )
         QApplication.setOverrideCursor(Qt.WaitCursor)
         inputs_same_crs, max_size_layer = self.inputLayer_same_crs()
         status = ""
 
         if inputs_same_crs:
-            test_result = QCoreApplication.translate("agregation","Super! Les couches sources sont du même type de géométrie.\n\nCréation du formule ...")
+            test_result = QCoreApplication.translate("aggregation","Super! Les couches sources sont du même type de géométrie.\n\nCréation du formule ...")
             self.append_edittext(test_result)
 
             # Get expression
             aggregation = Aggregation(self.listFactors, self.listContraintes, self.weighting.layers_weight)
             expression = aggregation.getexpression()
-            formule = QCoreApplication.translate("agregation","Formule = ") + expression
+            formule = QCoreApplication.translate("aggregation","Formule = ") + expression
             self.append_edittext(formule)
 
             # Commit changes if modified max_size_layer not saved
@@ -835,20 +835,20 @@ class initialiseAll:
             result = aggregation.aggregate(input_path,expression,output_path)
 
             # Write result
-            output_log = QCoreApplication.translate("agregation","Sauvegarde du résultat dans ") + output_path
+            output_log = QCoreApplication.translate("aggregation","Sauvegarde du résultat dans ") + output_path
             self.append_edittext(output_log)
             log = "\n".join([log,formule,output_log])
-            status = QCoreApplication.translate("agregation","\nAgrégation terminée avec succès!")
+            status = QCoreApplication.translate("aggregation","\nAgrégation terminée avec succès!")
 
             # Iterate over the list of temp filepaths & remove each file.
             if input_path != max_size_layer.path:
                 self.remove_temp_file(input_path)
         # else cannot aggregate
         else:
-            status = QCoreApplication.translate("agregation","\nAgrégation impossible! Les couches sources ne sont pas du même type de géométrie.")
+            status = QCoreApplication.translate("aggregation","\nAgrégation impossible! Les couches sources ne sont pas du même type de géométrie.")
 
         QApplication.restoreOverrideCursor()
-        button = QMessageBox.information(self.iface.dlg,QCoreApplication.translate("agregation","Résultat"),status,)
+        button = QMessageBox.information(self.iface.dlg,QCoreApplication.translate("aggregation","Résultat"),status,)
         self.append_edittext(status)
         log += status
         self.save_log(log,first_line)
@@ -860,12 +860,12 @@ class initialiseAll:
             try:
                 os.remove(filePath)
             except:
-                QgsProcessingFeedback.pushInfo(QCoreApplication.translate("agregation","\nError while deleting file") + filePath)
+                QgsProcessingFeedback.pushInfo(QCoreApplication.translate("aggregation","\nErreur lors de la suppression du fichier") + filePath)
 
     def save_matrix(self):
         tab = self.iface.dlg.TBL_JUGEMENT
         output_path, ok = QFileDialog.getSaveFileName(
-            self.iface.dlg, QCoreApplication.translate("initialisation","Sauvegarder la matrice de jugement"), self.iface.dlg.LE_OUTPUT_DIR.text(), 'CSV(*.csv)')
+            self.iface.dlg, QCoreApplication.translate("full_mce","Sauvegarder la matrice de jugement"), self.iface.dlg.LE_OUTPUT_DIR.text(), 'CSV(*.csv)')
 
         nb_columns = range(tab.columnCount())
         headers = [tab.horizontalHeaderItem(column).text() for column in nb_columns]
@@ -879,7 +879,7 @@ class initialiseAll:
     def load_matrix(self):
         tab = self.iface.dlg.TBL_JUGEMENT
         input_path, _filter = QFileDialog.getOpenFileName(
-            self.iface.dlg, QCoreApplication.translate("initialisation","Veuillez choisir le fichier CSV"), "", "*.csv")
+            self.iface.dlg, QCoreApplication.translate("full_mce","Veuillez choisir le fichier CSV"), "", "*.csv")
 
         if _filter:
             with open(input_path) as csvfile:
@@ -930,7 +930,7 @@ class initialiseAll:
 
         text_edit.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
         separator = "#######################################################"
-        text_edit.append(separator + QCoreApplication.translate("initialisation","\nSauvegarde du résultat de:\n"))
+        text_edit.append(separator + QCoreApplication.translate("full_mce","\nSauvegarde du résultat de:\n"))
 
         if reply == QMessageBox.Yes:
             for inputLayer in self.list_inputLayers:
@@ -948,7 +948,7 @@ class initialiseAll:
                     inputLayer.isValid()
         else:
             self.set_fields(list_object_not_ready,field_extension,None, text_edit,False)
-        text_edit.append(QCoreApplication.translate("initialisation","{0} terminés avec succès!").format(process))
+        text_edit.append(QCoreApplication.translate("full_mce","{0} terminées avec succès!").format(process))
         text_edit.append(separator)
         text_edit.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
 
@@ -962,7 +962,7 @@ class initialiseAll:
             object.setfield_idx(inputLayer.vlayer.fields().indexFromName(new_field_name))
             object.setready(2)
             path = inputLayer.reclass_output if new_output_path else object.inputLayer.path
-            text_edit.append(QCoreApplication.translate("initialisation","\"{0}\" dans le champ {2} du fichier {1}\n").format(object.name,path, object.field_name))
+            text_edit.append(QCoreApplication.translate("full_mce","\"{0}\" dans le champ {2} du fichier {1}\n").format(object.name,path, object.field_name))
 
     def remove_new_fields(self):
         QApplication.restoreOverrideCursor()
