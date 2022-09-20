@@ -817,17 +817,20 @@ class initialiseAll:
                 list_inputLayers = self.list_inputLayers.copy()
                 list_inputLayers.remove(max_size_layer)
                 for i,input in enumerate(list_inputLayers):
-                    output_temp_path = os.path.join(output_dir,"output"+f"{i}"+".shp" )
                     # Commit changes if modified layers not saved
                     if not input.name.endswith("_bool") and not input.name.endswith("_fuzz"):
-                        fuzz_path = os.path.join(output_dir,input.name + "_fuzz.shp")
-                        QgsVectorFileWriter.writeAsVectorFormat(input.vlayer, fuzz_path, 'utf-8',driverName='ESRI Shapefile')
-                        input.setpath(fuzz_path)
+                        input.vlayer.commitChanges()
+                        # fuzz_path = os.path.join(output_dir,input.name + "_fuzz.shp")
+                        # QgsVectorFileWriter.writeAsVectorFormat(input.vlayer, fuzz_path, 'utf-8',driverName='ESRI Shapefile')
+                        # input.setpath(fuzz_path)
+
                     # joinbylocation
-                    result = aggregation.joinbylocation(input_path,input.path,output_temp_path)
-                    if i > 0:
-                        self.remove_temp_file(input_path)
-                    input_path = output_temp_path
+                    # output_temp_path = os.path.join(output_dir,"output"+f"{i}"+".shp" )
+                    result = aggregation.joinbylocation(input_path,input.path)
+                    # if i > 0:
+                    #     self.remove_temp_file(input_path)
+                    # input_path = output_temp_path
+                    input_path = result['OUTPUT']
 
             # Agregate
             self.append_edittext("\nLancement de l'agrégation ...")
@@ -841,8 +844,8 @@ class initialiseAll:
             status = QCoreApplication.translate("aggregation","\nAgrégation terminée avec succès!")
 
             # Iterate over the list of temp filepaths & remove each file.
-            if input_path != max_size_layer.path:
-                self.remove_temp_file(input_path)
+            # if input_path != max_size_layer.path:
+            #     self.remove_temp_file(input_path)
         # else cannot aggregate
         else:
             status = QCoreApplication.translate("aggregation","\nAgrégation impossible! Les couches sources ne sont pas du même type de géométrie.")
@@ -853,14 +856,15 @@ class initialiseAll:
         log += status
         self.save_log(log,first_line)
 
-    def remove_temp_file(self, input_path):
-        filename, extension = os.path.splitext(input_path)
-        fileList = glob.glob(f"{filename}"+".*")
-        for filePath in fileList:
-            try:
-                os.remove(filePath)
-            except:
-                QgsProcessingFeedback.pushInfo(QCoreApplication.translate("aggregation","\nErreur lors de la suppression du fichier") + filePath)
+    # def remove_temp_file(self, input_path):
+    #     filename, extension = os.path.splitext(input_path)
+    #     fileList = glob.glob(f"{filename}"+".*")
+    #     for filePath in fileList:
+    #         try:
+    #             QgsVectorFileWriter.deleteShapeFile(filePath)
+    #         except:
+    #             msg = QCoreApplication.translate("aggregation","\nErreur lors de la suppression du fichier") + filePath
+    #             QgsProcessingFeedback.pushInfo(msg)
 
     def save_matrix(self):
         tab = self.iface.dlg.TBL_JUGEMENT
