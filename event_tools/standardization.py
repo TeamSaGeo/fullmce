@@ -136,7 +136,6 @@ class Standardization:
                 dX = value.daysTo(a)
                 dW = b.daysTo(a)
                 val_exp = -1 * value.daysTo(a.addDays(dW/2))
-
             try:
                 exp = math.exp(val_exp)
             except OverflowError:

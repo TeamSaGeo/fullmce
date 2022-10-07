@@ -9,22 +9,22 @@
         <translation>Full MCE for Public Health v1.0</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="48"/>
+        <location filename="../fullmce_dialog_base.ui" line="1270"/>
         <source>Lien</source>
         <translation>Link</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="55"/>
+        <location filename="../fullmce_dialog_base.ui" line="1300"/>
         <source>Annuler</source>
         <translation>Cancel</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="62"/>
+        <location filename="../fullmce_dialog_base.ui" line="1307"/>
         <source>Suivant &gt;</source>
         <translation>Next &gt;</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="75"/>
+        <location filename="../fullmce_dialog_base.ui" line="1280"/>
         <source>Executer</source>
         <translation>Execute</translation>
     </message>
@@ -36,57 +36,57 @@
     <message>
         <location filename="../fullmce_dialog_base.ui" line="153"/>
         <source>Plugin d&apos;Analyse Multicritère pour la santé publique</source>
-        <translation>Full MCE plugin for Public Health</translation>
+        <translation type="obsolete">Full MCE plugin for Public Health</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="166"/>
+        <location filename="../fullmce_dialog_base.ui" line="112"/>
         <source>Version</source>
         <translation>Desktop version</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="197"/>
+        <location filename="../fullmce_dialog_base.ui" line="142"/>
         <source>Fonctions</source>
         <translation>Features</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="1149"/>
+        <location filename="../fullmce_dialog_base.ui" line="1042"/>
         <source>Normalisation des facteurs</source>
         <translation>Factor Standardization</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="234"/>
         <source>Pondération par la méthode de comparaison par paires</source>
-        <translation>Factor weighting with the pair-wise comparison method</translation>
+        <translation type="obsolete">Factor weighting with the pair-wise comparison method</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="259"/>
         <source>Agrégation par la méthode de combinaison linéaire pondérée </source>
-        <translation>Criteria Aggregation with the weighted linear combination</translation>
+        <translation type="obsolete">Criteria Aggregation with the weighted linear combination</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="845"/>
+        <location filename="../fullmce_dialog_base.ui" line="747"/>
         <source>Reclassification des contraintes</source>
         <translation>Contraints classification</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="319"/>
+        <location filename="../fullmce_dialog_base.ui" line="237"/>
         <source>Concepteurs</source>
         <translation>Plugin designers</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="339"/>
         <source>Développeur</source>
-        <translation>Developer</translation>
+        <translation type="obsolete">Developer</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="355"/>
+        <location filename="../fullmce_dialog_base.ui" line="272"/>
         <source>1.0</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="386"/>
         <source>À propos</source>
-        <translation>About</translation>
+        <translation type="obsolete">About</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="990"/>
@@ -94,27 +94,27 @@
         <translation type="obsolete">Input data</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="457"/>
+        <location filename="../fullmce_dialog_base.ui" line="371"/>
         <source>...</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="480"/>
         <source>Répertoire de sortie</source>
-        <translation>Output folder</translation>
+        <translation type="obsolete">Output folder</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="516"/>
         <source>Données d&apos;entrée: CONTRAINTES</source>
-        <translation>Input data: CONTRAINTS</translation>
+        <translation type="obsolete">Input data: CONTRAINTS</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="1110"/>
+        <location filename="../fullmce_dialog_base.ui" line="1004"/>
         <source>nombre</source>
         <translation>count</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="543"/>
+        <location filename="../fullmce_dialog_base.ui" line="453"/>
         <source>Nombre de contraintes</source>
         <translation>Number of contraints</translation>
     </message>
@@ -134,22 +134,22 @@
         <translation type="obsolete">Classification parameters</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="712"/>
+        <location filename="../fullmce_dialog_base.ui" line="617"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="744"/>
+        <location filename="../fullmce_dialog_base.ui" line="648"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="868"/>
         <source>Données d&apos;entrée: FACTEURS</source>
-        <translation>Input data: FACTORS</translation>
+        <translation type="obsolete">Input data: FACTORS</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="1113"/>
+        <location filename="../fullmce_dialog_base.ui" line="1007"/>
         <source>Nombre de facteurs</source>
         <translation>Number of factors</translation>
     </message>
@@ -164,49 +164,59 @@
         <translation type="obsolete">Factor weighting: Pair-wise comparison method</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="1202"/>
+        <location filename="../fullmce_dialog_base.ui" line="1092"/>
         <source>Matrice de jugement</source>
         <translation>Comparison matrix</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="1208"/>
+        <location filename="../fullmce_dialog_base.ui" line="1124"/>
         <source>Importer</source>
         <translation>Import</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="1215"/>
+        <location filename="../fullmce_dialog_base.ui" line="1174"/>
         <source>Enregistrer</source>
         <translation>Save</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="1241"/>
+        <location filename="../fullmce_dialog_base.ui" line="1104"/>
         <source>Tester</source>
         <translation>Test</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="1248"/>
+        <location filename="../fullmce_dialog_base.ui" line="1157"/>
         <source>Statut matrice</source>
         <translation>Matrix status</translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="1261"/>
+        <location filename="../fullmce_dialog_base.ui" line="1137"/>
         <source>RC =</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../fullmce_dialog_base.ui" line="1310"/>
+        <location filename="../fullmce_dialog_base.ui" line="1212"/>
         <source>Traitements</source>
         <translation>Processing</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="998"/>
         <source>NB: Veuillez créer des copies des couches entrées avant leurs manipulations.</source>
-        <translation>NB: Please create copies of the layers entered before their manipulations.</translation>
+        <translation type="obsolete">NB: Please create copies of the layers entered before their manipulations.</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="687"/>
         <source>Paramètres de reclassification (par défaut nouvelle valeur = 0)</source>
-        <translation>Classification parameters (default new value =0)</translation>
+        <translation type="obsolete">Classification parameters (default new value =0)</translation>
+    </message>
+    <message>
+        <location filename="../fullmce_dialog_base.ui" line="1187"/>
+        <source>Effacer</source>
+        <translation>Reset</translation>
+    </message>
+    <message>
+        <location filename="../fullmce_dialog_base.ui" line="1241"/>
+        <source>Paramètres des traitements</source>
+        <translation>Processing parameters</translation>
     </message>
 </context>
 <context>
@@ -214,63 +224,73 @@
     <message>
         <location filename="../event_tools/initialiseAll.py" line="789"/>
         <source>----------AGRÉGATION----------</source>
-        <translation>----------AGGREGATION----------</translation>
+        <translation type="obsolete">----------AGGREGATION----------</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="793"/>
         <source>Vérification des SCR des facteurs et des contraintes ...</source>
-        <translation>Verification of CRS of factors and constraints</translation>
+        <translation type="obsolete">Verification of CRS of factors and constraints</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="801"/>
         <source>Super! Les couches sources sont du même type de géométrie.
 
 Création du formule ...</source>
-        <translation>Great! The source layers have the same geometry type.
+        <translation type="obsolete">Great! The source layers have the same geometry type.
 
 Creating the expression...</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="807"/>
+        <location filename="../event_tools/initialiseAll.py" line="827"/>
         <source>Formule = </source>
         <translation>Expression = </translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="839"/>
         <source>Sauvegarde du résultat dans </source>
-        <translation>Saving result in</translation>
+        <translation type="obsolete">Saving result in</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="842"/>
         <source>
 Agrégation terminée avec succès!</source>
-        <translation>
+        <translation type="obsolete">
 Aggregation finished succesfully!</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="849"/>
         <source>
 Agrégation impossible! Les couches sources ne sont pas du même type de géométrie.</source>
-        <translation>
+        <translation type="obsolete">
 Aggregation impossible! The source layers have not the same geometry type.</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="852"/>
         <source>Résultat</source>
-        <translation>Result</translation>
+        <translation type="obsolete">Result</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="864"/>
         <source>
 Erreur lors de la suppression du fichier</source>
-        <translation>
+        <translation type="obsolete">
 Error while removing file</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="340"/>
+        <source>Annuler</source>
+        <translation>Cancel</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="867"/>
+        <source>Terminé</source>
+        <translation>Exit</translation>
     </message>
 </context>
 <context>
     <name>classification</name>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="507"/>
+        <location filename="../event_tools/initialiseAll.py" line="513"/>
         <source>Traitement initié le {0}
 
 Répértoire de sortie: {1}
@@ -292,22 +312,61 @@ Number of constraints: {2}
     <message>
         <location filename="../event_tools/initialiseAll.py" line="529"/>
         <source>PRÊTE</source>
-        <translation>READY</translation>
+        <translation type="obsolete">READY</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="681"/>
         <source>Paramètres de reclassification:</source>
-        <translation>Classification parameters:</translation>
+        <translation type="obsolete">Classification parameters:</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="718"/>
+        <location filename="../event_tools/initialiseAll.py" line="745"/>
         <source>reclassifier les contraintes</source>
         <translation>classify contraints</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="922"/>
+        <location filename="../event_tools/initialiseAll.py" line="937"/>
         <source>Reclassification</source>
         <translation>Classification</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/classification.py" line="38"/>
+        <source>
+{0}) Contrainte &quot;{1}&quot;: Champ {2} (Type {3})
+</source>
+        <translation>
+{0}) Contraint &quot;{1}&quot;: Field {2} (Type {3})
+</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/classification.py" line="57"/>
+        <source>Sélectionner la contrainte &quot;{0}&quot; afin d&apos;ajouter les paramètres de reclassification</source>
+        <translation>Select the &quot;{0}&quot; contraint to add the classification parameters</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/classification.py" line="62"/>
+        <source>en entier</source>
+        <translation>integer</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/classification.py" line="65"/>
+        <source>Initiale (différente)</source>
+        <translation>Initial (different)</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/classification.py" line="67"/>
+        <source>début</source>
+        <translation>start</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/classification.py" line="69"/>
+        <source>finale (supérieure à la valeur Début)</source>
+        <translation>end (greater than start value)</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/classification.py" line="70"/>
+        <source>&lt;b&gt;Contrainte &quot;{0}&quot;:&lt;/b&gt; Saisir une valeur {1} valide à la ligne {2} .</source>
+        <translation>&lt;b&gt;Contraint &quot;{0}&quot;:&lt;/b&gt; Enter a valid {1} value at row {2} .</translation>
     </message>
 </context>
 <context>
@@ -434,166 +493,215 @@ Number of constraints: {2}
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="248"/>
-        <source>La valeur en entrée doit être comprise entre 0.1111 et 9.</source>
-        <translation>The input value must be between 0.1111 and 9.</translation>
+        <source>La valeur en entrée doit être comprise entre 0.11 et 9.</source>
+        <translation>The input value must be between 0.11 and 9.</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="265"/>
         <source>Veuillez saisir une valeur en entier ou réelle valide à la ligne {0} - colonne {1}!</source>
-        <translation>Enter a valid integer or real value at row {0} - column {1}!</translation>
+        <translation type="obsolete">Enter a valid integer or real value at row {0} - column {1}!</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="272"/>
         <source>Veuillez sélectionner le répertoire de sortie</source>
-        <translation>Select the output folder</translation>
+        <translation type="obsolete">Select the output folder</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="283"/>
         <source>Veuillez choisir un répertoire de sortie!</source>
-        <translation>Choose an output folder</translation>
+        <translation type="obsolete">Choose an output folder</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="434"/>
+        <location filename="../event_tools/initialiseAll.py" line="439"/>
         <source>Veuillez choisir un vecteur</source>
         <translation>Choose a vector image</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="453"/>
+        <location filename="../event_tools/initialiseAll.py" line="458"/>
         <source>Veuillez choisir un fichier valide!</source>
         <translation>Choose a valid file!</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="480"/>
         <source>Veuillez saisir un nom pour le {0} n° {1}</source>
-        <translation>Input a name for the {0} n° {1}</translation>
+        <translation type="obsolete">Input a name for the {0} n° {1}</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="481"/>
         <source>Veuillez sélectionner une image pour le {0} n° {1}</source>
-        <translation>Choose a vector for the {0} n° {1}</translation>
+        <translation type="obsolete">Choose a vector for the {0} n° {1}</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="482"/>
         <source>Champ dupliqué! Veuillez choisir des champs différents pour les {0}s issus du même fichier source.</source>
-        <translation>Duplicate field! Please choose different fields for {0}s from the same source file.</translation>
+        <translation type="obsolete">Duplicate field! Please choose different fields for {0}s from the same source file.</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="518"/>
         <source>Le contrainte &lt;b&gt;{0}&lt;/b&gt; de type &quot;String&quot; ne devrait pas être &quot;Prêt&quot;. Veuillez reclassifier ce contrainte.</source>
-        <translation>Constraint &lt;b&gt;{0}&lt;/b&gt; of type &quot;String&quot; should not be &quot;Ready&quot;. Please reclassify this constraint.</translation>
+        <translation type="obsolete">Constraint &lt;b&gt;{0}&lt;/b&gt; of type &quot;String&quot; should not be &quot;Ready&quot;. Please reclassify this constraint.</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="529"/>
         <source>NON PRÊTE</source>
-        <translation>NOT READY</translation>
+        <translation type="obsolete">NOT READY</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="563"/>
         <source>Le facteur &lt;b&gt;{0}&lt;/b&gt; de type {1} ne devrait pas être &quot;Normalisé&quot;. Veuillez normaliser ce facteur.</source>
-        <translation>Factor &lt;b&gt;{0}&lt;/b&gt; of type {1} should not be &quot;Standardized&quot;. Please stadardize this factor.</translation>
+        <translation type="obsolete">Factor &lt;b&gt;{0}&lt;/b&gt; of type {1} should not be &quot;Standardized&quot;. Please stadardize this factor.</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="727"/>
+        <location filename="../event_tools/initialiseAll.py" line="625"/>
         <source>Question ...</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="727"/>
         <source>Voulez-vous tout de suite {0} ?</source>
-        <translation>Do you want to proceed right now {0}?</translation>
+        <translation type="obsolete">Do you want to proceed right now {0}?</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="868"/>
+        <location filename="../event_tools/initialiseAll.py" line="876"/>
         <source>Sauvegarder la matrice de jugement</source>
         <translation>Save judgment matrix</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="882"/>
+        <location filename="../event_tools/initialiseAll.py" line="890"/>
         <source>Veuillez choisir le fichier CSV</source>
         <translation>Choose CSV file</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="934"/>
+        <location filename="../event_tools/initialiseAll.py" line="949"/>
         <source>
 Sauvegarde du résultat de:
 </source>
-        <translation type="unfinished">
+        <translation>
 Saving the result of:
 </translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="952"/>
-        <source>{0} terminées avec succès!</source>
-        <translation>{0} succesfully finished!</translation>
+        <location filename="../event_tools/initialiseAll.py" line="967"/>
+        <source>
+{0} terminées avec succès!</source>
+        <translation>
+{0} succesfully finished!</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="966"/>
+        <location filename="../event_tools/initialiseAll.py" line="980"/>
         <source>&quot;{0}&quot; dans le champ {2} du fichier {1}
 </source>
         <translation>&quot;{0}&quot; at the field {2} in file {1}</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="485"/>
+        <source>Veuillez saisir un nom pour le {0} nÂ° {1}</source>
+        <translation>Please,enter a name to the {0} nÂ° {1}</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="486"/>
+        <source>Veuillez sélectionner une image pour le {0} nÂ° {1}</source>
+        <translation>Choose a vector for the {0} n° {1}</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="625"/>
+        <source>Voulez-vous sauvegarder les résultats dans d&apos;autres fichiers?</source>
+        <translation>Do you want to save result in new files?</translation>
     </message>
 </context>
 <context>
     <name>normalisation</name>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="549"/>
+        <location filename="../event_tools/initialiseAll.py" line="560"/>
         <source>----------NORMALISATION----------</source>
         <translation>----------STANDARDIZATION----------</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="551"/>
+        <location filename="../event_tools/initialiseAll.py" line="562"/>
         <source>
 Nombre de facteurs: {0}
 </source>
         <translation>
-Nunmber of factors: {0}</translation>
+Number of factors: {0}
+
+</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="573"/>
+        <location filename="../event_tools/initialiseAll.py" line="584"/>
         <source>NON NORMALISÉ</source>
         <translation>NOT STANDARDIZED</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="578"/>
+        <location filename="../event_tools/initialiseAll.py" line="589"/>
         <source>Le facteur &lt;b&gt;{0}&lt;/b&gt; est de type &quot;String&quot;. Voulez-vous le reclassifier ?</source>
         <translation>The factor &lt;b&gt;{0}&lt;/b&gt; has type &quot;String&quot;. Do you want to reclassify it ?</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="579"/>
+        <location filename="../event_tools/initialiseAll.py" line="590"/>
         <source>Les facteurs &lt;b&gt;{0}&lt;/b&gt; sont de type &quot;String&quot;. Voulez-vous les reclassifier? </source>
         <translation>The factors &lt;b&gt;{0}&lt;/b&gt; have type &quot;String&quot;. Do you want to reclassify them ?</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="581"/>
+        <location filename="../event_tools/initialiseAll.py" line="592"/>
         <source>Question ...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="686"/>
+        <location filename="../event_tools/initialiseAll.py" line="713"/>
         <source>Paramètres de normalisation:</source>
         <translation>Standardization parameters:</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="687"/>
+        <location filename="../event_tools/initialiseAll.py" line="714"/>
         <source>
 Facteur	Champ	Fonction	Direction</source>
         <translation>
 Factor	Field	Function	Direction</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="721"/>
+        <location filename="../event_tools/initialiseAll.py" line="748"/>
         <source>normaliser les facteurs</source>
         <translation>standardize the factors</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="928"/>
+        <location filename="../event_tools/initialiseAll.py" line="943"/>
         <source>Normalisation</source>
         <translation>Standardization</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="581"/>
         <source>{0} Sinon, veuillez choisir des champs de type entier ou réelle.</source>
-        <translation>{0} Otherwise, please choose integer or real type fields.</translation>
+        <translation type="obsolete">{0} Otherwise, please choose integer or real type fields.</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="584"/>
+        <source>NORMALISÉ</source>
+        <translation>STANDARDIZED</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/standardization.py" line="116"/>
+        <source> (strictement supérieure à celle de la colonne {0})</source>
+        <translation> (greater than column {0} value)</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/standardization.py" line="117"/>
+        <source>&lt;b&gt;Facteur &quot;{0}&quot;:&lt;/b&gt; Saisir une valeur de type &lt;b&gt;{3}&lt;/b&gt; valide à la colonne {1}{2}.</source>
+        <translation>&lt;b&gt;Factor &quot;{0}&quot;:&lt;/b&gt;Enter a valid &lt;b&gt;{3}&lt;/b&gt; value valide at column {1}{2}.</translation>
+    </message>
+</context>
+<context>
+    <name>ponderation</name>
+    <message>
+        <location filename="../event_tools/weighting.py" line="18"/>
+        <source>Poids des facteurs:
+</source>
+        <translation>Factors weight:
+</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/weighting.py" line="56"/>
+        <source>Veuillez saisir une valeur en entier ou réelle valide à la ligne &lt;b&gt;{0}&lt;/b&gt; à la colonne &lt;b&gt;{1}&lt;/b&gt;!</source>
+        <translation>Please, enter a valid integer or real value at row &lt;b&gt;{0}&lt;/b&gt; at column &lt;b&gt;{1}&lt;/b&gt;</translation>
     </message>
 </context>
 <context>
@@ -606,7 +714,7 @@ Factor	Field	Function	Direction</translation>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="746"/>
         <source>RC &lt; 0.1. Matrice de jugement cohérent et acceptable!</source>
-        <translation>CR &lt; 0.1. Consistent and Acceptable judgment Matrix!</translation>
+        <translation type="obsolete">CR &lt; 0.1. Consistent and Acceptable judgment Matrix!</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="749"/>
@@ -614,16 +722,17 @@ Factor	Field	Function	Direction</translation>
         <translation>----------WEIGHTING----------</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="751"/>
+        <location filename="../event_tools/initialiseAll.py" line="770"/>
         <source>
 Matrice de jugement:</source>
-        <translation>Judgment matrix</translation>
+        <translation>
+Judgment matrix:</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="756"/>
         <source>RC &gt;= 0.1. Matrice de jugement non cohérent!
 Veuillez changer les valeurs saisies.</source>
-        <translation>CR &gt;= 0.1. Inconsistent judgment matrix!
+        <translation type="obsolete">CR &gt;= 0.1. Inconsistent judgment matrix!
 Please change the entered values.</translation>
     </message>
 </context>

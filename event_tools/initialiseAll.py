@@ -244,15 +244,17 @@ class initialiseAll:
         if sym and val != "":
             try:
                 val = float(val)
-                if val < 0.111 or val > 9:
+                if val < 0.11 or val > 9:
                     button = QMessageBox.information(
                         self.iface.dlg,
                         self.error_title,
-                        QCoreApplication.translate("full_mce","La valeur en entrée doit être comprise entre 0.1111 et 9."),
+                        QCoreApplication.translate("full_mce","La valeur en entrée doit être comprise entre 0.11 et 9."),
                         )
                     tab.cellWidget(row,col).setText('')
                 else:
                     reverse_val = 1 / val
+                    if reverse_val >= 9:
+                        reverse_val = float(9)
                     if round(reverse_val,2).is_integer():
                         decimals = 0
                     else:
@@ -286,7 +288,7 @@ class initialiseAll:
                 QCoreApplication.translate("full_mce","Veuillez choisir un répertoire de sortie!"),
                 )
         elif (self.pageInd == 2 and not self.contraintes_filled()) \
-            or ((self.pageInd == 3 or self.pageInd == 6 )and not self.run_process()) \
+            or ((self.pageInd == 3 or self.pageInd == 6)and not self.run_process()) \
             or ((self.pageInd == 4 or self.pageInd == 7) and not self.continue_next_process()) \
             or (self.pageInd == 5 and not self.factors_filled()):
             self.pageInd = self.iface.dlg.STACKED_WIDGET.currentIndex()
@@ -294,7 +296,8 @@ class initialiseAll:
             self.pageInd = 5
             self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
             self.iface.dlg.BT_PREVIOUS.setEnabled(True)
-        elif (self.pageInd == 5 and self.listFactorsNotNormalized == []) or (self.pageInd == 6 and self.iface.dlg.TE_RUN_PROCESS_NORMALISATION.document().isEmpty()):
+        elif (self.pageInd == 5 and self.listFactorsNotNormalized == []) \
+            or (self.pageInd == 6 and self.iface.dlg.TE_RUN_PROCESS_NORMALISATION.document().isEmpty()):
             self.pageInd = 8
             self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
             self.iface.dlg.BT_NEXT.setEnabled(False)
@@ -334,6 +337,8 @@ class initialiseAll:
             self.iface.dlg.BT_NEXT.setEnabled(True)
         elif self.pageInd == 8:
             self.iface.dlg.BT_EXECUTE.setEnabled(False)
+            exit = QCoreApplication.translate("aggregation","Annuler")
+            self.iface.dlg.BT_CANCEL.setText(exit)
         self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
 
     def update_listData(self,tbl,sb):
@@ -478,7 +483,7 @@ class initialiseAll:
         if not element.name or element.inputLayer.path == "" or element.inputLayer.field_is_duplicated(element.type):
             type = "contrainte" if element.type == "contraint" else "facteur"
             msg_name = QCoreApplication.translate("full_mce","Veuillez saisir un nom pour le {0} n° {1}").format(type,i+1)
-            msg_path = QCoreApplication.translate("full_mce","Veuillez sélectionner une image pour le {0} n° {1}").format(type,i+1)
+            msg_path = QCoreApplication.translate("full_mce","Veuillez sélectionner un vecteur pour le {0} n° {1}").format(type,i+1)
             msg_field = QCoreApplication.translate("full_mce","Champ dupliqué! Veuillez choisir des champs différents pour les {0}s issus du même fichier source.").format(type)
             error_msg = msg_name if not element.name else msg_path if element.inputLayer.path == "" else msg_field
             button = QMessageBox.information(
@@ -537,6 +542,12 @@ class initialiseAll:
 
         self.iface.dlg.STACKED_WIDGET_RECLASS.setCurrentIndex(-1)
         self.iface.dlg.BT_ADD_ROW_CONTRAINTE.setEnabled(False)
+
+        # Show dialog Box
+        # Show dialog Box
+        self.save_layer_into_new_file = self.get_reply(self.listContraintesNotReady)
+        if self.save_layer_into_new_file == QMessageBox.Cancel:
+            return False
 
         return True
 
@@ -601,7 +612,23 @@ class initialiseAll:
         log += "\n"
         self.save_log(log,first_line)
         self.init_weighting_table()
+
+        # Show dialog Box
+        self.save_layer_into_new_file = self.get_reply(self.listFactorsNotNormalized)
+        if self.save_layer_into_new_file == QMessageBox.Cancel:
+            return False
+
         return True
+
+    def get_reply (self, list):
+        if len(list) > 0:
+            reply = QMessageBox.question(
+                self.iface.dlg,
+                QCoreApplication.translate("full_mce","Question ..."),
+                QCoreApplication.translate("full_mce","Voulez-vous sauvegarder les résultats dans d'autres fichiers?"),
+                buttons= QMessageBox.Cancel | QMessageBox.No | QMessageBox.Yes,
+            )
+            return reply
 
     def select_contrainte_not_ready(self):
         # display selected containte tab
@@ -723,15 +750,7 @@ class initialiseAll:
         if text_edit.toPlainText().endswith("#"):
             return True
         else:
-            # Show dialog Box
-            reply = QMessageBox.question(
-                self.iface.dlg,
-                QCoreApplication.translate("full_mce","Question ..."),
-                QCoreApplication.translate("full_mce","Voulez-vous tout de suite {0} ?").format(question),
-                buttons= QMessageBox.Cancel | QMessageBox.No | QMessageBox.Yes,
-            )
-            if reply != QMessageBox.Cancel:
-                self.save_layer_into_file(reply,text_edit)
+            self.save_layer_into_file(self.save_layer_into_new_file,text_edit)
             return False
 
     def weighting(self):
@@ -785,6 +804,7 @@ class initialiseAll:
 
     def aggregate(self):
         self.iface.dlg.BT_EXECUTE.setEnabled(False)
+        self.iface.dlg.BT_PREVIOUS.setEnabled(False)
         self.iface.dlg.TE_RUN_PROCESS.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
         first_line = QCoreApplication.translate("aggregation","----------AGRÉGATION----------")
         log = first_line
@@ -807,34 +827,27 @@ class initialiseAll:
             self.append_edittext(formule)
 
             # Commit changes if modified max_size_layer not saved
-            if not max_size_layer.name.endswith("_bool") and not max_size_layer.name.endswith("_fuzz"):
-                max_size_layer.vlayer.commitChanges()
+            max_size_layer.vlayer.commitChanges()
 
             # if multiple layers, Join them by location
             input_path = max_size_layer.path
-            output_dir = self.iface.dlg.LE_OUTPUT_DIR.text()
+            fields = max_size_layer.vlayer.fields()
             if len(self.list_inputLayers) != 1:
                 list_inputLayers = self.list_inputLayers.copy()
                 list_inputLayers.remove(max_size_layer)
                 for i,input in enumerate(list_inputLayers):
                     # Commit changes if modified layers not saved
-                    if not input.name.endswith("_bool") and not input.name.endswith("_fuzz"):
-                        input.vlayer.commitChanges()
-                        # fuzz_path = os.path.join(output_dir,input.name + "_fuzz.shp")
-                        # QgsVectorFileWriter.writeAsVectorFormat(input.vlayer, fuzz_path, 'utf-8',driverName='ESRI Shapefile')
-                        # input.setpath(fuzz_path)
+                    input.vlayer.commitChanges()
 
                     # joinbylocation
-                    # output_temp_path = os.path.join(output_dir,"output"+f"{i}"+".shp" )
+                    joinfields = list(set(fields + input.vlayer.fields()))
                     result = aggregation.joinbylocation(input_path,input.path)
-                    # if i > 0:
-                    #     self.remove_temp_file(input_path)
-                    # input_path = output_temp_path
                     input_path = result['OUTPUT']
+                    fields = joinfields
 
             # Agregate
             self.append_edittext("\nLancement de l'agrégation ...")
-            output_path = os.path.join(output_dir,"resultat_final.shp" )
+            output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),"resultat_final.shp" )
             result = aggregation.aggregate(input_path,expression,output_path)
 
             # Write result
@@ -843,9 +856,6 @@ class initialiseAll:
             log = "\n".join([log,formule,output_log])
             status = QCoreApplication.translate("aggregation","\nAgrégation terminée avec succès!")
 
-            # Iterate over the list of temp filepaths & remove each file.
-            # if input_path != max_size_layer.path:
-            #     self.remove_temp_file(input_path)
         # else cannot aggregate
         else:
             status = QCoreApplication.translate("aggregation","\nAgrégation impossible! Les couches sources ne sont pas du même type de géométrie.")
@@ -853,18 +863,13 @@ class initialiseAll:
         QApplication.restoreOverrideCursor()
         button = QMessageBox.information(self.iface.dlg,QCoreApplication.translate("aggregation","Résultat"),status,)
         self.append_edittext(status)
+        self.iface.dlg.BT_PREVIOUS.setEnabled(True)
+        exit = QCoreApplication.translate("aggregation","Terminé")
+        self.iface.dlg.BT_CANCEL.setText(exit)
+
+        # Save log
         log += status
         self.save_log(log,first_line)
-
-    # def remove_temp_file(self, input_path):
-    #     filename, extension = os.path.splitext(input_path)
-    #     fileList = glob.glob(f"{filename}"+".*")
-    #     for filePath in fileList:
-    #         try:
-    #             QgsVectorFileWriter.deleteShapeFile(filePath)
-    #         except:
-    #             msg = QCoreApplication.translate("aggregation","\nErreur lors de la suppression du fichier") + filePath
-    #             QgsProcessingFeedback.pushInfo(msg)
 
     def save_matrix(self):
         tab = self.iface.dlg.TBL_JUGEMENT
@@ -897,6 +902,13 @@ class initialiseAll:
                                 cellwidget.setText(value)
                             else:
                                 break
+
+    def reset_matrix(self):
+        tab = self.iface.dlg.TBL_JUGEMENT
+        for row in range(tab.rowCount()):
+            for column in range(tab.columnCount()):
+                if row != column :
+                    tab.cellWidget(row, column).setText("")
 
     def save_log(self,log,first_line):
         with open(self.log_path, "r") as input:
@@ -952,13 +964,12 @@ class initialiseAll:
                     inputLayer.isValid()
         else:
             self.set_fields(list_object_not_ready,field_extension,None, text_edit,False)
-        text_edit.append(QCoreApplication.translate("full_mce","{0} terminées avec succès!").format(process))
+        text_edit.append(QCoreApplication.translate("full_mce","\n{0} terminées avec succès!").format(process))
         text_edit.append(separator)
         text_edit.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
 
     def set_fields(self,object_not_ready,field_extension, inputLayer, text_edit, new_output_path):
         for object in object_not_ready:
-            # new_field_name = object.field_name[:-2] + field_extension
             # Set object status
             new_field_name = object.name + field_extension
             if not new_output_path:
@@ -973,12 +984,10 @@ class initialiseAll:
         if self.pageInd == 9:
             for contrainte in self.listContraintesNotReady:
                 if not contrainte.inputLayer.path.endswith("_bool.shp"):
-                    # new_field_name = contrainte.field_name[:-2] + "Bl"
                     new_field_name = contrainte.name + "Bl"
                     contrainte.inputLayer.delete_new_field(new_field_name)
             for factor in self.listFactorsNotNormalized:
                 if not factor.inputLayer.path.endswith("_fuzz.shp"):
-                    # new_field_name = factor.field_name[:-2] + "Fz"
                     new_field_name = factor.name + "Fz"
                     factor.inputLayer.delete_new_field(new_field_name)
 
@@ -1010,6 +1019,8 @@ class initialiseAll:
 
             # On click on Tester
             self.iface.dlg.BT_TEST_JUGEMENT.clicked.connect(self.weighting)
+            # On click on Reset
+            self.iface.dlg.BT_RESET.clicked.connect(lambda: self.reset_matrix())
             # On click on Enregistrer
             self.iface.dlg.BT_SAVE_MATRIX.clicked.connect(lambda: self.save_matrix())
             # On click on Importer
