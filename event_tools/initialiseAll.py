@@ -65,12 +65,12 @@ class initialiseAll:
         self.iface.dlg.TE_INFO.setText(text)
 
         # Populate LBL_ROHY
-        self.iface.dlg.LBL_ROHY.setText(
-              "<a href=\"mailto:sfamenontsoa@pasteur.mg\">" + QCoreApplication.translate("full_mce","Suggestions ou Remarques") + "</a>")
-        self.iface.dlg.LBL_ROHY.setTextFormat(Qt.RichText)
-        self.iface.dlg.LBL_ROHY.setTextInteractionFlags(
-            Qt.TextBrowserInteraction)
-        self.iface.dlg.LBL_ROHY.setOpenExternalLinks(True)
+        # self.iface.dlg.LBL_ROHY.setText(
+        #       "<a href=\"mailto:sfamenontsoa@pasteur.mg\">" + QCoreApplication.translate("full_mce","Suggestions ou Remarques") + "</a>")
+        # self.iface.dlg.LBL_ROHY.setTextFormat(Qt.RichText)
+        # self.iface.dlg.LBL_ROHY.setTextInteractionFlags(
+        #     Qt.TextBrowserInteraction)
+        # self.iface.dlg.LBL_ROHY.setOpenExternalLinks(True)
 
     def init_inputData_table(self, columns, tbl, sb):
         tbl.setColumnCount(len(columns))
@@ -85,12 +85,12 @@ class initialiseAll:
         sb.valueChanged.connect(lambda: self.update_listData(tbl,sb))
 
     def init_classification_table(self):
-        name = QCoreApplication.translate("full_mce","Noms")
-        path = QCoreApplication.translate("full_mce","Chemins")
+        name = QCoreApplication.translate("full_mce","Nom")
+        path = QCoreApplication.translate("full_mce","Répertoire")
         field = QCoreApplication.translate("full_mce","Champ")
         type = QCoreApplication.translate("full_mce","Type")
         scr = QCoreApplication.translate("full_mce","SCR")
-        ready = QCoreApplication.translate("full_mce","Prêts")
+        ready = QCoreApplication.translate("full_mce","Prêt")
         columns = [name, path, "", field, type, scr, ready]
         self.init_inputData_table(columns,self.iface.dlg.TBL_CONTRAINTE,self.iface.dlg.SB_NB_CONTRAINTE)
 
@@ -107,7 +107,7 @@ class initialiseAll:
         # Get columns name
         tab = self.iface.dlg.TBL_CONTRAINTE
         columns =  [tab.horizontalHeaderItem(col).text() for col in range(tab.columnCount())]
-        normalized = QCoreApplication.translate("full_mce","Normalisés")
+        normalized = QCoreApplication.translate("full_mce","Normalisé")
         columns[-1] = normalized
 
         # Initialize standardization input table
@@ -118,19 +118,22 @@ class initialiseAll:
 
     def display_standardization_params(self):
         tab = self.iface.dlg.TBL_DATA_STANDARDIZATION
-        name = QCoreApplication.translate("full_mce","Noms")
-        fonctions = QCoreApplication.translate("full_mce","Fonctions")
+        name = QCoreApplication.translate("full_mce","Nom")
+        fonctions = QCoreApplication.translate("full_mce","Fonction")
         sens = QCoreApplication.translate("full_mce","Sens")
-        columns = [name, fonctions, sens, "A", "B", "C", "D"]
+        inclued_value = QCoreApplication.translate("full_mce","Inclus")
+        columns = [name, fonctions, sens, "A", inclued_value, "B", inclued_value, "C",inclued_value, "D", inclued_value]
         tab.setColumnCount(len(columns))
         tab.setHorizontalHeaderLabels(columns)
-        tab.horizontalHeader().setSectionResizeMode(0,QHeaderView.Stretch)
-        tab.horizontalHeader().setSectionResizeMode(1,QHeaderView.ResizeToContents)
-        tab.horizontalHeader().setSectionResizeMode(2,QHeaderView.Stretch)
+        tab.horizontalHeader().setSectionResizeMode(1,QHeaderView.Stretch)
+        for i in range(3,11):
+            if (i % 2) == 0:
+                tab.horizontalHeader().setSectionResizeMode(i,QHeaderView.ResizeToContents)
+            else:
+                tab.setColumnWidth(i,80)
+
         tab.verticalHeader().setVisible(True)
         tab.setRowCount(0)
-        tab.setStyleSheet(
-            "QTableWidget::item {border: 0px; padding: 4px;}")
 
     def display_classification_params(self, i, contrainte):
         ###---------Initialize List contrainte not ready Widget----------
@@ -147,7 +150,7 @@ class initialiseAll:
             start_value = QCoreApplication.translate("full_mce","Début")
             start_value_inclued =QCoreApplication.translate("full_mce","Inclus")
             end_value = QCoreApplication.translate("full_mce","Fin")
-            end_value_inclued= QCoreApplication.translate("full_mce","Inclus")
+            end_value_inclued= start_value_inclued
             columns.extend([start_value, start_value_inclued,end_value,end_value_inclued])
         tab.setColumnCount(len(columns))
         tab.setHorizontalHeaderLabels(columns)
@@ -195,18 +198,23 @@ class initialiseAll:
         factor_direction.setCurrentIndex(1)
 
     def add_standardization_column(self,tab,row, ind):
-        for col in range(3,7):
-            factor_param = QLineEdit()
-            factor_param.setFont(self.myFont)
-            tab.setCellWidget(row, col, factor_param)
+        for col in range(3,11):
+            if (col % 2) != 0 :
+                factor_param = QLineEdit()
+                factor_param.setFont(self.myFont)
+                tab.setCellWidget(row, col, factor_param)
+            else:
+                inclued_value = QCheckBox()
+                tab.setCellWidget(row,col,inclued_value)
+                inclued_value.setStyleSheet("margin-left:10%;");
         if ind == 0:
-            for col in range(3,5):
+            for col in range(3,7):
                 tab.removeCellWidget(row, col)
         elif ind == 1:
-            for col in range(5,7):
+            for col in range(7,11):
                 tab.removeCellWidget(row, col)
         tab.setStyleSheet(
-            "QTableWidget::item {border: 0px; padding: 4px;}")
+            "QTableWidget::item {border: 0px; padding: 3px;}")
 
     def init_weighting_table(self):
         tab = self.iface.dlg.TBL_JUGEMENT
@@ -840,10 +848,11 @@ class initialiseAll:
                     input.vlayer.commitChanges()
 
                     # joinbylocation
-                    joinfields = list(set(fields + input.vlayer.fields()))
+                    #  ---- amboary ito sarah ------
+                    # joinfields = list(set(fields.extend(input.vlayer.fields())))
                     result = aggregation.joinbylocation(input_path,input.path)
                     input_path = result['OUTPUT']
-                    fields = joinfields
+                    # fields = joinfields
 
             # Agregate
             self.append_edittext("\nLancement de l'agrégation ...")
@@ -1007,7 +1016,7 @@ class initialiseAll:
             # On click on Precedent
             self.iface.dlg.BT_PREVIOUS.clicked.connect(lambda: self.display_previous_page())
             # On click on Cancel
-            # self.iface.dlg.BT_CANCEL.clicked.connect(lambda: self.remove_new_fields())
+            self.iface.dlg.BT_CANCEL.clicked.connect(lambda: self.remove_new_fields())
             # On click on Close
             self.iface.dlg.rejected.connect(lambda: self.remove_new_fields())
 

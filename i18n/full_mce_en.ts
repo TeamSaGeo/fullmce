@@ -86,7 +86,7 @@
     <message>
         <location filename="../fullmce_dialog_base.ui" line="386"/>
         <source>À propos</source>
-        <translation type="obsolete">About</translation>
+        <translation>About</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="990"/>
@@ -101,7 +101,7 @@
     <message>
         <location filename="../fullmce_dialog_base.ui" line="480"/>
         <source>Répertoire de sortie</source>
-        <translation type="obsolete">Output folder</translation>
+        <translation>Output folder</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="516"/>
@@ -121,17 +121,17 @@
     <message>
         <location filename="../fullmce_dialog_base.ui" line="644"/>
         <source>Paramètres de reclassification des contraintes</source>
-        <translation type="obsolete">Contraints classification parameters</translation>
+        <translation>Contraints classification parameters</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="662"/>
         <source>Liste des contraintes à reclassifier</source>
-        <translation type="obsolete">List of contraints to classify</translation>
+        <translation>List of contraints to classify</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="721"/>
         <source>Paramètres de reclassification</source>
-        <translation type="obsolete">Classification parameters</translation>
+        <translation>Classification parameters</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="617"/>
@@ -201,12 +201,12 @@
     <message>
         <location filename="../fullmce_dialog_base.ui" line="998"/>
         <source>NB: Veuillez créer des copies des couches entrées avant leurs manipulations.</source>
-        <translation type="obsolete">NB: Please create copies of the layers entered before their manipulations.</translation>
+        <translation>NB: Please create copies of the layers entered before their manipulations.</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="687"/>
         <source>Paramètres de reclassification (par défaut nouvelle valeur = 0)</source>
-        <translation type="obsolete">Classification parameters (default new value =0)</translation>
+        <translation>Classification parameters (default new value =0)</translation>
     </message>
     <message>
         <location filename="../fullmce_dialog_base.ui" line="1187"/>
@@ -251,10 +251,10 @@ Creating the expression...</translation>
         <translation type="obsolete">Saving result in</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="842"/>
+        <location filename="../event_tools/initialiseAll.py" line="857"/>
         <source>
 Agrégation terminée avec succès!</source>
-        <translation type="obsolete">
+        <translation>
 Aggregation finished succesfully!</translation>
     </message>
     <message>
@@ -504,12 +504,12 @@ Number of constraints: {2}
     <message>
         <location filename="../event_tools/initialiseAll.py" line="272"/>
         <source>Veuillez sélectionner le répertoire de sortie</source>
-        <translation type="obsolete">Select the output folder</translation>
+        <translation>Select the output folder</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="283"/>
         <source>Veuillez choisir un répertoire de sortie!</source>
-        <translation type="obsolete">Choose an output folder</translation>
+        <translation>Choose an output folder</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="439"/>
