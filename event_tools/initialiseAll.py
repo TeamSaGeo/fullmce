@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt, QCoreApplication, QEventLoop, QTimer
-from qgis.PyQt.QtGui import QFont, QTextCursor
+from qgis.PyQt.QtGui import QFont, QTextCursor, QPixmap, QImage
 from qgis.PyQt.QtWidgets import *
 from qgis.core import QgsVectorFileWriter, QgsProcessingFeedback
 from .inputData import InputData
@@ -63,6 +63,8 @@ class initialiseAll:
         # Populate TE_INFO
         text = QCoreApplication.translate("full_mce","Ce plugin a été spécialement dévéloppé par l'Institut Pasteur de Madagascar dans le cadre d'une étude sur la surveillance constante du paludisme et la détermination des zones prioritaires aux Campagnes d'Aspertion Intra-Domiciliaire (CAID) à Madagascar. Son utilisation est privilégié dans le domaine de la santé publique.")
         self.iface.dlg.TE_INFO.setText(text)
+
+        # self.iface.dlg.LBL_IPM.setPixmap(QPixmap(":/plugins/fullmce/images/ipm.png"))
 
         # Populate LBL_ROHY
         # self.iface.dlg.LBL_ROHY.setText(
@@ -252,18 +254,18 @@ class initialiseAll:
         if sym and val != "":
             try:
                 val = float(val)
-                if val < 0.11 or val > 9:
+                nbr_dec = str(val)[::-1].find('.')
+                saaty_scale = [round(1/9,nbr_dec),round(1/7,nbr_dec),0.2,round(1/3,nbr_dec),1,3,5,7,9]
+                if val not in saaty_scale:
                     button = QMessageBox.information(
                         self.iface.dlg,
                         self.error_title,
-                        QCoreApplication.translate("full_mce","La valeur en entrée doit être comprise entre 0.11 et 9."),
+                        QCoreApplication.translate("full_mce","Choisir une valeur dans l'échelle de Saaty ci-dessous:") + "<p><img  src=\":/plugins/fullmce/images/saaty.png\"/></p>",
                         )
                     tab.cellWidget(row,col).setText('')
                 else:
                     reverse_val = 1 / val
-                    if reverse_val >= 9:
-                        reverse_val = float(9)
-                    if round(reverse_val,2).is_integer():
+                    if reverse_val >= 1 or round(reverse_val,2).is_integer() :
                         decimals = 0
                     else:
                         decimals = 5
@@ -275,12 +277,12 @@ class initialiseAll:
                 button = QMessageBox.information(
                     self.iface.dlg,
                     self.error_title,
-                    QCoreApplication.translate("full_mce","Veuillez saisir une valeur en entier ou réelle valide à la ligne {0} - colonne {1}!").format(row_name,col_name),
+                    QCoreApplication.translate("full_mce","Saisir une valeur en entier ou réelle valide à la ligne {0} - colonne {1}!").format(row_name,col_name),
                     )
 
     def select_output_dir(self):
         foldername = QFileDialog.getExistingDirectory(
-            self.iface.dlg, QCoreApplication.translate("full_mce","Veuillez sélectionner le répertoire de sortie"))
+            self.iface.dlg, QCoreApplication.translate("full_mce","Sélectionner le répertoire de sortie"))
         self.iface.dlg.LE_OUTPUT_DIR.setText(foldername)
 
     def load_log_file(self, text_edit):
@@ -293,7 +295,7 @@ class initialiseAll:
             button = QMessageBox.information(
                 self.iface.dlg,
                 self.error_title,
-                QCoreApplication.translate("full_mce","Veuillez choisir un répertoire de sortie!"),
+                QCoreApplication.translate("full_mce","Choisir un répertoire de sortie!"),
                 )
         elif (self.pageInd == 2 and not self.contraintes_filled()) \
             or ((self.pageInd == 3 or self.pageInd == 6)and not self.run_process()) \
@@ -356,7 +358,7 @@ class initialiseAll:
         tbl.verticalHeader().setVisible(True)
 
         # Update list of input data
-        if self.pageInd == 2:
+        if self.pageInd == 2 :
             self.listContraintes = self.listContraintes[:spinbox_value]
             list_object = self.listContraintes
         else:
@@ -445,7 +447,7 @@ class initialiseAll:
 
     def select_source_path(self, tbl, row):
         path, _filter = QFileDialog.getOpenFileName(
-            tbl, QCoreApplication.translate("full_mce","Veuillez choisir un vecteur"), "", "*.shp")
+            tbl, QCoreApplication.translate("full_mce","Choisir un vecteur"), "", "*.shp")
 
         if self.pageInd == 2:
             inputData = self.listContraintes[row]
@@ -466,7 +468,7 @@ class initialiseAll:
                 button = QMessageBox.information(
                     self.iface.dlg,
                     self.error_title,
-                    QCoreApplication.translate("full_mce","Veuillez choisir un fichier valide!"),
+                    QCoreApplication.translate("full_mce","Choisir un fichier valide!"),
                     )
 
         # Remove empty inputLayer from list
@@ -490,9 +492,9 @@ class initialiseAll:
     def input_row_filled(self, element, i):
         if not element.name or element.inputLayer.path == "" or element.inputLayer.field_is_duplicated(element.type):
             type = "contrainte" if element.type == "contraint" else "facteur"
-            msg_name = QCoreApplication.translate("full_mce","Veuillez saisir un nom pour le {0} n° {1}").format(type,i+1)
-            msg_path = QCoreApplication.translate("full_mce","Veuillez sélectionner un vecteur pour le {0} n° {1}").format(type,i+1)
-            msg_field = QCoreApplication.translate("full_mce","Champ dupliqué! Veuillez choisir des champs différents pour les {0}s issus du même fichier source.").format(type)
+            msg_name = QCoreApplication.translate("full_mce","Saisir un nom pour le {0} n° {1}").format(type,i+1)
+            msg_path = QCoreApplication.translate("full_mce","Sélectionner un vecteur pour le {0} n° {1}").format(type,i+1)
+            msg_field = QCoreApplication.translate("full_mce","Champ dupliqué! Choisir des champs différents pour les {0}s issus du même fichier source.").format(type)
             error_msg = msg_name if not element.name else msg_path if element.inputLayer.path == "" else msg_field
             button = QMessageBox.information(
                 self.iface.dlg,
@@ -531,7 +533,7 @@ class initialiseAll:
                     button = QMessageBox.information(
                         self.iface.dlg,
                         self.error_title,
-                        QCoreApplication.translate("full_mce","Le contrainte <b>{0}</b> de type \"String\" ne devrait pas être \"Prêt\". Veuillez reclassifier ce contrainte.").format(contrainte.name)
+                        QCoreApplication.translate("full_mce","Le contrainte <b>{0}</b> de type \"String\" ne devrait pas être \"Prêt\". Reclassifier ce contrainte.").format(contrainte.name)
                     )
                     return False
                 self.listContraintesNotReady.remove(contrainte)
@@ -582,7 +584,7 @@ class initialiseAll:
                     button = QMessageBox.information(
                         self.iface.dlg,
                         self.error_title,
-                        QCoreApplication.translate("full_mce","Le facteur <b>{0}</b> de type {1} ne devrait pas être \"Normalisé\". Veuillez normaliser ce facteur.").format(factor.name, factor.field_type)
+                        QCoreApplication.translate("full_mce","Le facteur <b>{0}</b> de type {1} ne devrait pas être \"Normalisé\". Normaliser ce facteur.").format(factor.name, factor.field_type)
                     )
                     return False
                 self.listFactorsNotNormalized.remove(factor)
@@ -600,7 +602,7 @@ class initialiseAll:
             reply = QMessageBox.question(
                 self.iface.dlg,
                 QCoreApplication.translate("normalisation","Question ..."),
-                QCoreApplication.translate("normalisation","{0} Sinon, veuillez choisir des champs de type entier ou réelle.").format(txt),
+                QCoreApplication.translate("normalisation","{0} Sinon, choisir des champs de type entier ou réelle.").format(txt),
                 buttons=QMessageBox.Yes | QMessageBox.No,
                 defaultButton=QMessageBox.No,
             )
@@ -633,7 +635,7 @@ class initialiseAll:
             reply = QMessageBox.question(
                 self.iface.dlg,
                 QCoreApplication.translate("full_mce","Question ..."),
-                QCoreApplication.translate("full_mce","Voulez-vous sauvegarder les résultats dans d'autres fichiers?"),
+                QCoreApplication.translate("full_mce","Voulez-vous sauvegarder les résultats dans des nouveaux fichiers?"),
                 buttons= QMessageBox.Cancel | QMessageBox.No | QMessageBox.Yes,
             )
             return reply
@@ -780,7 +782,7 @@ class initialiseAll:
                 self.save_log(log,first_line)
                 self.load_log_file(self.iface.dlg.TE_RUN_PROCESS)
             else:
-                status = QCoreApplication.translate("weighting","RC >= 0.1. Matrice de jugement non cohérent!\nVeuillez changer les valeurs saisies.")
+                status = QCoreApplication.translate("weighting","RC >= 0.1. Matrice de jugement non cohérent!\nChanger les valeurs saisies.")
                 self.iface.dlg.BT_NEXT.setEnabled(False)
             self.iface.dlg.LBL_STATUT_MATRICE.setText(status)
         else:
@@ -873,7 +875,7 @@ class initialiseAll:
         button = QMessageBox.information(self.iface.dlg,QCoreApplication.translate("aggregation","Résultat"),status,)
         self.append_edittext(status)
         self.iface.dlg.BT_PREVIOUS.setEnabled(True)
-        exit = QCoreApplication.translate("aggregation","Terminé")
+        exit = QCoreApplication.translate("aggregation","Terminer")
         self.iface.dlg.BT_CANCEL.setText(exit)
 
         # Save log
@@ -897,7 +899,7 @@ class initialiseAll:
     def load_matrix(self):
         tab = self.iface.dlg.TBL_JUGEMENT
         input_path, _filter = QFileDialog.getOpenFileName(
-            self.iface.dlg, QCoreApplication.translate("full_mce","Veuillez choisir le fichier CSV"), "", "*.csv")
+            self.iface.dlg, QCoreApplication.translate("full_mce","Choisir le fichier CSV"), "", "*.csv")
 
         if _filter:
             with open(input_path) as csvfile:
@@ -912,7 +914,7 @@ class initialiseAll:
                             else:
                                 break
 
-    def reset_matrix(self):
+    def clear_matrix(self):
         tab = self.iface.dlg.TBL_JUGEMENT
         for row in range(tab.rowCount()):
             for column in range(tab.columnCount()):
@@ -979,12 +981,17 @@ class initialiseAll:
 
     def set_fields(self,object_not_ready,field_extension, inputLayer, text_edit, new_output_path):
         for object in object_not_ready:
-            # Set object status
+            # Add field extension
             new_field_name = object.name + field_extension
+            # set field index
             if not new_output_path:
                 inputLayer = object.inputLayer
+                inputLayer.vlayer.commitChanges()
+
             object.setfield_idx(inputLayer.vlayer.fields().indexFromName(new_field_name))
+            # Set Ready
             object.setready(2)
+            # Set path
             path = inputLayer.reclass_output if new_output_path else object.inputLayer.path
             text_edit.append(QCoreApplication.translate("full_mce","\"{0}\" dans le champ {2} du fichier {1}\n").format(object.name,path, object.field_name))
 
@@ -1000,6 +1007,10 @@ class initialiseAll:
                     new_field_name = factor.name + "Fz"
                     factor.inputLayer.delete_new_field(new_field_name)
 
+    def reset_page(self):
+        self.pageInd = 0
+        self.iface.dlg.STACKED_WIDGET.setCurrentIndex(self.pageInd)
+
     def initialise_variable_init(self):
         return self
 
@@ -1011,12 +1022,14 @@ class initialiseAll:
             self.iface.first_start = False
             self.display_plugin_info()
 
+            # On click on Reset
+            self.iface.dlg.BT_RESET.clicked.connect(lambda : self.reset_page())
             # On click on Suivant
             self.iface.dlg.BT_NEXT.pressed.connect(lambda: self.display_next_page())
             # On click on Precedent
             self.iface.dlg.BT_PREVIOUS.clicked.connect(lambda: self.display_previous_page())
             # On click on Cancel
-            self.iface.dlg.BT_CANCEL.clicked.connect(lambda: self.remove_new_fields())
+            # self.iface.dlg.BT_CANCEL.clicked.connect(lambda: self.remove_new_fields())
             # On click on Close
             self.iface.dlg.rejected.connect(lambda: self.remove_new_fields())
 
@@ -1028,8 +1041,8 @@ class initialiseAll:
 
             # On click on Tester
             self.iface.dlg.BT_TEST_JUGEMENT.clicked.connect(self.weighting)
-            # On click on Reset
-            self.iface.dlg.BT_RESET.clicked.connect(lambda: self.reset_matrix())
+            # On click on Clear
+            self.iface.dlg.BT_CLEAR.clicked.connect(lambda: self.clear_matrix())
             # On click on Enregistrer
             self.iface.dlg.BT_SAVE_MATRIX.clicked.connect(lambda: self.save_matrix())
             # On click on Importer

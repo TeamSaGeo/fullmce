@@ -50,7 +50,7 @@ class InputLayer:
         new_field_idx = self.vlayer.fields().indexOf(new_field_name)
         if new_field_idx == -1:
             type = QVariant.Double if typeName == "double" else QVariant.Int
-            vlayer_provider.addAttributes([QgsField(new_field_name,type,typeName,10,3)])
+            vlayer_provider.addAttributes([QgsField(new_field_name,type,typeName,10,5)]) # Round to 5 decimal places
             self.vlayer.updateFields()
             new_field_idx = self.vlayer.fields().indexOf(new_field_name)
         return new_field_idx

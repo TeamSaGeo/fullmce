@@ -6,7 +6,7 @@
 name=Full MCE for Public Health
 qgisMinimumVersion=3.0
 description=Full Multicriteria Evaluation tool for Public Health
-version=1.1
+version=0.1
 author=Sarah FAMENONTSOA, Anthonio RAKOTOARISON, Fanjasoa RAKOTOMANANA
 email=sfamenontsoa@gmail.com
 

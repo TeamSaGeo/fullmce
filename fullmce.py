@@ -173,7 +173,7 @@ class full_mce:
         icon_path = ':/plugins/fullmce/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'Analyse Multicritère pour la santé publique'),
+            text=self.tr(u'Full MCE'),
             callback=self.run,
             parent=self.iface.mainWindow())
 
@@ -187,7 +187,7 @@ class full_mce:
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginVectorMenu(
-                self.tr(u'&Analyse Multicritère pour la santé publique'),
+                self.tr(u'&Full MCE'),
                 action)
             self.iface.removeToolBarIcon(action)
 

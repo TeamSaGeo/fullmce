@@ -7,13 +7,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>897</width>
+    <width>890</width>
     <height>447</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>780</width>
+    <width>890</width>
     <height>430</height>
    </size>
   </property>
@@ -24,7 +24,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Analyse Multicritère pour la santé publique v1.0</string>
+   <string>Analyse Multicritère pour la santé publique v0.1</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>
@@ -36,6 +36,29 @@
    <property name="rightMargin">
     <number>6</number>
    </property>
+   <item row="1" column="5">
+    <widget class="QPushButton" name="BT_EXECUTE">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Agréger</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <spacer name="horizontalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>150</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
    <item row="1" column="3">
     <widget class="QPushButton" name="BT_NEXT">
      <property name="text">
@@ -43,6 +66,36 @@
      </property>
      <property name="flat">
       <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
+    <spacer name="horizontalSpacer_5">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>75</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="6">
+    <widget class="QPushButton" name="BT_CANCEL">
+     <property name="text">
+      <string>Annuler</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QPushButton" name="BT_PREVIOUS">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>&lt; Précédent</string>
      </property>
     </widget>
    </item>
@@ -62,7 +115,64 @@
      </property>
      <widget class="QWidget" name="page_1">
       <layout class="QGridLayout" name="gridLayout_25">
-       <item row="1" column="0" rowspan="3">
+       <item row="3" column="2" rowspan="2">
+        <widget class="QGroupBox" name="GB_INFO">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="title">
+          <string>À propos</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_23">
+          <item row="0" column="1">
+           <widget class="QTextEdit" name="TE_INFO">
+            <property name="font">
+             <font>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QLabel" name="label">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>26</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Plugin d'Analyse Multicritère pour la santé publique</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" rowspan="2">
         <widget class="QGroupBox" name="groupBox_7">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -111,7 +221,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Agrégation par la méthode de combinaison linéaire pondérée </string>
+             <string>Agrégation par la méthode de combinaison linéaire pondérée</string>
             </property>
            </widget>
           </item>
@@ -157,64 +267,20 @@
          </layout>
         </widget>
        </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QLabel" name="label">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>26</height>
-          </size>
-         </property>
+       <item row="4" column="0">
+        <widget class="QGroupBox" name="GB_DEVELOPER">
          <property name="font">
           <font>
-           <pointsize>11</pointsize>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Plugin d'Analyse Multicritère pour la santé publique</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="2" rowspan="2" colspan="2">
-        <widget class="QGroupBox" name="GB_INFO">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>450</width>
-           <height>221</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
+           <italic>false</italic>
            <bold>true</bold>
           </font>
          </property>
          <property name="title">
-          <string>À propos</string>
+          <string>Développeur</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_23">
-          <item row="0" column="1">
-           <widget class="QTextEdit" name="TE_INFO">
-            <property name="font">
-             <font>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="3" column="0">
         <widget class="QGroupBox" name="GB_CONCEPTEUR">
          <property name="maximumSize">
           <size>
@@ -232,20 +298,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
-        <widget class="QGroupBox" name="GB_DEVELOPER">
-         <property name="font">
-          <font>
-           <italic>false</italic>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="title">
-          <string>Développeur</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="2">
+       <item row="2" column="2">
         <widget class="QGroupBox" name="groupBox_2">
          <property name="font">
           <font>
@@ -270,7 +323,7 @@
              </font>
             </property>
             <property name="text">
-             <string>1.0</string>
+             <string>0.1</string>
             </property>
            </widget>
           </item>
@@ -526,7 +579,7 @@
              </font>
             </property>
             <property name="text">
-             <string>NB: Veuillez créer des copies des couches entrées avant leurs manipulations.</string>
+             <string>NB: Créer des copies des couches entrées avant leurs manipulations.</string>
             </property>
            </widget>
           </item>
@@ -867,7 +920,7 @@
              </font>
             </property>
             <property name="text">
-             <string>NB: Veuillez créer des copies des couches entrées avant leurs manipulations.</string>
+             <string>NB: Créer des copies des couches entrées avant leurs manipulations.</string>
             </property>
            </widget>
           </item>
@@ -1067,53 +1120,7 @@
              <string>Matrice de jugement</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_20">
-             <item row="1" column="2">
-              <widget class="QPushButton" name="BT_TEST_JUGEMENT">
-               <property name="maximumSize">
-                <size>
-                 <width>75</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>Tester</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <spacer name="verticalSpacer_6">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>88</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="5" column="2">
-              <widget class="QPushButton" name="BT_LOAD_MATRIX">
-               <property name="text">
-                <string>Importer</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="0">
-              <widget class="QLabel" name="LBL_RC_VALUE">
-               <property name="minimumSize">
-                <size>
-                 <width>151</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>RC =</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="2">
+             <item row="4" column="2">
               <spacer name="verticalSpacer_7">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
@@ -1126,14 +1133,34 @@
                </property>
               </spacer>
              </item>
-             <item row="7" column="1">
-              <widget class="QLabel" name="LBL_STATUT_MATRICE">
+             <item row="6" column="2">
+              <widget class="QPushButton" name="BT_LOAD_MATRIX">
                <property name="text">
-                <string>Statut matrice</string>
+                <string>Importer</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="0" rowspan="7" colspan="2">
+             <item row="5" column="2">
+              <widget class="QPushButton" name="BT_SAVE_MATRIX">
+               <property name="text">
+                <string>Enregistrer</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="2">
+              <widget class="QPushButton" name="BT_CLEAR">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Effacer</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0" rowspan="8" colspan="2">
               <widget class="QTableWidget" name="TBL_JUGEMENT">
                <property name="frameShape">
                 <enum>QFrame::StyledPanel</enum>
@@ -1143,23 +1170,55 @@
                </attribute>
               </widget>
              </item>
-             <item row="4" column="2">
-              <widget class="QPushButton" name="BT_SAVE_MATRIX">
+             <item row="8" column="1">
+              <widget class="QLabel" name="LBL_STATUT_MATRICE">
                <property name="text">
-                <string>Enregistrer</string>
+                <string>Statut matrice</string>
                </property>
               </widget>
              </item>
+             <item row="0" column="2">
+              <spacer name="verticalSpacer_6">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
              <item row="2" column="2">
-              <widget class="QPushButton" name="BT_RESET">
+              <widget class="QPushButton" name="BT_TEST_JUGEMENT">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="maximumSize">
                 <size>
-                 <width>75</width>
+                 <width>16777215</width>
                  <height>16777215</height>
                 </size>
                </property>
                <property name="text">
-                <string>Effacer</string>
+                <string>Tester</string>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="0">
+              <widget class="QLabel" name="LBL_RC_VALUE">
+               <property name="minimumSize">
+                <size>
+                 <width>151</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>RC =</string>
                </property>
               </widget>
              </item>
@@ -1227,56 +1286,10 @@
      </widget>
     </widget>
    </item>
-   <item row="1" column="4">
-    <spacer name="horizontalSpacer_5">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>75</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="6">
-    <widget class="QPushButton" name="BT_CANCEL">
+   <item row="1" column="0">
+    <widget class="QPushButton" name="BT_RESET">
      <property name="text">
-      <string>Annuler</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="5">
-    <widget class="QPushButton" name="BT_EXECUTE">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Agréger</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <spacer name="horizontalSpacer_3">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>150</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="2">
-    <widget class="QPushButton" name="BT_PREVIOUS">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>&lt; Précédent</string>
+      <string>Réinitialiser</string>
      </property>
     </widget>
    </item>

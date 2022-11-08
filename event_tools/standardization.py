@@ -36,7 +36,7 @@ class Standardization:
                         if len(values) == 2 and param_value == "min":
                             param_value = self.factor.get_mimimum_value()
 
-                        if ((len(values) == 4 and direction != 2) or len(values) == 10)  and param_value == "max":
+                        if ((len(values) == 4 and direction != 2) or len(values) == 8)  and param_value == "max":
                             param_value = self.factor.get_maximum_value()
 
                         if field_type != "Date":
@@ -147,7 +147,7 @@ class Standardization:
         return {
             0 : dX / dW,    #lineaire
             # 1 : math.pow(math.sin(dX / dW * (math.pi / 2)), 2.0), #sigmoid trigo
-            1 : 1.0 / (1.0 + exp),
+            1 : 1.0 / (1.0 + exp), # sigmoid
             # 2 : 1.0 / (1.0 + math.pow((dW - dX) / dW, 2.0)),    #j-shaped
             }[x]
 
