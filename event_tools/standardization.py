@@ -1,7 +1,7 @@
+""" This class contains Standardization Fuzzy functions """
 
-from qgis.PyQt.QtCore import QCoreApplication, QDate, QDateTime
+from qgis.PyQt.QtCore import QCoreApplication, QDate
 import math
-from datetime import datetime
 
 class Standardization:
     def __init__(self, factor, tab, row):

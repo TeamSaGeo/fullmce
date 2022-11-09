@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt, QCoreApplication, QEventLoop, QTimer
-from qgis.PyQt.QtGui import QFont, QTextCursor, QPixmap, QImage
+from qgis.PyQt.QtGui import QFont, QTextCursor, QPixmap
 from qgis.PyQt.QtWidgets import *
 from qgis.core import QgsVectorFileWriter, QgsProcessingFeedback
 from .inputData import InputData
@@ -9,7 +9,7 @@ from .classification import Classification
 from .standardization import Standardization
 from .weighting import Weigthing
 from .aggregation import Aggregation
-import os, csv, glob
+import os, csv
 from datetime import datetime
 
 class initialiseAll:
