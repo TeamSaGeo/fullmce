@@ -19,25 +19,23 @@ Le présent manuel illustre un traitement complet d’analyse multicritère.
 2. ## ` `**Page d'accueil**
 Pour lancer le plugin, cliquer sur l’icône “Full MCE” dans la barre d’outils. Le plugin peut aussi être lancé en cliquant sur le menu “Vecteur > Analyse Multicritère pour la santé publique > Full MCE “.
 
-![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.001.png)
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.001.png)
 
 La page d'accueil du plugin présente les principales fonctionnalités du plugin ainsi que les noms des concepteurs.
 
-![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.002.png)
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.002.png)
 
 3. ## ` `**Répertoire de sortie**
 Après la page d’accueil, le plugin demande à l’utilisateur de choisir le répertoire de sortie. Tous les résultats de la reclassification des contraintes, de la normalisation des facteurs et de l’agrégation seront groupés dans ce répertoire. Le format de sortie est de type shapefile (.shp)
 
 Un fichier nommé **“fullmce\_log[date].txt”** y est également créé afin de sauvegarder tous les paramètres que l’utilisateur saisit au cours du traitement.
 
-![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.003.png)
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.003.png)
 
 4. ## ` `**Reclassification des contraintes en booléen**
 Après avoir choisi le répertoire de sortie, l’utilisateur doit spécifier le nombre de contraintes à utiliser lors du traitement (zone en rouge sur la figure ci-dessous).
 
-
-
-![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.004.png)![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.005.png)![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.006.png)
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.004.png)
 
 Le nombre minimal des contraintes autorisé est **0**, le nombre maximal est **illimité.**Des lignes apparaissent suivant le nombre de contraintes choisies. En effet, l’utilisateur peut saisir les noms et choisir les fichiers sources ainsi que les champs des contraintes.
 
@@ -48,7 +46,7 @@ Si une ou plusieurs cases "Prêts" ne sont pas cochées (zone en vert sur la fig
 - Si la réponse est “Oui”, le plugin sauvegarde les résultats de la reclassification dans des champs nommés “**[nom\_du\_contrainte]Bl**” de **type entier** dans des nouveaux fichiers nommés **“[nom\_du\_fichier\_source]\_bool.shp**”.
 - Sinon, les résultats seront sauvegardés dans les mêmes fichiers sources.
 
-![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.007.png)
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.005.png)
 
 - **Cas des contraintes de type quantitative:**
 **
@@ -63,9 +61,7 @@ La colonne “Début” et “Fin” accepte les valeurs de type entier ainsi qu
 - la colonne “Fin” accepte uniquement les valeurs supérieures ou égales à celle de la colonne “Début”, sinon le plugin renvoie une erreur.
 - chaque intervalle ("Début", "Fin”) ne devrait pas contenir un autre intervalle spécifié dans d’autres lignes, ni être inclus dans un autre intervalle.
 
-![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.008.png)
-
-
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.006.png)
 
 - **Cas des contraintes de type qualitative:**
 
@@ -73,18 +69,18 @@ La colonne “Début” et “Fin” accepte les valeurs de type entier ainsi qu
 
 La colonne “Nouvelle valeur” accepte uniquement les valeurs de type entier ou  **“Null”.** Chaque “Valeur Initiale” ne doit être choisie qu'une seule fois.
 
-![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.009.png)
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.007.png)
 
 Lorsque les paramètres de classification sont remplis, le plugin résume dans la page suivante valeurs entrées. En cliquant sur le bouton **“Suivant”**, l’utilisateur confirme ces paramètres et lance la reclassification des contraintes.
 
-![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.010.png)
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.008.png)
+
 5. ## **Normalisation des facteurs**
-Le nombre minimal des facteurs autorisé est 3, le nombre maximale est 15. Des lignes seront ajoutées suivant le nombre de contraintes choisies. Ainsi, l’utilisateur peut saisir les noms et choisir les fichiers sources ainsi que les champs des facteurs.
+Le nombre minimal des facteurs autorisé est 3, le nombre maximal est 15. Des lignes seront ajoutées suivant le nombre de contraintes choisies. Ainsi, l’utilisateur peut saisir les noms et choisir les fichiers sources ainsi que les champs des facteurs.
 
 Chaque facteur doit correspondre à un et un seul champ de la table attributaire d’un vecteur source et vice-versa. Le plugin renvoie une erreur si plusieurs facteurs correspondent à un même champ d’un même vecteur source.
 
-
-![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.011.png)![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.012.png)
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.009.png)
 
 Si une ou plusieurs cases "Normalisé" ne sont pas cochées (zone en vert sur la figure ci-dessus), le plugin propose de normaliser les facteurs correspondants. Dans ce cas, une question sera alors posée à l’utilisateur s’il veut sauvegarder les résultats dans des nouveaux fichiers:
 
@@ -105,70 +101,32 @@ Les points de contrôles changent selon le sens choisi.Les valeurs des colonnes 
 - si la valeur “A” ou “C” est égale à **"min"**, le plugin remplacera cette valeur par la valeur minimum du champ choisi
 - si la valeur de "B"ou “D” est égale à **"max"**, le plugin remplacera cette valeur par la valeur maximale du champ  choisi
 
-![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.013.png)
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.010.png)
 
 - **Cas de la fonction “linéaire” :**
 
-`				`![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.014.png)
-
-0           x<a si a Inclus, sinon x ≤a   
-
-`		`x-a b-a     a≤x<b si a Inclus et b non Inclus
-
-`             `a≤x≤b si a Inclus et b Inclus
-
-` `a < x≤b si a non Inclus et b Inclus             a<x<b si a non Inclus et b non Inclus![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.015.png)
-
-μa(x) =	 1          b ≤ x < c si b Inclus et c non Inclus
-
-`             `b≤x≤c si b Inclus et c Inclus
-
-` `b < x≤c si b non Inclus et c Inclus             b<x<c si b non Inclus et c non Inclus
-
-`		`d-x d-c     c≤ x< d si c Inclus et d non Inclus
-
-`             `c≤x≤d si c Inclus et d Inclus
-
-` `c< x≤d si c non Inclus et d Inclus             c<x<d si c non Inclus et d non Inclus
-
-`		 `0          x  >d si d Inclus sinon x≥d 		
-
-- ` `**Cas de la fonction "sigmoïdale" :![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.016.png)![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.017.png)**
-
-`		`0                        x<a si a Inclus, sinon x ≤a
-
-11+e- (x- (a+b)/2)     a≤x<b si a Inclus et b non Inclus
-
-`                          `a≤x≤b si a Inclus et b Inclus
-
-`              `a < x≤b si a non Inclus et b Inclus                          a<x<b si a non Inclus et b non Inclus
-
-μa(x) =         1                       b ≤ x < c si b Inclus et c non Inclus
-
-`              `b≤x≤c si b Inclus et c Inclus
-
-`              `b < x≤c si b non Inclus et c Inclus                          b<x<c si b non Inclus et c non Inclus
-
-`		`11+e x- (c+d)/2        c≤ x< d si c Inclus et d non Inclus
-
-`              `c≤x≤d si c Inclus et d Inclus
-
-`  `c< x≤d si c non Inclus et d Inclus              c<x<d si c non Inclus et d non Inclus
-
-`		`0                        x  >d si d Inclus sinon x≥d
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.011.png)				
 
 
+
+
+
+
+
+- ` `**Cas de la fonction "sigmoïdale" :**
+
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.012.png)
 
 Lorsque les paramètres de normalisation sont remplis, le plugin résume dans la page suivante valeurs entrées. En cliquant sur le bouton **“Suivant”**, l’utilisateur confirme ces paramètres et lance la normalisation des facteurs.
 
-![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.018.png)
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.013.png)
 
 6. ## **Pondération des facteurs**
 La pondération des facteurs est réalisée en utilisant la méthode de comparaison par paires. L’utilisateur doit alors remplir la matrice de jugement (suivant l’échelle de Saaty).Lorsqu’on saisit un nombre dans une cellule de la matrice, la cellule symétrique par rapport à la diagonale se remplit automatiquement (inversement symétrique).
 
 Le bouton **“Importer”** permet à l’utilisateur d’importer une matrice de jugement depuis un fichier csv. L’utilisateur peut aussi enregistrer la matrice sous un fichier csv en cliquant sur le bouton **"Enregistrer"** .
 
-![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.019.png)
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.014.png)
 
 Après que la matrice est remplie, il est indispensable de tester sa cohérence en appuyant sur le bouton **« Tester »** :  
 
@@ -177,7 +135,8 @@ Après que la matrice est remplie, il est indispensable de tester sa cohérence 
 
 Lorsque la matrice de jugement est cohérente, le plugin résume dans la page suivante tous les paramètres saisis. En cliquant sur le bouton **“Agréger”**, l’utilisateur confirme ces paramètres et lance l’agrégation des contraintes et des facteurs.
 
-![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.020.png)
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.015.png)
+
 7. ## **Agrégation des contraintes et des facteurs**
 Lors de l’agrégation des contraintes et des facteurs, le plugin vérifie en premier lieu les vecteurs sources:
 
@@ -188,10 +147,9 @@ Lors de l’agrégation des contraintes et des facteurs, le plugin vérifie en p
 
 La formule de l’agrégation est définit comme suit :
 
-*pour tout* ω *= poids du facteur;* χ *= valeur du facteur; C= valeur de la contrainte*
+*pour tout* ω *= poids du facteur;* χ *= valeur du facteur;* C*= valeur de la contrainte*
 
-- WLC = i=1nωi χi \* 1, 	si aucune contrainte est spécifié		
-- WLC = i=1nωi χi j=1mCj, 	si au moins une contrainte est spécifié
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.016.png)
 
 
 
@@ -199,4 +157,4 @@ Les résultats de l’agrégation sont stockés dans un nouveau champ nommé **"
 
 Une fois tous les traitements exécutés, une boîte de dialogue affiche **« Agrégation terminée avec succès »**. En cas d’erreur, le plugin s’arrête aussitôt en affichant l’erreur correspondante.
 
-![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.021.png)
+![](images/Aspose.Words.84d072a5-77b0-4208-8416-c680d43f38f2.017.png)
