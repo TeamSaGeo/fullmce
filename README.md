@@ -15,6 +15,7 @@ Cette version 0.1 est compatible au QGIS version 3.x.
 Elle supporte les fichiers sources et celles de sortie au format shapefile (.shp).
 
 Le présent manuel illustre un traitement complet d’analyse multicritère.
+
 2. ## ` `**Page d'accueil**
 Pour lancer le plugin, cliquer sur l’icône “Full MCE” dans la barre d’outils. Le plugin peut aussi être lancé en cliquant sur le menu “Vecteur > Analyse Multicritère pour la santé publique > Full MCE “.
 
@@ -23,6 +24,7 @@ Pour lancer le plugin, cliquer sur l’icône “Full MCE” dans la barre d’o
 La page d'accueil du plugin présente les principales fonctionnalités du plugin ainsi que les noms des concepteurs.
 
 ![](images/Aspose.Words.fb52e601-9777-48cb-b2b9-c6bb78c6dc8d.002.png)
+
 3. ## ` `**Répertoire de sortie**
 Après la page d’accueil, le plugin demande à l’utilisateur de choisir le répertoire de sortie. Tous les résultats de la reclassification des contraintes, de la normalisation des facteurs et de l’agrégation seront groupés dans ce répertoire. Le format de sortie est de type shapefile (.shp)
 
