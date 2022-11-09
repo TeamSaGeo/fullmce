@@ -16,6 +16,7 @@ Elle supporte les fichiers sources et celles de sortie au format shapefile (.shp
 
 Le présent manuel illustre un traitement complet d’analyse multicritère.
 
+
 2. ## ` `**Page d'accueil**
 Pour lancer le plugin, cliquer sur l’icône “Full MCE” dans la barre d’outils. Le plugin peut aussi être lancé en cliquant sur le menu “Vecteur > Analyse Multicritère pour la santé publique > Full MCE “.
 
