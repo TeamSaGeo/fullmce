@@ -841,20 +841,20 @@ class initialiseAll:
 
             # if multiple layers, Join them by location
             input_path = max_size_layer.path
-            fields = max_size_layer.vlayer.fields()
             if len(self.list_inputLayers) != 1:
                 list_inputLayers = self.list_inputLayers.copy()
                 list_inputLayers.remove(max_size_layer)
                 for i,input in enumerate(list_inputLayers):
-                    # Commit changes if modified layers not saved
-                    input.vlayer.commitChanges()
+                    if not os.path.samefile(input_path, input.path):
+                        # Commit changes if modified layers not saved
+                        input.vlayer.commitChanges()
 
-                    # joinbylocation
-                    #  ---- amboary ito sarah ------
-                    # joinfields = list(set(fields.extend(input.vlayer.fields())))
-                    result = aggregation.joinbylocation(input_path,input.path)
-                    input_path = result['OUTPUT']
-                    # fields = joinfields
+                        # joinbylocation
+                        #  ---- amboary ito sarah ------
+                        # joinfields = list(set(fields.extend(input.vlayer.fields())))
+                        result = aggregation.joinbylocation(input_path,input.path)
+                        input_path = result['OUTPUT']
+                        # fields = joinfields
 
             # Agregate
             self.append_edittext("\nLancement de l'agrégation ...")
@@ -995,17 +995,17 @@ class initialiseAll:
             path = inputLayer.reclass_output if new_output_path else object.inputLayer.path
             text_edit.append(QCoreApplication.translate("full_mce","\"{0}\" dans le champ {2} du fichier {1}\n").format(object.name,path, object.field_name))
 
-    def remove_new_fields(self):
-        QApplication.restoreOverrideCursor()
-        if self.pageInd == 9:
-            for contrainte in self.listContraintesNotReady:
-                if not contrainte.inputLayer.path.endswith("_bool.shp"):
-                    new_field_name = contrainte.name + "Bl"
-                    contrainte.inputLayer.delete_new_field(new_field_name)
-            for factor in self.listFactorsNotNormalized:
-                if not factor.inputLayer.path.endswith("_fuzz.shp"):
-                    new_field_name = factor.name + "Fz"
-                    factor.inputLayer.delete_new_field(new_field_name)
+    # def remove_new_fields(self):
+    #     QApplication.restoreOverrideCursor()
+    #     if self.pageInd == 9:
+    #         for contrainte in self.listContraintesNotReady:
+    #             if not contrainte.inputLayer.path.endswith("_bool.shp"):
+    #                 new_field_name = contrainte.name + "Bl"
+    #                 contrainte.inputLayer.delete_new_field(new_field_name)
+    #         for factor in self.listFactorsNotNormalized:
+    #             if not factor.inputLayer.path.endswith("_fuzz.shp"):
+    #                 new_field_name = factor.name + "Fz"
+    #                 factor.inputLayer.delete_new_field(new_field_name)
 
     def reset_page(self):
         self.pageInd = 0
@@ -1031,7 +1031,7 @@ class initialiseAll:
             # On click on Cancel
             # self.iface.dlg.BT_CANCEL.clicked.connect(lambda: self.remove_new_fields())
             # On click on Close
-            self.iface.dlg.rejected.connect(lambda: self.remove_new_fields())
+            # self.iface.dlg.rejected.connect(lambda: self.remove_new_fields())
 
             # On click on répertoire de sortie
             self.iface.dlg.BT_OUTPUT.clicked.connect(lambda: self.select_output_dir())
