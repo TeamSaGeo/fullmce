@@ -12,7 +12,7 @@ email=sfamenontsoa@gmail.com
 
 about=This plugin is a full multicriteria evaluation (MCE) tool for vector data. It allows: - to reclassify constraints to boolean - to normalize factors - to get weight of each factors using a pairwise comparison matrix - to combine constraints and weighted factors using Weighted Linear Combination (WLC)
 
-tracker=http://bugs
+tracker=https://github.com/famenontsoa/fullmce_Sarah/issues
 repository=https://github.com/famenontsoa/fullmce_Sarah/
 # End of mandatory metadata
 
@@ -23,13 +23,13 @@ hasProcessingProvider=no
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=python,mce,
+tags=python,mce,ahp,wlc,fuzzy
 
 homepage=http://homepage
 category=Vector
 icon=icon.png
 # experimental flag
-experimental=True
+experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
