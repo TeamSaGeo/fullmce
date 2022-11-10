@@ -431,7 +431,7 @@ class initialiseAll:
 
     def same_source_path (self, new_path):
         for inputLayer in self.list_inputLayers:
-            if inputLayer.path == new_path:
+            if os.path.samefile(inputLayer.path, new_path):
                 return inputLayer
         return None
 
@@ -842,19 +842,18 @@ class initialiseAll:
             # if multiple layers, Join them by location
             input_path = max_size_layer.path
             if len(self.list_inputLayers) != 1:
+                # Take off maximum size layer
                 list_inputLayers = self.list_inputLayers.copy()
                 list_inputLayers.remove(max_size_layer)
                 for i,input in enumerate(list_inputLayers):
-                    if not os.path.samefile(input_path, input.path):
-                        # Commit changes if modified layers not saved
-                        input.vlayer.commitChanges()
-
-                        # joinbylocation
-                        #  ---- amboary ito sarah ------
-                        # joinfields = list(set(fields.extend(input.vlayer.fields())))
-                        result = aggregation.joinbylocation(input_path,input.path)
-                        input_path = result['OUTPUT']
-                        # fields = joinfields
+                    # Commit changes if modified layers not saved
+                    input.vlayer.commitChanges()
+                    # joinbylocation
+                    #  ---- amboary ito sarah ------
+                    # joinfields = list(set(fields.extend(input.vlayer.fields())))
+                    result = aggregation.joinbylocation(input_path,input.path)
+                    input_path = result['OUTPUT']
+                    # fields = joinfields
 
             # Agregate
             self.append_edittext("\nLancement de l'agrégation ...")
