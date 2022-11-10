@@ -431,7 +431,7 @@ class initialiseAll:
 
     def same_source_path (self, new_path):
         for inputLayer in self.list_inputLayers:
-            if os.path.samefile(inputLayer.path, new_path):
+            if new_path != '' and os.path.samefile(inputLayer.path,new_path):
                 return inputLayer
         return None
 
