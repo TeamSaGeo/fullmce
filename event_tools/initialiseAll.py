@@ -431,7 +431,7 @@ class initialiseAll:
 
     def same_source_path (self, new_path):
         for inputLayer in self.list_inputLayers:
-            if new_path != '' and os.path.samefile(inputLayer.path,new_path):
+            if os.path.exists(inputLayer.path) and os.path.exists(new_path) and os.path.samefile(inputLayer.path,new_path):
                 return inputLayer
         return None
 
@@ -964,8 +964,9 @@ class initialiseAll:
                 if object_not_ready != []:
                     output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),inputLayer.name + file_extension)
                     inputLayer.setreclass_output(output_path)
-                    QgsVectorFileWriter.writeAsVectorFormat(inputLayer.vlayer, inputLayer.reclass_output, 'utf-8',driverName='ESRI Shapefile')
+                    QgsVectorFileWriter.writeAsVectorFormat(inputLayer.vlayer, inputLayer.reclass_output, 'utf-8', inputLayer.vlayer.crs(), 'ESRI Shapefile')
                     self.set_fields(object_not_ready,field_extension,inputLayer, text_edit,True)
+
                     # Remove temp fields
                     for object in object_not_ready:
                         inputLayer.delete_new_field(object.field_name)
