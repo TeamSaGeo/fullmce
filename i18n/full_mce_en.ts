@@ -275,7 +275,7 @@ Aggregation impossible! The source layers have not the same geometry type.</tran
         <translation>Cancel</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="879"/>
+        <location filename="../event_tools/initialiseAll.py" line="878"/>
         <source>Terminer</source>
         <translation></translation>
     </message>

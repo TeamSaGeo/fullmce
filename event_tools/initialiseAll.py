@@ -833,6 +833,7 @@ class initialiseAll:
             # Get expression
             aggregation = Aggregation(self.listFactors, self.listContraintes, self.weighting.layers_weight)
             expression = aggregation.getexpression()
+
             formule = QCoreApplication.translate("aggregation","Formule = ") + expression
             self.append_edittext(formule)
 
