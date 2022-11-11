@@ -25,7 +25,7 @@ hasProcessingProvider=no
 # Tags are comma separated with spaces allowed
 tags=python,mce,ahp,wlc,fuzzy
 
-homepage=http://homepage
+#homepage=http://homepage
 category=Vector
 icon=icon.png
 # experimental flag
