@@ -520,7 +520,7 @@ Number of constraints: {2}
         <translation>Choose CSV file</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="960"/>
+        <location filename="../event_tools/initialiseAll.py" line="959"/>
         <source>
 Sauvegarde du résultat de:
 </source>

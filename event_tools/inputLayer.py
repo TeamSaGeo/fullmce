@@ -1,7 +1,7 @@
 import ntpath
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsVectorLayer, QgsField
 from qgis.PyQt.QtCore import QVariant
-from qgis.core import QgsField
+
 
 class InputLayer:
     def __init__(self, path):

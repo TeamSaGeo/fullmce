@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import Qt, QCoreApplication, QEventLoop, QTimer
+from qgis.PyQt.QtCore import Qt, QCoreApplication, QEventLoop, QTimer, QFile
 from qgis.PyQt.QtGui import QFont, QTextCursor, QPixmap
 from qgis.PyQt.QtWidgets import *
 from qgis.core import QgsVectorFileWriter, QgsProcessingFeedback
@@ -32,33 +32,33 @@ class initialiseAll:
         self.list_inputLayers = []
 
     def display_plugin_info(self):
-        concepteurpath = os.path.join(
-            self.iface.plugin_dir, 'event_tools/concepteur.csv')
+        # concepteurpath = QFile(':/plugins/fullmce/event_tools/concepteur.csv')
+        # concepteurs = []
+        # if concepteurpath.open(QFile.ReadOnly):
+        #     concepteur_header = concepteurpath.readLine()
+        #     while (not concepteurpath.atEnd()):
+        #         line = str(concepteurpath.readLine(),"utf-8")
+        #         concepteurs.append(line.rstrip('\n').split(";"))
+        #     concepteurpath.close()
 
-        concepteurs = []
-        with open(concepteurpath, mode='r') as infile:
-            concepteur_header = next(infile)
-            for row in infile:
-                data = row.rstrip('\n').split(";")
-                concepteurs.append(data)
 
-        # Populate GB_DEVELOPER
-        devbox = QVBoxLayout()  # create groupbox layout
-        developper = " ".join(concepteurs[-1][1::-1])
-        labeldevelopper = QLabel(developper)
-        labeldevelopper.setFont(self.myFont)
-        devbox.addWidget(labeldevelopper)
-        self.iface.dlg.GB_DEVELOPER.setLayout(devbox)
-
-        # Populate GB_CONCEPTEUR
-        conceptbox = QVBoxLayout()  # create groupbox layout
-        for concepteur in concepteurs:
-            concepteurtxt = " ".join(concepteur[1::-1])
-            concepteurtxt += " (" + concepteur[-1] + ")"
-            labelconcepteur = QLabel(concepteurtxt)
-            labelconcepteur.setFont(self.myFont)
-            conceptbox.addWidget(labelconcepteur)
-            self.iface.dlg.GB_CONCEPTEUR.setLayout(conceptbox)
+        # # Populate GB_DEVELOPER
+        # devbox = QVBoxLayout()  # create groupbox layout
+        # developper = " ".join(concepteurs[-1][1::-1])
+        # labeldevelopper = QLabel(developper)
+        # labeldevelopper.setFont(self.myFont)
+        # devbox.addWidget(labeldevelopper)
+        # self.iface.dlg.GB_DEVELOPER.setLayout(devbox)
+        #
+        # # Populate GB_CONCEPTEUR
+        # conceptbox = QVBoxLayout()  # create groupbox layout
+        # for concepteur in concepteurs:
+        #     concepteurtxt = " ".join(concepteur[1::-1])
+        #     concepteurtxt += " (" + concepteur[-1] + ")"
+        #     labelconcepteur = QLabel(concepteurtxt)
+        #     labelconcepteur.setFont(self.myFont)
+        #     conceptbox.addWidget(labelconcepteur)
+        #     self.iface.dlg.GB_CONCEPTEUR.setLayout(conceptbox)
 
         # Populate TE_INFO
         text = QCoreApplication.translate("full_mce","Ce plugin a été spécialement dévéloppé par l'Institut Pasteur de Madagascar dans le cadre d'une étude sur la surveillance constante du paludisme et la détermination des zones prioritaires aux Campagnes d'Aspertion Intra-Domiciliaire (CAID) à Madagascar. Son utilisation est privilégié dans le domaine de la santé publique.")
@@ -945,34 +945,36 @@ class initialiseAll:
         if text_edit == self.iface.dlg.TE_RUN_PROCESS_CONTRAINTE :
             list_object = self.listContraintes
             list_object_not_ready = self.listContraintesNotReady
-            process = QCoreApplication.translate("classification","Reclassification")
             file_extension = "_bool.shp"
+            process = QCoreApplication.translate("classification","Reclassification")
             field_extension = "Bl"
         else:
             list_object  = self.listFactors
             list_object_not_ready = self.listFactorsNotNormalized
-            process = QCoreApplication.translate("normalisation","Normalisation")
             file_extension = "_fuzz.shp"
+            process = QCoreApplication.translate("normalisation","Normalisation")
             field_extension = "Fz"
-
         text_edit.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
         separator = "#######################################################"
         text_edit.append(separator + QCoreApplication.translate("full_mce","\nSauvegarde du résultat de:\n"))
-
         if reply == QMessageBox.Yes:
             for inputLayer in self.list_inputLayers:
                 object_not_ready = self.objects_same_inputLayer(inputLayer,list_object_not_ready)
                 if object_not_ready != []:
                     output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),inputLayer.name + file_extension)
                     inputLayer.setreclass_output(output_path)
-                    QgsVectorFileWriter.writeAsVectorFormat(inputLayer.vlayer, inputLayer.reclass_output, 'utf-8', inputLayer.vlayer.crs(), 'ESRI Shapefile')
+                    options = QgsVectorFileWriter.SaveVectorOptions()
+                    if not os.path.exists(output_path):
+                        options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteFile
+                    else :
+                        options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
+                    options.fileEncoding = "utf-8"
+                    options.driverName = 'ESRI Shapefile'
+                    QgsVectorFileWriter.writeAsVectorFormat(inputLayer.vlayer, inputLayer.reclass_output, options)
                     self.set_fields(object_not_ready,field_extension,inputLayer, text_edit,True)
-
-                    # Remove temp fields
-                    for object in object_not_ready:
+                    for object in object_not_ready: # Remove temp fields
                         inputLayer.delete_new_field(object.field_name)
-                    # Set object new path
-                    inputLayer.setpath(inputLayer.reclass_output)
+                    inputLayer.setpath(inputLayer.reclass_output) # Set object new path
                     inputLayer.isValid()
         else:
             self.set_fields(list_object_not_ready,field_extension,None, text_edit,False)
@@ -992,6 +994,7 @@ class initialiseAll:
             object.setfield_idx(inputLayer.vlayer.fields().indexFromName(new_field_name))
             # Set Ready
             object.setready(2)
+
             # Set path
             path = inputLayer.reclass_output if new_output_path else object.inputLayer.path
             text_edit.append(QCoreApplication.translate("full_mce","\"{0}\" dans le champ {2} du fichier {1}\n").format(object.name,path, object.field_name))

@@ -2,5 +2,6 @@
     <qresource prefix="/plugins/fullmce" >
         <file>icon.png</file>
         <file>images/saaty.png</file>
+        <file>event_tools/concepteur.csv</file>
     </qresource>
 </RCC>
