@@ -32,14 +32,14 @@ class initialiseAll:
         self.list_inputLayers = []
 
     def display_plugin_info(self):
-        # concepteurpath = QFile(':/plugins/fullmce/event_tools/concepteur.csv')
-        # concepteurs = []
-        # if concepteurpath.open(QFile.ReadOnly):
-        #     concepteur_header = concepteurpath.readLine()
-        #     while (not concepteurpath.atEnd()):
-        #         line = str(concepteurpath.readLine(),"utf-8")
-        #         concepteurs.append(line.rstrip('\n').split(";"))
-        #     concepteurpath.close()
+        concepteurpath = QFile(':/plugins/fullmce/event_tools/concepteur.csv')
+        concepteurs = []
+        if concepteurpath.open(QFile.ReadOnly):
+            concepteur_header = concepteurpath.readLine()
+            while (not concepteurpath.atEnd()):
+                line = str(concepteurpath.readLine(),"utf-8")
+                concepteurs.append(line.rstrip('\n').split(";"))
+            concepteurpath.close()
 
 
         # # Populate GB_DEVELOPER
