@@ -30,12 +30,13 @@ class Aggregation:
             QgsMessageLog.logMessage(str(e), level=Qgis.Critical)
             return str(e)
 
-    def joinbylocation(self,inputpath,joinpath):
+    def joinbylocation(self,inputpath,joinpath,joinfieldsname):
         context = processing.tools.dataobjects.createContext()
         context.setInvalidGeometryCheck(QgsFeatureRequest.GeometryNoCheck)
         return processing.run("qgis:joinattributesbylocation",
         {"INPUT":inputpath,
         "JOIN":joinpath,
+        "JOIN_FIELDS" : joinfieldsname,
         "PREDICATE":[2],
         "METHOD":0,
         "OUTPUT":QgsProcessing.TEMPORARY_OUTPUT}, context=context)

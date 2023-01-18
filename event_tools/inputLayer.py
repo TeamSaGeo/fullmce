@@ -42,6 +42,25 @@ class InputLayer:
                 list_field_idx.append(element.field_idx)
         return False
 
+    def newfieldname_exist (self, type, name):
+        field_extension = "Fz" if type == "factor" else "Bl"
+        new_field_name = name + field_extension
+        if new_field_name in self.vlayer.fields().names():
+            return True
+        else:
+            return False
+
+    def newfieldname_is_duplicated (self,type):
+        list_name = []
+        field_extension = "Fz" if type == "factor" else "Bl"
+        for element in self.elements:
+            if element.type == type:
+                new_field_name = element.name + field_extension
+                if new_field_name in list_name:
+                    return True
+                list_name.append(new_field_name)
+        return False
+
     def setreclass_output(self,output_path):
         self.reclass_output = output_path
 

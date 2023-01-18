@@ -127,13 +127,13 @@ class initialiseAll:
         columns = [name, fonctions, sens, "A", inclued_value, "B", inclued_value, "C",inclued_value, "D", inclued_value]
         tab.setColumnCount(len(columns))
         tab.setHorizontalHeaderLabels(columns)
+        tab.setColumnWidth(0,75)
         tab.horizontalHeader().setSectionResizeMode(1,QHeaderView.Stretch)
         for i in range(3,11):
             if (i % 2) == 0:
                 tab.horizontalHeader().setSectionResizeMode(i,QHeaderView.ResizeToContents)
             else:
-                tab.setColumnWidth(i,80)
-
+                tab.setColumnWidth(i,75)
         tab.verticalHeader().setVisible(True)
         tab.setRowCount(0)
 
@@ -490,32 +490,32 @@ class initialiseAll:
         scr.setText(inputData.inputLayer.vlayer.crs().description())
 
     def input_row_filled(self, element, i):
-        if not element.name or element.inputLayer.path == "" or element.inputLayer.field_is_duplicated(element.type):
-            type = "contrainte" if element.type == "contraint" else "facteur"
-            msg_name = QCoreApplication.translate("full_mce","Saisir un nom pour le {0} n° {1}").format(type,i+1)
-            msg_path = QCoreApplication.translate("full_mce","Sélectionner un vecteur pour le {0} n° {1}").format(type,i+1)
-            msg_field = QCoreApplication.translate("full_mce","Champ dupliqué! Choisir des champs différents pour les {0}s issus du même fichier source.").format(type)
-            error_msg = msg_name if not element.name else msg_path if element.inputLayer.path == "" else msg_field
-            button = QMessageBox.information(
-                self.iface.dlg,
-                self.error_title,
-                f"{error_msg}",
-            )
+        type = "contrainte" if element.type == "contraint" else "facteur"
+        error_msg = ""
+        if not element.name :
+            error_msg = QCoreApplication.translate("full_mce","Saisir un nom pour le {0} n° {1}").format(type,i+1)
+        elif element.inputLayer.path == "":
+            error_msg = QCoreApplication.translate("full_mce","Sélectionner un vecteur pour le {0} n° {1}").format(type,i+1)
+        elif element.inputLayer.newfieldname_exist(element.type, element.name):
+            error_msg = QCoreApplication.translate("full_mce","Le nom du {0} n° {1} existe déjà! Saisir un autre nom.").format(type,i+1)
+        elif element.inputLayer.field_is_duplicated(element.type):
+            error_msg = QCoreApplication.translate("full_mce","Champ dupliqué! Choisir des champs différents pour les {0}s issus du même fichier source.").format(type)
+        elif element.inputLayer.newfieldname_is_duplicated(element.type) :
+            error_msg = QCoreApplication.translate("full_mce","Nom dupliqué! Choisir des noms différents pour les {0}s issus du même fichier source.").format(type)
+        if error_msg != "":
+            button = QMessageBox.information(self.iface.dlg,self.error_title,f"{error_msg}",)
             return False
-        else:
-            return True
+        return True
 
     def contraintes_filled(self):
         # Re-initialize the list of contrainte not ready
         self.listContraintesNotReady = self.listContraintes.copy()
-
         # Clear reclassification table
         self.iface.dlg.LV_CONTRAINTE_NOT_READY.clear()
         nb_tab = self.iface.dlg.STACKED_WIDGET_RECLASS.count()
         for ind in range(nb_tab-1,-1,-1):
             tab = self.iface.dlg.STACKED_WIDGET_RECLASS.widget(ind)
             self.iface.dlg.STACKED_WIDGET_RECLASS.removeWidget(tab)
-
         # Start writing log
         now = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
         output_dir = self.iface.dlg.LE_OUTPUT_DIR.text()
@@ -842,6 +842,7 @@ class initialiseAll:
 
             # if multiple layers, Join them by location
             input_path = max_size_layer.path
+            fieldsname = max_size_layer.vlayer.fields().names()
             if len(self.list_inputLayers) != 1:
                 # Take off maximum size layer
                 list_inputLayers = self.list_inputLayers.copy()
@@ -850,14 +851,13 @@ class initialiseAll:
                     # Commit changes if modified layers not saved
                     input.vlayer.commitChanges()
                     # joinbylocation
-                    #  ---- amboary ito sarah ------
-                    # joinfields = list(set(fields.extend(input.vlayer.fields())))
-                    result = aggregation.joinbylocation(input_path,input.path)
+                    joinfieldsname = list(set(input.vlayer.fields().names()).difference(fieldsname))
+                    result = aggregation.joinbylocation(input_path,input.path,joinfieldsname)
                     input_path = result['OUTPUT']
-                    # fields = joinfields
+                    fieldsname = fieldsname.extend(joinfieldsname)
 
             # Agregate
-            self.append_edittext("\nLancement de l'agrégation ...")
+            self.append_edittext(QCoreApplication.translate("aggregation","\nLancement de l'agrégation ..."))
             output_path = os.path.join(self.iface.dlg.LE_OUTPUT_DIR.text(),"resultat_final.shp" )
             result = aggregation.aggregate(input_path,expression,output_path)
 

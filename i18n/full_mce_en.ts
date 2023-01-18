@@ -246,6 +246,13 @@ Creating the expression...</translation>
         <translation>Expression = </translation>
     </message>
     <message>
+        <location filename="../event_tools/initialiseAll.py" line="860"/>
+        <source>
+Lancement de l'agrégation ...</source>
+        <translation>
+Aggregation loading ...</translation>
+    </message>
+    <message>
         <location filename="../event_tools/initialiseAll.py" line="865"/>
         <source>Sauvegarde du résultat dans </source>
         <translation>Saving result in</translation>
@@ -485,9 +492,14 @@ Number of constraints: {2}
         <translation>Choose a valid file!</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="497"/>
+        <location filename="../event_tools/initialiseAll.py" line="502"/>
         <source>Champ dupliqué! Choisir des champs différents pour les {0}s issus du même fichier source.</source>
-        <translation>Duplicate field! Choose different fields for {0}s from the same source file.</translation>
+        <translation>Duplicated field! Choose different fields for {0}s from the same source file.</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="504"/>
+        <source>Nom dupliqué! Choisir des noms différents pour les {0}s issus du même fichier source.</source>
+        <translation>Duplicated name! Choose different names for {0}s from the same source file.</translation>
     </message>
     <message>
         <location filename="../event_tools/initialiseAll.py" line="536"/>
@@ -542,7 +554,7 @@ Saving the result of:
         <translation>&quot;{0}&quot; at the field {2} in file {1}</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="495"/>
+        <location filename="../event_tools/initialiseAll.py" line="496"/>
         <source>Saisir un nom pour le {0} n° {1}</source>
         <translation>Enter a name to the {0} n° {1}</translation>
     </message>
@@ -582,9 +594,14 @@ Saving the result of:
         <translation>Choose a value amongst Saaty scale below:</translation>
     </message>
     <message>
-        <location filename="../event_tools/initialiseAll.py" line="496"/>
+        <location filename="../event_tools/initialiseAll.py" line="498"/>
         <source>Sélectionner un vecteur pour le {0} n° {1}</source>
         <translation>Choose a vector for {0} n° {1}</translation>
+    </message>
+    <message>
+        <location filename="../event_tools/initialiseAll.py" line="500"/>
+        <source>Le nom du {0} n° {1} existe déjà! Saisir un autre nom.</source>
+        <translation>The name of the {0} n° {1} already exist! Enter another name</translation>
     </message>
 </context>
 <context>
