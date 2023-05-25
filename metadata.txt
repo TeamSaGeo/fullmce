@@ -24,7 +24,7 @@ hasProcessingProvider=no
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=python,mce,ahp,wlc,fuzzy
+tags=vector,mce,ahp,wlc,fuzzy
 
 homepage=https://github.com/famenontsoa/fullmce_Sarah/
 category=Vector
