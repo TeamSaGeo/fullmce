@@ -7,14 +7,14 @@ name=Full MCE for Public Health
 qgisMinimumVersion=3.0
 description=Full Multicriteria Evaluation tool for Public Health
 version=0.1
-author=Sarah FAMENONTSOA, Anthonio RAKOTOARISON, Fanjasoa RAKOTOMANANA
-email=sfamenontsoa@gmail.com
+author=Sarah FAMENONTSOA, Mampionona RASAMIMALALA, Anthonio RAKOTOARISON, Fanjasoa RAKOTOMANANA
+email=groupesageoipm@gmail.com
 
 # about=This plugin is a full multicriteria evaluation (MCE) tool for vector data. It allows: - to reclassify constraints to boolean - to normalize factors - to get weight of each factors using a pairwise comparison matrix - to combine constraints and weighted factors using Weighted Linear Combination (WLC)
 about=Ce plugin est un outil complet d'évaluation multicritère (MCE) pour les données vectorielles. Il permet : - de reclasser les contraintes en booléen - de standardiser les facteurs - d'obtenir le poids de chaque facteur par la méthode de comparaison par paires - d'agréger les contraintes et les facteurs pondérés par la méthode de combinaison linéaire pondérée (WLC)
 
-tracker=https://github.com/famenontsoa/fullmce_Sarah/issues
-repository=https://github.com/famenontsoa/fullmce_Sarah/
+tracker=https://github.com/TeamSaGeo/fullmce/issues
+repository=https://github.com/TeamSaGeo/fullmce/
 # End of mandatory metadata
 
 # Recommended items:
@@ -26,7 +26,7 @@ hasProcessingProvider=no
 # Tags are comma separated with spaces allowed
 tags=vector,mce,ahp,wlc,fuzzy
 
-homepage=https://github.com/famenontsoa/fullmce_Sarah/
+homepage=https://github.com/TeamSaGeo/fullmce/
 category=Vector
 icon=icon.png
 # experimental flag
